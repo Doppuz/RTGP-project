@@ -68,7 +68,11 @@
 			"xstring": "cpp",
 			"xtr1common": "cpp",
 			"xtree": "cpp",
-			"xutility": "cpp"
+			"xutility": "cpp",
+			"array": "cpp",
+			"iterator": "cpp",
+			"numeric": "cpp",
+			"random": "cpp"
 		}
 	}
 }
