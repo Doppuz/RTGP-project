@@ -29,7 +29,9 @@
 
 #include <utils/mesh_v1.h>
 
-# include <utils/FastNoiseLite.h>
+#include <utils/FastNoiseLite.h>
+
+#include <utils/terrain.h>
 
 // dimensions of application's window
 GLuint screenWidth = 800, screenHeight = 600;
@@ -82,6 +84,10 @@ vector<GLint> textureID;
 //FPS
 double lastTime = glfwGetTime();
 int nbFrames = 0;
+
+//youtube Terrain example variable
+const float maxHeight =  40;
+const float maxPixelColor =  256 * 256 * 256;
 
 /////////////////// MAIN function ///////////////////////
 int main(){
@@ -143,18 +149,22 @@ int main(){
     
     glm::mat4 modelMatrix = glm::mat4(1.0f);     
     modelMatrix = glm::scale(modelMatrix,glm::vec3(1.0f,1.0f,1.0f));
+    modelMatrix = glm::translate(modelMatrix, glm::vec3(-400.0f, -100.0f, -900.0f));
 
-    GLint grassTexture = LoadTexture("../../textures/plane/ground.jpg");
+    GLint groundTexture = LoadTexture("../../textures/plane/ground.jpg");
+    GLint grassTexture = LoadTexture("../../textures/plane/ground2.jpg");
     GLint snowTexture = LoadTexture("../../textures/plane/snow.jpg");
-
-    textureID.push_back(grassTexture);
-    textureID.push_back(snowTexture);
 
     //GLint textureNoise = createNoise();
 
     bool prova = false; 
 
-    Model cubeModel("../../models/plane.obj");
+    //Model cubeModel("../../models/plane.obj");
+
+    Terrain terrain(0,0);
+    //for(int i = 0; i < terrain.terrainMesh.vertices.size(); i++){
+    //    std::cout << terrain.terrainMesh.vertices[i].Position.x << " " << terrain.terrainMesh.vertices[i].Position.y << " " << terrain.terrainMesh.vertices[i].Position.z << std::endl;
+    //}
     
 
     // Rendering loop: this code is executed at each frame
@@ -179,32 +189,25 @@ int main(){
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        shader.setInt("grassTexture",0);
+        shader.setInt("groundTexture",0);
         shader.setInt("snowTexture",1);
+        shader.setInt("grassTexture",2);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, grassTexture);
+        glBindTexture(GL_TEXTURE_2D, groundTexture);
 
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, snowTexture);
 
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, grassTexture);
+
         if(!prova){
-            int t = 0;
-            for(int i = 0; i < cubeModel.meshes[0].indices.size(); i++){
-                float y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-                //cubeModel.meshes[0].vertices[i].Position.y = 5 * y;
-                //cubeModel.meshes[0].vertices[i].Position.x = 1;
-                //cubeModel.meshes[0].vertices[i].Position.z = 1;
-                //std::cout << cubeModel.meshes[0].vertices[i].Position.x << " " << cubeModel.meshes[0].vertices[i].Position.y << " " <<cubeModel.meshes[0].vertices[i].Position.z << std::endl;               
-                //std::cout << "A " << cubeModel.meshes[0].indices[i] << std::endl;
-                prova = true;
-                t += 1;
-            }
             //std::cout << "AA " << t << std::endl;
             prova = true;
-            createNoise(&cubeModel.meshes[0]);
+            createNoise(&terrain.terrainMesh);
             //std::cout << cubeModel.meshes[0].vertices.size();
-            cubeModel.meshes[0].SetupMesh();
+            terrain.terrainMesh.SetupMesh();
             //setupMesh(cubeModel.meshes[0]);
         }
         //generateTerrain(128,128);
@@ -213,7 +216,7 @@ int main(){
         shader.setMat4("model", modelMatrix);
 
         // we render the model
-        cubeModel.Draw();     
+        terrain.draw();     
         /*glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, cubeModel.meshes[0].indices.size(), GL_UNSIGNED_INT,0);
         glBindVertexArray(0);*/
@@ -310,6 +313,10 @@ GLint LoadTexture(const char* path){
 void createNoise(Mesh *m){
     int width = 128;
     int height = 128;
+    int w, h, channels;
+    unsigned char* image;
+
+    
     /*noise::module::Perlin perlinNoise;
     // Base frequency for octave 1.
     /*perlinNoise.SetFrequency(4.0);
@@ -354,22 +361,40 @@ void createNoise(Mesh *m){
     FastNoiseLite noise;
     noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
 
-    // Gather noise data
-    float *noiseData = new float[128 * 128];
     int index = 0;
-
-    for (int y = 0; y < 128; y++)
-    {
-        for (int x = 0; x < 128; x++)
-        {
-            noiseData[index++] = noise.GetNoise((float)x, (float)y);
+    for (int y = 0; y < 256; y++){
+        for (int x = 0; x < 256; x++){
+            m->vertices[index].Position.y = 50 *  noise.GetNoise((float)x, (float)y);
+            index += 1;
         }
     }
 
-    for (GLuint i = 0; i < m->vertices.size(); ++i) { 
-        m->vertices[i].Position.y = 20 * noiseData[i]; 
-    } 
+    // Gather noise data
+    /*vector<vector<float>> matrix;
+    int index = 0;
 
+    for (int y = 0; y < 128; y++){
+        vector<float> row;
+        for (int x = 0; x < 128; x++){
+            row.push_back(noise.GetNoise((float)x, (float)y));
+        }
+        matrix.push_back(row);
+    }
+
+    for (GLuint i = 0; i < m->vertices.size(); ++i) { 
+        int x = (int)m->vertices[i].Position.x;
+        int y = (int)m->vertices[i].Position.y;
+
+        if(x < 0)
+            x = x + 5;
+
+        if(y < 0)
+            y = y + 5;
+
+        m->vertices[i].Position.y = 10 * matrix[x][y];
+ 
+        
+    } */
     // Do something with this data...
 
     // Free data later
@@ -480,7 +505,7 @@ void generateTerrain(int wRes = 128, int lRes = 128){
      nbFrames++;
      if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1 sec ago
          // printf and reset timer
-         printf("%f ms/frame\n", 1000.0/double(nbFrames));
+         //printf("%f ms/frame\n", 1000.0/double(nbFrames));
          nbFrames = 0;
          lastTime += 1.0;
      }

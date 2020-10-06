@@ -8,12 +8,15 @@ in vec2 outTexture;
 
 in float h;
 
-uniform sampler2D grassTexture;
+uniform sampler2D groundTexture;
 uniform sampler2D snowTexture;
+uniform sampler2D grassTexture;
 
 void main(){
-    //if(h < 12.0f)
+    //if(h < -15.0f)
+    //    FragColor = texture(groundTexture, outTexture);
+     if (h > 35)
+        FragColor = texture(snowTexture, outTexture);
+    else
         FragColor = texture(grassTexture, outTexture);
-    //else
-    //    FragColor = texture(snowTexture, outTexture);
 }
