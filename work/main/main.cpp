@@ -49,6 +49,8 @@ void generateTerrain(int wRes, int lRes);
 void setupMesh(Mesh m);
 //FPS
 void calculateFPS();
+//ComputeNormal
+void calculateNormal(vector<vector<Vertex>> m, Mesh *mesh);
 
 //First movement bool
 bool firstMouse = true;
@@ -186,7 +188,7 @@ int main(){
         lastFrame = currentFrame;
 
         // we "clear" the frame and z  buffer
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.setInt("groundTexture",0);
@@ -316,7 +318,7 @@ void createNoise(Mesh *m){
     int w, h, channels;
     unsigned char* image;
 
-    
+    vector<vector<Vertex>> matrix;
     /*noise::module::Perlin perlinNoise;
     // Base frequency for octave 1.
     /*perlinNoise.SetFrequency(4.0);
@@ -363,11 +365,30 @@ void createNoise(Mesh *m){
 
     int index = 0;
     for (int y = 0; y < 256; y++){
+        vector<Vertex> temp;
         for (int x = 0; x < 256; x++){
             m->vertices[index].Position.y = 50 *  noise.GetNoise((float)x, (float)y);
+            temp.push_back(m->vertices[index]);
             index += 1;
         }
+        matrix.push_back(temp);
     }
+
+    index = 0;
+    /*for (int y = 0; y < 5; y++){
+        for (int x = 0; x < 5; x++){
+            std::cout << m->vertices[index].Normal.x << m->vertices[index].Normal.y << m->vertices[index].Normal.z << std::endl;
+            index += 1;
+        }
+    }*/
+    calculateNormal(matrix, m);
+    /*index = 0;
+    for (int y = 0; y < 5; y++){
+        for (int x = 0; x < 5; x++){
+            std::cout << m->vertices[index].Normal.x << " " << m->vertices[index].Normal.y <<  " " << m->vertices[index].Normal.z << std::endl;
+            index += 1;
+        }
+    }*/
 
     // Gather noise data
     /*vector<vector<float>> matrix;
@@ -496,7 +517,22 @@ void generateTerrain(int wRes = 128, int lRes = 128){
 		return h;
 	}*/
 
-
+    void calculateNormal(vector<vector<Vertex>> m, Mesh *mesh){
+        int index = 0;
+        for(int i = 0; i < m.size(); i++){
+            for(int j = 0; j < m[i].size(); j++){
+                float hL,hR,hD,hU = 0;
+                hL =  m[i][(j-1)%m[i].size()].Position.y;
+                hR =  m[i][(j+1)%m[i].size()].Position.y;
+                hD =  m[(i-1)%m.size()][j].Position.y;
+                hU =  m[(i+1)%m.size()][j].Position.y;
+                glm::vec3 normal = glm::vec3(hL - hR, 2.0f, hD - hU);
+                glm::normalize(normal);
+                mesh->vertices[index].Normal = normal;
+                index = index + 1;
+            }
+        }
+    }
 
  void calculateFPS(){
 
