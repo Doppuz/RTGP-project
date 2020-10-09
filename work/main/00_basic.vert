@@ -5,11 +5,20 @@
 // the number used for the location in the layout qualifier is the position of the vertex attribute
 // as defined in the Mesh class
 layout (location = 0) in vec3 pos;
+layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texCoord;
+
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+
+uniform vec3 pointLightPosition;
+
+// light incidence direction (calculated in vertex shader, interpolated by rasterization)
+out vec3 lightDir;
+// the transformed normal has been calculated per-vertex in the vertex shader
+out vec3 vNormal;
 
 out vec2 outTexture;
 out float h;
@@ -147,6 +156,10 @@ float noise (in vec2 st) {
 void main() {
 	//float height = noise(pos.xz);
 	outTexture = texCoord;
+  vNormal = normal;
+  // light incidence direction (in view coordinate)
+  vec4 lightPos = view  * vec4(pointLightPosition, 1.0);
+  lightDir = lightPos.xyz - pos.xyz;
   h = pos.y;
   gl_Position = projection * view * model * vec4(pos, 1.0f);
 }

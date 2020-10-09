@@ -87,9 +87,14 @@ vector<GLint> textureID;
 double lastTime = glfwGetTime();
 int nbFrames = 0;
 
-//youtube Terrain example variable
-const float maxHeight =  40;
-const float maxPixelColor =  256 * 256 * 256;
+//lightPosition
+glm::vec3 lightPos = glm::vec3(5.0f, 10.0f, 10.0f);
+
+//diffuseComponent
+glm::vec3 diffuseColor = glm::vec3(1.0f,0.0f,0.0f);
+GLfloat Kd = 0.5f;
+
+
 
 /////////////////// MAIN function ///////////////////////
 int main(){
@@ -179,6 +184,11 @@ int main(){
         // View matrix (=camera): position, view direction, camera "up" vector
         view = camera.GetViewMatrix();
         shader.setMat4("view", view);
+
+        //light
+        shader.setVec3("pointLightPosition",lightPos);
+        shader.setVec3("diffuseColor",diffuseColor);
+        shader.setFloat("Kd",Kd);
 
         // Check is an I/O event is happening
         glfwPollEvents();

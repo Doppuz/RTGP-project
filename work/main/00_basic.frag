@@ -12,6 +12,33 @@ uniform sampler2D groundTexture;
 uniform sampler2D snowTexture;
 uniform sampler2D grassTexture;
 
+// ambient, diffusive and specular components (passed from the application)
+uniform vec3 diffuseColor;
+
+// weight of the components
+// in this case, we can pass separate values from the main application even if Ka+Kd+Ks>1. In more "realistic" situations, I have to set this sum = 1, or at least Kd+Ks = 1, by passing Kd as uniform, and then setting Ks = 1.0-Kd
+
+uniform float Kd;
+
+// light incidence direction (calculated in vertex shader, interpolated by rasterization)
+in vec3 lightDir;
+// the transformed normal has been calculated per-vertex in the vertex shader
+in vec3 vNormal;
+
+vec3 Lambert() // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
+{
+    // normalization of the per-fragment normal
+    vec3 N = normalize(vNormal);
+    // normalization of the per-fragment light incidence direction
+    vec3 L = normalize(lightDir.xyz);
+
+    // Lambert coefficient
+    float lambertian = max(dot(L,N), 0.0);
+
+    // Lambert illumination model  
+    return vec3(Kd * lambertian * diffuseColor);
+}
+
 void main(){
     //if(h < -15.0f)
     //    FragColor = texture(groundTexture, outTexture);
@@ -28,5 +55,6 @@ void main(){
          (1 - ((abs(h) - 20) / 30)) * texture(grassTexture, outTexture) ;
     else if (h < -50)
         FragColor = texture(groundTexture, outTexture);
+    //FragColor = vec4(Lambert(), 1.0);
     
 }
