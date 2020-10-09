@@ -1,6 +1,8 @@
 
 // Std. Includes
 #include <string>
+#include <stdlib.h>
+#include <ctime>
 
 #ifdef _WIN32
     #define APIENTRY __stdcall
@@ -372,12 +374,19 @@ void createNoise(Mesh *m){
     // Create and configure FastNoise object
     FastNoiseLite noise;
     noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+    srand((unsigned) time(0));
+    noise.SetSeed(rand() % 1000000);
+    noise.SetFrequency(0.02f);
+    noise.SetFractalType(FastNoiseLite::FractalType_FBm);
+    noise.SetFractalOctaves(5);
+    noise.SetFractalLacunarity(2.0f);
+    noise.SetFractalGain(0.5f);
 
     int index = 0;
     for (int y = 0; y < 256; y++){
         vector<Vertex> temp;
         for (int x = 0; x < 256; x++){
-            m->vertices[index].Position.y = 50 *  noise.GetNoise((float)x, (float)y);
+            m->vertices[index].Position.y = 100 *  noise.GetNoise((float)x, (float)y);
             temp.push_back(m->vertices[index]);
             index += 1;
         }
@@ -391,7 +400,7 @@ void createNoise(Mesh *m){
             index += 1;
         }
     }*/
-    calculateNormal(matrix, m);
+    //calculateNormal(matrix, m);
     /*index = 0;
     for (int y = 0; y < 5; y++){
         for (int x = 0; x < 5; x++){
