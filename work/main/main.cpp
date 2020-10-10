@@ -65,6 +65,7 @@ GLfloat lastX, lastY;
 
 //Movement with wasd
 void apply_camera_movements(GLFWwindow* window);
+void light_movements(GLFWwindow* window);
 
 // parameters for time calculation (for animations)
 GLfloat deltaTime = 0.0f;
@@ -77,7 +78,7 @@ glm::mat4 projection;
 glm::mat4 view = glm::mat4(1.0f);
 
 //Camera
-Camera camera(glm::vec3(0.0f, 10.0f, 150.0f), GL_FALSE);
+Camera camera(glm::vec3(0.0f, 800.0f, 150.0f), GL_FALSE);
 
 // vector for the textures IDs
 vector<GLint> textureID;
@@ -89,12 +90,13 @@ vector<GLint> textureID;
 double lastTime = glfwGetTime();
 int nbFrames = 0;
 
-//lightPosition
-glm::vec3 lightPos = glm::vec3(5.0f, 10.0f, 10.0f);
+//light
+glm::vec3 lightPos = glm::vec3(0.0f, 1000.0f,300.0f);
+GLfloat lightMovement = 10.0f;
 
 //diffuseComponent
 glm::vec3 diffuseColor = glm::vec3(1.0f,0.0f,0.0f);
-GLfloat Kd = 0.5f;
+GLfloat Kd = 0.7f;
 
 
 
@@ -182,6 +184,7 @@ int main(){
         calculateFPS();
 
         apply_camera_movements(window);
+        light_movements(window);
 
         // View matrix (=camera): position, view direction, camera "up" vector
         view = camera.GetViewMatrix();
@@ -264,6 +267,18 @@ void apply_camera_movements(GLFWwindow* window){
         camera.ProcessKeyboard(LEFT, deltaTime);
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         camera.ProcessKeyboard(RIGHT, deltaTime);
+}
+
+//Light key movement.
+void light_movements(GLFWwindow* window){
+    if(glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
+        lightPos.y += lightPos.y * lightMovement * deltaTime; 
+    if(glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
+        lightPos.y -= lightPos.y * lightMovement * deltaTime; 
+    if(glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+        lightPos.z += lightPos.z * lightMovement * deltaTime; 
+    if(glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+        lightPos.z -= lightPos.z * lightMovement * deltaTime; 
 }
 
 // callback for mouse events
@@ -376,6 +391,7 @@ void createNoise(Mesh *m){
     noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
     srand((unsigned) time(0));
     noise.SetSeed(rand() % 1000000);
+    noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
     noise.SetFrequency(0.02f);
     noise.SetFractalType(FastNoiseLite::FractalType_FBm);
     noise.SetFractalOctaves(5);
@@ -383,10 +399,10 @@ void createNoise(Mesh *m){
     noise.SetFractalGain(0.5f);
 
     int index = 0;
-    for (int y = 0; y < 256; y++){
+    for (int y = 0; y < 128; y++){
         vector<Vertex> temp;
-        for (int x = 0; x < 256; x++){
-            m->vertices[index].Position.y = 100 *  noise.GetNoise((float)x, (float)y);
+        for (int x = 0; x < 128; x++){
+            m->vertices[index].Position.y = 500 *  noise.GetNoise((float)x, (float)y);
             temp.push_back(m->vertices[index]);
             index += 1;
         }
@@ -400,7 +416,7 @@ void createNoise(Mesh *m){
             index += 1;
         }
     }*/
-    //calculateNormal(matrix, m);
+    calculateNormal(matrix, m);
     /*index = 0;
     for (int y = 0; y < 5; y++){
         for (int x = 0; x < 5; x++){
@@ -560,7 +576,7 @@ void generateTerrain(int wRes = 128, int lRes = 128){
      nbFrames++;
      if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1 sec ago
          // printf and reset timer
-         //printf("%f ms/frame\n", 1000.0/double(nbFrames));
+         printf("%f ms/frame\n", 1000.0/double(nbFrames));
          nbFrames = 0;
          lastTime += 1.0;
      }

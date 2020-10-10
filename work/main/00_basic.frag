@@ -25,8 +25,7 @@ in vec3 lightDir;
 // the transformed normal has been calculated per-vertex in the vertex shader
 in vec3 vNormal;
 
-vec3 Lambert() // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
-{
+vec3 Lambert(sampler2D texture){ // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
     // normalization of the per-fragment normal
     vec3 N = normalize(vNormal);
     // normalization of the per-fragment light incidence direction
@@ -36,14 +35,14 @@ vec3 Lambert() // this name is the one which is detected by the SetupShaders() f
     float lambertian = max(dot(L,N), 0.0);
 
     // Lambert illumination model  
-    return vec3(Kd * lambertian * diffuseColor);
+    return vec3(Kd * lambertian * texture(texture, outTexture));
 }
 
 void main(){
     //if(h < -15.0f)
     //    FragColor = texture(groundTexture, outTexture);
-    float interpolation =  h - 15; 
-    if (h > 35)
+    //float interpolation =  h - 15; 
+    /*if (h > 35)
         FragColor = texture(snowTexture, outTexture);
     else if (h < 15 && h > -20)
         FragColor = texture(grassTexture, outTexture);
@@ -55,6 +54,16 @@ void main(){
          (1 - ((abs(h) - 20) / 30)) * texture(grassTexture, outTexture) ;
     else if (h < -50)
         FragColor = texture(groundTexture, outTexture);
+    */
+    float interpolation =  h - 5; 
+    if (h > 35)
+        FragColor =  vec4(Lambert(snowTexture), 1.0);
+    else if (h < 5)
+        FragColor =  vec4(Lambert(grassTexture), 1.0);
+    else //if(h >= 15 && h <= 35)
+        FragColor = (interpolation / 30) * vec4(Lambert(snowTexture), 1.0) +
+         (1 - (interpolation / 30)) * vec4(Lambert(grassTexture), 1.0) ;
     //FragColor = vec4(Lambert(), 1.0);
-    
+    //FragColor = texture(grassTexture, outTexture);
+    //FragColor = vec4(Lambert(grassTexture), 1.0);
 }
