@@ -46,7 +46,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 GLint LoadTexture(const char* path);
 void createNoise(Mesh *m);
 // Create Terrain
-void generateTerrain(int wRes, int lRes);
+vector<Terrain> generateTerrains(int x, int y);
 //just a try
 void setupMesh(Mesh m);
 //FPS
@@ -78,7 +78,8 @@ glm::mat4 projection;
 glm::mat4 view = glm::mat4(1.0f);
 
 //Camera
-Camera camera(glm::vec3(0.0f, 800.0f, 150.0f), GL_FALSE);
+//Camera camera(glm::vec3(1000.0f, 800.0f, 3000.0f), GL_FALSE);
+Camera camera(glm::vec3(0.0f, 600.0f, 2000.0f), GL_FALSE);
 
 // vector for the textures IDs
 vector<GLint> textureID;
@@ -89,6 +90,7 @@ vector<GLint> textureID;
 //FPS
 double lastTime = glfwGetTime();
 int nbFrames = 0;
+int initialTime = time(NULL), finalTime, frameCount;
 
 //light
 glm::vec3 lightPos = glm::vec3(0.0f, 1000.0f,300.0f);
@@ -98,15 +100,19 @@ GLfloat lightMovement = 10.0f;
 glm::vec3 diffuseColor = glm::vec3(1.0f,0.0f,0.0f);
 GLfloat Kd = 0.7f;
 
+// boolean to activate/deactivate wireframe rendering
+GLboolean wireframe = GL_FALSE;
 
+//Terrain
+int vertices = 170;
 
 /////////////////// MAIN function ///////////////////////
 int main(){
-    
+
     glfwInit();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     // we set if the window is resizable
@@ -155,29 +161,40 @@ int main(){
     Shader shader("00_basic.vert", "00_basic.frag");
     shader.Use();  
 
-    projection = glm::perspective(45.0f, (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
+    //projection = glm::perspective(45.0f, (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
+    projection = glm::perspective(45.0f, (float)screenWidth/(float)screenHeight, 0.1f, 100000.0f);
     shader.setMat4("projection", projection); 
     
-    glm::mat4 modelMatrix = glm::mat4(1.0f);     
-    modelMatrix = glm::scale(modelMatrix,glm::vec3(1.0f,1.0f,1.0f));
-    modelMatrix = glm::translate(modelMatrix, glm::vec3(-400.0f, -100.0f, -900.0f));
+    /*glm::mat4 modelMatrix = glm::mat4(1.0f);     
+    modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));*/
+
+    std::cout << "Before texture" << std::endl;
 
     GLint groundTexture = LoadTexture("../../textures/plane/ground.jpg");
-    GLint grassTexture = LoadTexture("../../textures/plane/ground2.jpg");
+    
+    std::cout << "After 1 texture" << std::endl;
+
     GLint snowTexture = LoadTexture("../../textures/plane/snow.jpg");
 
-    //GLint textureNoise = createNoise();
-
-    bool prova = false; 
-
-    //Model cubeModel("../../models/plane.obj");
-
-    Terrain terrain(0,0);
-    //for(int i = 0; i < terrain.terrainMesh.vertices.size(); i++){
-    //    std::cout << terrain.terrainMesh.vertices[i].Position.x << " " << terrain.terrainMesh.vertices[i].Position.y << " " << terrain.terrainMesh.vertices[i].Position.z << std::endl;
-    //}
+    std::cout << "After 2 texture" << std::endl;
     
+    GLint grassTexture = LoadTexture("../../textures/plane/ground2.jpg");
 
+    std::cout << "After 3 texture" << std::endl;
+
+    Terrain terrain(0,0,vertices);
+    //vector<Terrain> terrains = generateTerrains(10,10);
+    createNoise(&terrain.terrainMesh);
+    terrain.terrainMesh.SetupMesh();
+/*for(int p = 0; p < terrains.size(); p++){
+    std::cout << std::endl << std::endl;
+    for(int i = 0; i < 4; i++){
+        std::cout << std::endl;
+        for(int j = 0; j < 4; j++){
+            std::cout << terrains[p].getModelMatrix()[i][j] << " ";
+        }
+    }
+}    */
     // Rendering loop: this code is executed at each frame
     while(!glfwWindowShouldClose(window)){
 
@@ -219,27 +236,22 @@ int main(){
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, grassTexture);
 
-        if(!prova){
-            //std::cout << "AA " << t << std::endl;
-            prova = true;
-            createNoise(&terrain.terrainMesh);
-            //std::cout << cubeModel.meshes[0].vertices.size();
-            terrain.terrainMesh.SetupMesh();
-            //setupMesh(cubeModel.meshes[0]);
-        }
-        //generateTerrain(128,128);
-            //float angle = 1.0f;
-            //modelMatrix = glm::rotate(modelMatrix, glm::radians(angle), glm::vec3(0.0f, 1.0f, 0.0f));
-        shader.setMat4("model", modelMatrix);
-
-        // we render the model
-        terrain.draw();     
-        /*glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, cubeModel.meshes[0].indices.size(), GL_UNSIGNED_INT,0);
-        glBindVertexArray(0);*/
-
+        /*for(int i = 0; i < terrains.size(); i++){
+            //std::cout << "prova " << terrains[i].getModelMatrix()[0][0] << std::endl;
+            shader.setMat4("model", terrains[i].getModelMatrix());
+            terrains[i].draw(); 
+        } */   
+        shader.setMat4("model", terrain.getModelMatrix());
+        terrain.draw(); 
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        if (wireframe)
+            // Draw in wireframe
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        else
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
     }
 
     shader.Delete();
@@ -255,6 +267,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     // if ESC is pressed, we close the application
     if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
+
+    // if L is pressed, we activate/deactivate wireframe rendering of models
+    if(key == GLFW_KEY_L && action == GLFW_PRESS)
+        wireframe=!wireframe;
 }
 
 //Camera key movement.
@@ -339,70 +355,44 @@ GLint LoadTexture(const char* path){
 
 }
 
+vector<Terrain> generateTerrains(int x, int y){
+    vector<Terrain> terrains;
+
+    for(int i = 0; i < x; i++){
+        for(int j = 0; j < y; j++){
+            Terrain terrain(i,j,vertices);
+            createNoise(&terrain.terrainMesh);
+            terrain.terrainMesh.SetupMesh();
+            terrains.push_back(terrain);
+        }
+    }
+    return terrains;
+}
+
 void createNoise(Mesh *m){
-    int width = 128;
-    int height = 128;
+
+    int width = vertices;
+    int height = vertices;
     int w, h, channels;
     unsigned char* image;
 
     vector<vector<Vertex>> matrix;
-    /*noise::module::Perlin perlinNoise;
-    // Base frequency for octave 1.
-    /*perlinNoise.SetFrequency(4.0);
-    GLubyte *data = new GLubyte[ width * height * 4 ];
-    double xRange = 1.0;
-    double yRange = 1.0;
-    double xFactor = xRange / width;
-    double yFactor = yRange / height;
-    for( int oct = 0; oct < 4; oct++ ) {
-        perlinNoise.SetOctaveCount(oct+1);
-        for( int i = 0; i < width; i++ ) {
-            for( int j = 0 ; j < height; j++ ) {
-                double x = xFactor * i;
-                double y = yFactor * j;
-                double z = 0.0;
-                float val = (float)perlinNoise.GetValue(x,y,z);
-                // Scale and translate to roughly between 0 and 1
-                val = (val + 1.0f) * 0.5f;
-                // Clamp strictly between 0 and 1
-                val = val> 1.0f ? 1.0f :val;
-                val = val< 0.0f ? 0.0f :val;
-                // Store in texture
-                data[((j * width + i) * 4) + oct] =
-                (GLubyte) ( val * 255.0f );
-            }
-        }
-    }
-    GLuint texID;
-    glGenTextures(1, &texID);
-    glBindTexture(GL_TEXTURE_2D, texID);
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,
-    GL_UNSIGNED_BYTE,data);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-    GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-    GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    delete [] data;
-    return texID;*/
-    // Create and configure FastNoise object
+
     FastNoiseLite noise;
-    noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+    noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
     srand((unsigned) time(0));
     noise.SetSeed(rand() % 1000000);
-    noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-    noise.SetFrequency(0.02f);
+    noise.SetFrequency(0.008f);
     noise.SetFractalType(FastNoiseLite::FractalType_FBm);
     noise.SetFractalOctaves(5);
     noise.SetFractalLacunarity(2.0f);
     noise.SetFractalGain(0.5f);
 
     int index = 0;
-    for (int y = 0; y < 128; y++){
+    for (int y = 0; y < width; y++){
         vector<Vertex> temp;
-        for (int x = 0; x < 128; x++){
-            m->vertices[index].Position.y = 500 *  noise.GetNoise((float)x, (float)y);
+        for (int x = 0; x < height; x++){
+            m->vertices[index].Position.y = 8000 *  noise.GetNoise((float)x, (float)y);
             temp.push_back(m->vertices[index]);
             index += 1;
         }
@@ -410,147 +400,10 @@ void createNoise(Mesh *m){
     }
 
     index = 0;
-    /*for (int y = 0; y < 5; y++){
-        for (int x = 0; x < 5; x++){
-            std::cout << m->vertices[index].Normal.x << m->vertices[index].Normal.y << m->vertices[index].Normal.z << std::endl;
-            index += 1;
-        }
-    }*/
+
     calculateNormal(matrix, m);
-    /*index = 0;
-    for (int y = 0; y < 5; y++){
-        for (int x = 0; x < 5; x++){
-            std::cout << m->vertices[index].Normal.x << " " << m->vertices[index].Normal.y <<  " " << m->vertices[index].Normal.z << std::endl;
-            index += 1;
-        }
-    }*/
-
-    // Gather noise data
-    /*vector<vector<float>> matrix;
-    int index = 0;
-
-    for (int y = 0; y < 128; y++){
-        vector<float> row;
-        for (int x = 0; x < 128; x++){
-            row.push_back(noise.GetNoise((float)x, (float)y));
-        }
-        matrix.push_back(row);
-    }
-
-    for (GLuint i = 0; i < m->vertices.size(); ++i) { 
-        int x = (int)m->vertices[i].Position.x;
-        int y = (int)m->vertices[i].Position.y;
-
-        if(x < 0)
-            x = x + 5;
-
-        if(y < 0)
-            y = y + 5;
-
-        m->vertices[i].Position.y = 10 * matrix[x][y];
- 
-        
-    } */
-    // Do something with this data...
-
-    // Free data later
-    /*GLuint texID;
-    glGenTextures(1, &texID);
-    glBindTexture(GL_TEXTURE_2D, texID);
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,width,height,0,GL_RGBA,
-    GL_UNSIGNED_BYTE,data);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-    GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-    GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    delete [] data;
-    return texID;*/
-    //return 1;
 }
 
-/*GLuint terrainVbo = 0,terrainVboNorm = 0,terrainEbo = 0;
-static int terrainCount = 0;
-
-void generateTerrain(int wRes = 128, int lRes = 128){
-  float w = 10.0f, l = 10.0f;  
-  const int size = wRes * lRes;
-  vector<glm::vec3> verts(size), norms(size);  
-  vector<glm::vec3> tris;
-
-  int i = 0;
-
-  for(int z = 0; z < lRes; z ++){
-    for(int x = 0; x < wRes; x++) {
-        glm::vec3 v = glm::vec3(x/(float)lRes,0,z/(float)wRes);
-        v.x *= w;
-        v.z *= l;
-        v.x -= w/2;
-        v.z -= l/2;
-
-        verts[i] = v;
-        norms[i] = glm::vec3(0,1,0);
-
-        if(((i + 1) % (int) w) != 0 && z + 1 < lRes){
-            glm::vec3 tri = glm::vec3(i, i+wRes, i+wRes+1);
-            glm::vec3 tri2 = glm::vec3(i, i+wRes+1, i+1);
-            tris.push_back(tri);
-            tris.push_back(tri2);
-        }
-
-        i++;
-    }
-  }
-  terrainCount = tris.size();
-
-    glGenBuffers(1, &terrainVbo);
-    glGenBuffers(1, &terrainVboNorm);
-    glGenBuffers(1, &terrainEbo);
-
-    glBindBuffer(GL_ARRAY_BUFFER,terrainVbo);
-    glBufferData(GL_ARRAY_BUFFER,sizeof(glm::vec3)*verts.size(),verts.data(),GL_STATIC_DRAW);
-    
-    glBindBuffer(GL_ARRAY_BUFFER,terrainVboNorm);
-    glBufferData(GL_ARRAY_BUFFER,sizeof(glm::vec3)*norms.size(),norms.data(),GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,terrainEbo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(glm::vec3)*tris.size(),tris.data(),GL_STATIC_DRAW);
-}*/
-
-    /*void BicubicInterpolator (int x, int y, int subsampling, vector<Vertex> vertices) {
-
-		// build a lattice
-		for (int i = 0; i < x; i += subsampling) {
-			for (int j = 0; j < y; j += subsampling) {
-				h [j, i] = Random.Range (0f, 1f);
-			}
-		}
-
-		// cut out border effects to make code simpler
-		int xCut = subsampling * ((int)Mathf.Floor (x / subsampling));
-		int yCut = subsampling * ((int)Mathf.Floor (y / subsampling));
-
-		// build bilinear interpolations
-		// first direction i only on lattice points
-		for (int i = 0; i < xCut; i += subsampling) { // avoid border effect
-			for (int j = 0; j <= yCut; j += subsampling) {
-				for (int k = 1; k < subsampling; k += 1) {
-					h [j, i + k] = Mathf.Lerp (h [j, i], h [j, i + subsampling], slope((float)k / (float)subsampling)); // change here!
-				}
-			}
-		}
-		// then direction j on all points to cover all grid
-		for (int i = 0; i <= xCut; i += 1) {
-			for (int j = 0; j < yCut; j += subsampling) {
-				for (int k = 1; k < subsampling; k += 1) {
-					h [j + k, i] = Mathf.Lerp (h [j, i], h [j + subsampling, i], slope((float)k / (float)subsampling)); // change here!
-				}
-			}
-		}
-
-		return h;
-	}*/
 
     void calculateNormal(vector<vector<Vertex>> m, Mesh *mesh){
         int index = 0;
@@ -570,14 +423,11 @@ void generateTerrain(int wRes = 128, int lRes = 128){
     }
 
  void calculateFPS(){
-
-     // Measure speed
-     double currentTime = glfwGetTime();
-     nbFrames++;
-     if ( currentTime - lastTime >= 1.0 ){ // If last prinf() was more than 1 sec ago
-         // printf and reset timer
-         printf("%f ms/frame\n", 1000.0/double(nbFrames));
-         nbFrames = 0;
-         lastTime += 1.0;
-     }
+        frameCount++;
+        finalTime = time(NULL);
+        if((finalTime - initialTime) > 0){
+            std::cout << "FPS: " << frameCount / (finalTime - initialTime) << std::endl;
+            frameCount = 0;
+            initialTime = finalTime;
+        }
  }

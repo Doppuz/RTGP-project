@@ -1,0 +1,80 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "FastNoiseLite/1.0.0": {
+        "dependencies": {
+          "Eto.Forms": "2.5.2",
+          "Eto.Platform.Wpf": "2.5.2"
+        },
+        "runtime": {
+          "FastNoiseLite.dll": {}
+        }
+      },
+      "Eto.Forms/2.5.2": {
+        "dependencies": {
+          "System.ComponentModel.Annotations": "4.7.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Eto.dll": {
+            "assemblyVersion": "2.5.0.0",
+            "fileVersion": "2.5.7453.35170"
+          }
+        }
+      },
+      "Eto.Platform.Wpf/2.5.2": {
+        "dependencies": {
+          "Eto.Forms": "2.5.2",
+          "Microsoft.NETFramework.ReferenceAssemblies": "1.0.0"
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/Eto.Wpf.dll": {
+            "assemblyVersion": "2.5.0.0",
+            "fileVersion": "2.5.7453.35174"
+          }
+        }
+      },
+      "Microsoft.NETFramework.ReferenceAssemblies/1.0.0": {},
+      "System.ComponentModel.Annotations/4.7.0": {}
+    }
+  },
+  "libraries": {
+    "FastNoiseLite/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Eto.Forms/2.5.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-WkXAiBoNdThf5Sn5aKsmIf0JlAxWwhRkJVPXaC7jpg8tBSvvMlZGSztbzk/EUZTrBz1eHHvpcVyAjlStT4zwgg==",
+      "path": "eto.forms/2.5.2",
+      "hashPath": "eto.forms.2.5.2.nupkg.sha512"
+    },
+    "Eto.Platform.Wpf/2.5.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-246dt04u5RVp8Rd2+IUlo4HZDaVHpBIdjvvkoY/CeFpCqi1iYtDSbsGX9BXqZ52hQkbQi6mf2PR5x/X4WzjfFg==",
+      "path": "eto.platform.wpf/2.5.2",
+      "hashPath": "eto.platform.wpf.2.5.2.nupkg.sha512"
+    },
+    "Microsoft.NETFramework.ReferenceAssemblies/1.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-7D2TMufjGiowmt0E941kVoTIS+GTNzaPopuzM1/1LSaJAdJdBrVP0SkZW7AgDd0a2U1DjsIeaKG1wxGVBNLDMw==",
+      "path": "microsoft.netframework.referenceassemblies/1.0.0",
+      "hashPath": "microsoft.netframework.referenceassemblies.1.0.0.nupkg.sha512"
+    },
+    "System.ComponentModel.Annotations/4.7.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-0YFqjhp/mYkDGpU0Ye1GjE53HMp9UVfGN7seGpAMttAC0C40v5gw598jCgpbBLMmCo0E5YRLBv5Z2doypO49ZQ==",
+      "path": "system.componentmodel.annotations/4.7.0",
+      "hashPath": "system.componentmodel.annotations.4.7.0.nupkg.sha512"
+    }
+  }
+}
