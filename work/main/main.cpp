@@ -17,7 +17,7 @@
 #endif
 
 #include <utils/shader_v1.h>
-#include <utils/model_v1.h>
+#include <utils/model_v2.h>
 #include <utils/camera.h>
 
 #include <glm/glm.hpp>
@@ -29,11 +29,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image/stb_image.h>
 
-#include <utils/mesh_v1.h>
+#include <utils/mesh_v2.h>
 
 #include <utils/FastNoiseLite.h>
 
-#include <utils/terrain.h>
+#include <utils/terrainGeneration.h>
 
 // dimensions of application's window
 GLuint screenWidth = 800, screenHeight = 600;
@@ -46,7 +46,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 GLint LoadTexture(const char* path);
 void createNoise(Mesh *m);
 // Create Terrain
-vector<Terrain> generateTerrains(int x, int y);
+//vector<Terrain> generateTerrains(int x, int y);
 //just a try
 void setupMesh(Mesh m);
 //FPS
@@ -104,7 +104,7 @@ GLfloat Kd = 0.7f;
 GLboolean wireframe = GL_FALSE;
 
 //Terrain
-int vertices = 170;
+int vertices = 64;
 
 /////////////////// MAIN function ///////////////////////
 int main(){
@@ -182,10 +182,38 @@ int main(){
 
     std::cout << "After 3 texture" << std::endl;
 
-    Terrain terrain(0,0,vertices);
+    //Terrain terrain(0,0,vertices);
     //vector<Terrain> terrains = generateTerrains(10,10);
-    createNoise(&terrain.terrainMesh);
-    terrain.terrainMesh.SetupMesh();
+    //createNoise(&terrain.terrainMesh);
+    //terrain.terrainMesh.SetupMesh();
+
+    TerrainGeneration terrain(2);
+    glm::mat4 modelMatrix = glm::mat4(1.0f);     
+    modelMatrix = glm::translate(modelMatrix, glm::vec3(0, 0.0f, 0));
+
+    glm::mat4 modelMatrix2 = glm::mat4(1.0f);     
+    modelMatrix2 = glm::translate(modelMatrix2, glm::vec3(-3000, 0.0f, 0));
+
+ /*int index = 0;
+    for(int i=0;i<4;i++){
+        std::cout << std::endl;
+		for(int j=0;j<4;j++){
+            std::cout << terrain.terrainBaseMesh.indices[index] << " ";
+            index++;
+		}
+	}
+
+    /*std::cout <<  std::endl;
+
+    index = 0;
+    for(int i=0;i<vertices;i++){
+		for(int j=0;j<4;j++){
+            std::cout << terrain.terrainYMirroredBaseMesh.vertices[index].Position.x << " " << terrain.terrainYMirroredBaseMesh.vertices[index].Position.y 
+                << " " << terrain.terrainYMirroredBaseMesh.vertices[index].Position.z << std::endl;
+            index++;
+		}
+	}
+
 /*for(int p = 0; p < terrains.size(); p++){
     std::cout << std::endl << std::endl;
     for(int i = 0; i < 4; i++){
@@ -241,8 +269,12 @@ int main(){
             shader.setMat4("model", terrains[i].getModelMatrix());
             terrains[i].draw(); 
         } */   
-        shader.setMat4("model", terrain.getModelMatrix());
-        terrain.draw(); 
+        shader.setMat4("model", modelMatrix);
+        terrain.draw();
+
+        shader.setMat4("model", modelMatrix2);
+        terrain.draw2();
+
         glfwSwapBuffers(window);
         glfwPollEvents();
 
@@ -355,7 +387,7 @@ GLint LoadTexture(const char* path){
 
 }
 
-vector<Terrain> generateTerrains(int x, int y){
+/*vector<Terrain> generateTerrains(int x, int y){
     vector<Terrain> terrains;
 
     for(int i = 0; i < x; i++){
@@ -367,7 +399,7 @@ vector<Terrain> generateTerrains(int x, int y){
         }
     }
     return terrains;
-}
+}*/
 
 void createNoise(Mesh *m){
 
@@ -392,12 +424,14 @@ void createNoise(Mesh *m){
     for (int y = 0; y < width; y++){
         vector<Vertex> temp;
         for (int x = 0; x < height; x++){
-            m->vertices[index].Position.y = 8000 *  noise.GetNoise((float)x, (float)y);
+            m->vertices[index].Position.y = 1500 *  noise.GetNoise((float)x, (float)y);
             temp.push_back(m->vertices[index]);
             index += 1;
         }
         matrix.push_back(temp);
     }
+
+    
 
     index = 0;
 
