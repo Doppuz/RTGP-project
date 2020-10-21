@@ -3,6 +3,7 @@
 #include <string>
 #include <stdlib.h>
 #include <ctime>
+#include <cmath>
 
 #ifdef _WIN32
     #define APIENTRY __stdcall
@@ -17,7 +18,7 @@
 #endif
 
 #include <utils/shader_v1.h>
-#include <utils/model_v2.h>
+#include <utils/model_v1.h>
 #include <utils/camera.h>
 
 #include <glm/glm.hpp>
@@ -29,7 +30,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image/stb_image.h>
 
-#include <utils/mesh_v2.h>
+#include <utils/mesh_v1.h>
 
 #include <utils/FastNoiseLite.h>
 
@@ -53,6 +54,9 @@ void setupMesh(Mesh m);
 void calculateFPS();
 //ComputeNormal
 void calculateNormal(vector<vector<Vertex>> m, Mesh *mesh);
+//lerp
+void lerpMesh(Mesh *a, Mesh *b);
+float lerp(float a, float b, float c);
 
 //First movement bool
 bool firstMouse = true;
@@ -78,8 +82,8 @@ glm::mat4 projection;
 glm::mat4 view = glm::mat4(1.0f);
 
 //Camera
-//Camera camera(glm::vec3(1000.0f, 800.0f, 3000.0f), GL_FALSE);
-Camera camera(glm::vec3(0.0f, 600.0f, 2000.0f), GL_FALSE);
+Camera camera(glm::vec3(0.0f, 300.0f, 0.0f), GL_FALSE);
+//Camera camera(glm::vec3(0.0f, 600.0f, 2000.0f), GL_FALSE);
 
 // vector for the textures IDs
 vector<GLint> textureID;
@@ -105,6 +109,13 @@ GLboolean wireframe = GL_FALSE;
 
 //Terrain
 int vertices = 64;
+
+// boolean to start/stop animated rotation on Y angle
+GLboolean spinning = GL_FALSE;
+// rotation angle on Y axis
+GLfloat orientationY = 0.0f;
+// rotation speed on Y axis
+GLfloat spin_speed = 30.0f;
 
 /////////////////// MAIN function ///////////////////////
 int main(){
@@ -162,7 +173,7 @@ int main(){
     shader.Use();  
 
     //projection = glm::perspective(45.0f, (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
-    projection = glm::perspective(45.0f, (float)screenWidth/(float)screenHeight, 0.1f, 100000.0f);
+    projection = glm::perspective(45.0f, (float)screenWidth/(float)screenHeight, 0.1f, 5000000.0f);
     shader.setMat4("projection", projection); 
     
     /*glm::mat4 modelMatrix = glm::mat4(1.0f);     
@@ -187,12 +198,41 @@ int main(){
     //createNoise(&terrain.terrainMesh);
     //terrain.terrainMesh.SetupMesh();
 
+    GLfloat orientationY = -90.0f;
+
     TerrainGeneration terrain(2);
+    TerrainGeneration terrain2(3);
+
     glm::mat4 modelMatrix = glm::mat4(1.0f);     
     modelMatrix = glm::translate(modelMatrix, glm::vec3(0, 0.0f, 0));
 
     glm::mat4 modelMatrix2 = glm::mat4(1.0f);     
-    modelMatrix2 = glm::translate(modelMatrix2, glm::vec3(-3000, 0.0f, 0));
+    modelMatrix2 = glm::translate(modelMatrix2, glm::vec3(-5, 0.0f, 0));
+
+    glm::mat4 modelMatrix3 = glm::mat4(1.0f);     
+    modelMatrix3 = glm::translate(modelMatrix3, glm::vec3(+5, 0.0f, 0));
+
+    glm::mat4 modelMatrix4 = glm::mat4(1.0f);    
+    modelMatrix4 = glm::translate(modelMatrix4, glm::vec3(0.0f, 0.0f, 5.0f));
+
+    glm::mat4 modelMatrix5 = glm::mat4(1.0f);     
+    modelMatrix5 = glm::translate(modelMatrix5, glm::vec3(0.0f, 0.0f, -5.0f));
+    
+    glm::mat4 modelMatrix6 = glm::mat4(1.0f);     
+    modelMatrix6 = glm::translate(modelMatrix6, glm::vec3(5.0f, 0.0f, 5.0f));
+
+    glm::mat4 modelMatrix7 = glm::mat4(1.0f);     
+    modelMatrix7 = glm::translate(modelMatrix7, glm::vec3(-5.0f, 0.0f, 5.0f));
+
+    glm::mat4 modelMatrix8 = glm::mat4(1.0f);     
+    modelMatrix8 = glm::translate(modelMatrix8, glm::vec3(100.0f, 0.0f, 00.0f));
+
+    glm::mat4 modelMatrix9 = glm::mat4(1.0f);     
+    modelMatrix9 = glm::translate(modelMatrix9, glm::vec3(100.0f, 0.0f, 5.0f));
+
+   
+    //modelMatrix4 = glm::rotate(modelMatrix4,glm::radians(orientationY),glm::vec3(0.0f,1.0f,0.0f));
+
 
  /*int index = 0;
     for(int i=0;i<4;i++){
@@ -224,9 +264,14 @@ int main(){
     }
 }    */
     // Rendering loop: this code is executed at each frame
+
+    bool first = false;
     while(!glfwWindowShouldClose(window)){
 
         calculateFPS();
+
+        if (spinning)
+            orientationY+=(deltaTime*spin_speed);
 
         apply_camera_movements(window);
         light_movements(window);
@@ -269,11 +314,98 @@ int main(){
             shader.setMat4("model", terrains[i].getModelMatrix());
             terrains[i].draw(); 
         } */   
+
+
+        /*
+        shader.setMat4("model", modelMatrix8);
+        terrain.draw();
+
+        shader.setMat4("model", modelMatrix9);
+        terrain2.draw();
+*/
+        if(!first){
+            
+            int index = 0;
+            for(int i = 0; i < 4; i++){
+                std::cout << std::endl;
+                for(int j = 0; j < 4; j++){
+                std::cout << " " << terrain.terrainBaseMesh.vertices[index].Position.y << " ";
+                index++;
+                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
+                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
+                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
+                }
+            }   
+            std::cout << std::endl;
+            index = 0;
+             for(int i = 0; i < 4; i++){
+                std::cout << std::endl;
+                for(int j = 0; j < 4; j++){
+                std::cout << " " << terrain2.terrainBaseMesh.vertices[index].Position.y << " ";
+                index++;
+                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
+                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
+                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
+                }
+            } 
+            std::cout << std::endl;
+            lerpMesh(&terrain.terrainBaseMesh,&terrain2.terrainBaseMesh);
+            index = 0;
+            for(int i = 0; i < 4; i++){
+                std::cout << std::endl;
+                for(int j = 0; j < 4; j++){
+                std::cout << " " << terrain.terrainBaseMesh.vertices[index].Position.y << " ";
+                index++;
+                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
+                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
+                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
+                }
+            }   
+            std::cout << std::endl;
+            index = 0;
+             for(int i = 0; i < 4; i++){
+                std::cout << std::endl;
+                for(int j = 0; j < 4; j++){
+                std::cout << " " << terrain2.terrainBaseMesh.vertices[index].Position.y << " ";
+                index++;
+                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
+                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
+                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
+                }
+            } 
+            
+            std::cout << std::endl;
+            terrain.terrainBaseMesh.SetupMesh();
+            terrain2.terrainBaseMesh.SetupMesh(); 
+            first = true;
+        }
         shader.setMat4("model", modelMatrix);
         terrain.draw();
 
-        shader.setMat4("model", modelMatrix2);
-        terrain.draw2();
+        shader.setMat4("model", modelMatrix4);
+        terrain2.draw();
+
+
+        shader.setMat4("model", modelMatrix3);
+        //terrain.drawYMesh();
+
+        shader.setMat4("model", modelMatrix4);
+        //terrain.drawXMesh();
+
+        shader.setMat4("model", modelMatrix5);
+        //terrain.drawXMesh();
+
+        shader.setMat4("model", modelMatrix6);
+        //terrain.drawXYMesh();
+
+        shader.setMat4("model", modelMatrix7);
+        //terrain.drawXYMesh();
+
+        shader.setMat4("model", modelMatrix8);
+        //terrain.drawXYMesh();
+
+        shader.setMat4("model", modelMatrix9);
+        //terrain.drawXYMesh();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -303,6 +435,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     // if L is pressed, we activate/deactivate wireframe rendering of models
     if(key == GLFW_KEY_L && action == GLFW_PRESS)
         wireframe=!wireframe;
+
+         // if P is pressed, we start/stop the animated rotation of models
+    if(key == GLFW_KEY_P && action == GLFW_PRESS)
+        spinning=!spinning;
 }
 
 //Camera key movement.
@@ -464,4 +600,19 @@ void createNoise(Mesh *m){
             frameCount = 0;
             initialTime = finalTime;
         }
+ }
+
+ //Lerp vertex
+ void lerpMesh(Mesh *a, Mesh *b){
+    for(int i = 0; i < b->vertices.size(); i++){
+        //std::cout << " prima: " << a->vertices[i].Position.y << " , " << b->vertices[b->vertices.size() - i].Position.y << std::endl;
+        float value = lerp(a->vertices[i].Position.y,b->vertices[(b->vertices.size() - 1) - i].Position.y,0.5f);          
+        //std::cout << " Dopo: " << value << std::endl;
+        a->vertices[i].Position.y = value;
+        b->vertices[(b->vertices.size() - 1) - i].Position.y = value;
+    }
+ }
+
+float lerp(float a, float b, float c){
+     return a * c + b * (1-c);
  }
