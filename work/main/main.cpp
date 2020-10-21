@@ -606,10 +606,10 @@ void createNoise(Mesh *m){
  void lerpMesh(Mesh *a, Mesh *b){
     for(int i = 0; i < b->vertices.size(); i++){
         //std::cout << " prima: " << a->vertices[i].Position.y << " , " << b->vertices[b->vertices.size() - i].Position.y << std::endl;
-        float value = lerp(a->vertices[i].Position.y,b->vertices[(b->vertices.size() - 1) - i].Position.y,0.5f);          
-        //std::cout << " Dopo: " << value << std::endl;
+        float value = lerp(a->vertices[i].Position.y,b->vertices[ (b->vertices.size() - 2) - ((4 * ((int)i / 4) + 1)) + (i % 4 - 1) ].Position.y,0.5f);          
+        //std::cout << " Dopo: " << (b->vertices.size() - 2) - ((4 * ((int)i / 4) + 1)) + (i % 4 - 1) << std::endl;
         a->vertices[i].Position.y = value;
-        b->vertices[(b->vertices.size() - 1) - i].Position.y = value;
+        b->vertices[ (b->vertices.size() - 2) - ((4 * ((int)i / 4) + 1)) + (i % 4 - 1)].Position.y = value;
     }
  }
 
