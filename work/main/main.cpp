@@ -56,6 +56,8 @@ void calculateFPS();
 void calculateNormal(vector<vector<Vertex>> m, Mesh *mesh);
 //lerp
 void lerpMesh(Mesh *a, Mesh *b);
+void lerpMesh2(Mesh *a);
+void lerpMesh3(Mesh *a);
 float lerp(float a, float b, float c);
 
 //First movement bool
@@ -116,6 +118,8 @@ GLboolean spinning = GL_FALSE;
 GLfloat orientationY = 0.0f;
 // rotation speed on Y axis
 GLfloat spin_speed = 30.0f;
+
+int vertexCount = 16;
 
 /////////////////// MAIN function ///////////////////////
 int main(){
@@ -213,7 +217,7 @@ int main(){
     modelMatrix3 = glm::translate(modelMatrix3, glm::vec3(+5, 0.0f, 0));
 
     glm::mat4 modelMatrix4 = glm::mat4(1.0f);    
-    modelMatrix4 = glm::translate(modelMatrix4, glm::vec3(0.0f, 0.0f, 5.0f));
+    modelMatrix4 = glm::translate(modelMatrix4, glm::vec3(0.0f, 0.0f, -5.0f));
 
     glm::mat4 modelMatrix5 = glm::mat4(1.0f);     
     modelMatrix5 = glm::translate(modelMatrix5, glm::vec3(0.0f, 0.0f, -5.0f));
@@ -326,9 +330,9 @@ int main(){
         if(!first){
             
             int index = 0;
-            for(int i = 0; i < 4; i++){
+            for(int i = 0; i < vertexCount; i++){
                 std::cout << std::endl;
-                for(int j = 0; j < 4; j++){
+                for(int j = 0; j < vertexCount; j++){
                 std::cout << " " << terrain.terrainBaseMesh.vertices[index].Position.y << " ";
                 index++;
                 /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
@@ -338,9 +342,9 @@ int main(){
             }   
             std::cout << std::endl;
             index = 0;
-             for(int i = 0; i < 4; i++){
+             for(int i = 0; i < vertexCount; i++){
                 std::cout << std::endl;
-                for(int j = 0; j < 4; j++){
+                for(int j = 0; j < vertexCount; j++){
                 std::cout << " " << terrain2.terrainBaseMesh.vertices[index].Position.y << " ";
                 index++;
                 /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
@@ -350,10 +354,12 @@ int main(){
             } 
             std::cout << std::endl;
             lerpMesh(&terrain.terrainBaseMesh,&terrain2.terrainBaseMesh);
+            lerpMesh3(&terrain.terrainBaseMesh);
+            lerpMesh2(&terrain2.terrainBaseMesh);
             index = 0;
-            for(int i = 0; i < 4; i++){
+            for(int i = 0; i < vertexCount; i++){
                 std::cout << std::endl;
-                for(int j = 0; j < 4; j++){
+                for(int j = 0; j < vertexCount; j++){
                 std::cout << " " << terrain.terrainBaseMesh.vertices[index].Position.y << " ";
                 index++;
                 /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
@@ -363,9 +369,9 @@ int main(){
             }   
             std::cout << std::endl;
             index = 0;
-             for(int i = 0; i < 4; i++){
+             for(int i = 0; i < vertexCount; i++){
                 std::cout << std::endl;
-                for(int j = 0; j < 4; j++){
+                for(int j = 0; j < vertexCount; j++){
                 std::cout << " " << terrain2.terrainBaseMesh.vertices[index].Position.y << " ";
                 index++;
                 /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
@@ -602,15 +608,48 @@ void createNoise(Mesh *m){
         }
  }
 
+
  //Lerp vertex
  void lerpMesh(Mesh *a, Mesh *b){
-    for(int i = 0; i < b->vertices.size(); i++){
-        //std::cout << " prima: " << a->vertices[i].Position.y << " , " << b->vertices[b->vertices.size() - i].Position.y << std::endl;
-        float value = lerp(a->vertices[i].Position.y,b->vertices[ (b->vertices.size() - 2) - ((4 * ((int)i / 4) + 1)) + (i % 4 - 1) ].Position.y,0.5f);          
+    for(int i = 0; i < b->vertices.size() / vertexCount; i++){
+        //std::cout << " prima: " <<i << " , " << (b->vertices.size() - 1) - (vertexCount * ((int)(i / vertexCount) + 1) - 1) + i % vertexCount << std::endl;
+        float value = lerp(a->vertices[i].Position.y,b->vertices[(b->vertices.size() - 1) - (vertexCount * ((int)(i / vertexCount) + 1) - 1) + i % vertexCount].Position.y,0.5f);          
         //std::cout << " Dopo: " << (b->vertices.size() - 2) - ((4 * ((int)i / 4) + 1)) + (i % 4 - 1) << std::endl;
         a->vertices[i].Position.y = value;
-        b->vertices[ (b->vertices.size() - 2) - ((4 * ((int)i / 4) + 1)) + (i % 4 - 1)].Position.y = value;
+        b->vertices[(b->vertices.size() - 1) - (vertexCount * ((int)(i / vertexCount) + 1) - 1) + i % vertexCount].Position.y = value;
     }
+ }
+
+ void lerpMesh2(Mesh *a){
+     int size = a->vertices.size() - vertexCount - 1;
+     float value1,value2,value3,value4;
+    for(int i = 0; i <= size; i++){
+        /*if(((size - i) - vertexCount) >= 0)
+            value1 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - vertexCount].Position.y,0.5f);
+        if(((size - i) + vertexCount) <= (a->vertices.size() - 1))*/
+        value2 =  lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + vertexCount].Position.y,0.5f);
+        /*if(((size - i) - 1) >= 0)
+            value3 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - 1].Position.y,0.5f);
+        if(((size - i) + 1) <= (a->vertices.size() - 1))
+            value4 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + 1].Position.y,0.5f);*/
+        a->vertices[(size - i)].Position.y = value2;
+    }    
+ }
+
+  void lerpMesh3(Mesh *a){
+     //int size = a->vertices.size() - vertexCount - 1;
+     float value1,value2,value3,value4;
+    for(int i = vertexCount; i < a->vertices.size(); i++){
+        /*if(((size - i) - vertexCount) >= 0)
+            value1 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - vertexCount].Position.y,0.5f);
+        if(((size - i) + vertexCount) <= (a->vertices.size() - 1))*/
+        value2 =  lerp(a->vertices[i].Position.y,a->vertices[i - vertexCount].Position.y,0.5f);
+        /*if(((size - i) - 1) >= 0)
+            value3 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - 1].Position.y,0.5f);
+        if(((size - i) + 1) <= (a->vertices.size() - 1))
+            value4 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + 1].Position.y,0.5f);*/
+        a->vertices[i].Position.y = value2;
+    }    
  }
 
 float lerp(float a, float b, float c){
