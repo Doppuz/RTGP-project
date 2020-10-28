@@ -58,6 +58,8 @@ void calculateNormal(vector<vector<Vertex>> m, Mesh *mesh);
 void lerpMesh(Mesh *a, Mesh *b);
 void lerpMesh2(Mesh *a);
 void lerpMesh3(Mesh *a);
+void lerpMesh4(Mesh *a);
+void lerpMesh5(Mesh *a);
 float lerp(float a, float b, float c);
 
 //First movement bool
@@ -84,7 +86,7 @@ glm::mat4 projection;
 glm::mat4 view = glm::mat4(1.0f);
 
 //Camera
-Camera camera(glm::vec3(0.0f, 300.0f, 0.0f), GL_FALSE);
+Camera camera(glm::vec3(0.0f, 50.0f, 0.0f), GL_FALSE);
 //Camera camera(glm::vec3(0.0f, 600.0f, 2000.0f), GL_FALSE);
 
 // vector for the textures IDs
@@ -119,7 +121,7 @@ GLfloat orientationY = 0.0f;
 // rotation speed on Y axis
 GLfloat spin_speed = 30.0f;
 
-int vertexCount = 16;
+int vertexCount = 32;
 
 /////////////////// MAIN function ///////////////////////
 int main(){
@@ -206,6 +208,7 @@ int main(){
 
     TerrainGeneration terrain(2);
     TerrainGeneration terrain2(3);
+    TerrainGeneration terrain3(4);
 
     glm::mat4 modelMatrix = glm::mat4(1.0f);     
     modelMatrix = glm::translate(modelMatrix, glm::vec3(0, 0.0f, 0));
@@ -220,7 +223,7 @@ int main(){
     modelMatrix4 = glm::translate(modelMatrix4, glm::vec3(0.0f, 0.0f, -5.0f));
 
     glm::mat4 modelMatrix5 = glm::mat4(1.0f);     
-    modelMatrix5 = glm::translate(modelMatrix5, glm::vec3(0.0f, 0.0f, -5.0f));
+    modelMatrix5 = glm::translate(modelMatrix5, glm::vec3(0.0f, 0.0f, 5.0f));
     
     glm::mat4 modelMatrix6 = glm::mat4(1.0f);     
     modelMatrix6 = glm::translate(modelMatrix6, glm::vec3(5.0f, 0.0f, 5.0f));
@@ -229,10 +232,10 @@ int main(){
     modelMatrix7 = glm::translate(modelMatrix7, glm::vec3(-5.0f, 0.0f, 5.0f));
 
     glm::mat4 modelMatrix8 = glm::mat4(1.0f);     
-    modelMatrix8 = glm::translate(modelMatrix8, glm::vec3(100.0f, 0.0f, 00.0f));
+    modelMatrix8 = glm::translate(modelMatrix8, glm::vec3(5.0f, 0.0f, 00.0f));
 
     glm::mat4 modelMatrix9 = glm::mat4(1.0f);     
-    modelMatrix9 = glm::translate(modelMatrix9, glm::vec3(100.0f, 0.0f, 5.0f));
+    modelMatrix9 = glm::translate(modelMatrix9, glm::vec3(5.0f, 0.0f, 5.0f));
 
    
     //modelMatrix4 = glm::rotate(modelMatrix4,glm::radians(orientationY),glm::vec3(0.0f,1.0f,0.0f));
@@ -329,7 +332,7 @@ int main(){
 */
         if(!first){
             
-            int index = 0;
+            /*int index = 0;
             for(int i = 0; i < vertexCount; i++){
                 std::cout << std::endl;
                 for(int j = 0; j < vertexCount; j++){
@@ -338,7 +341,7 @@ int main(){
                 /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
                 " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
                 " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
-                }
+            /*    }
             }   
             std::cout << std::endl;
             index = 0;
@@ -350,39 +353,48 @@ int main(){
                 /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
                 " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
                 " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
-                }
+            /*    }
             } 
+
             std::cout << std::endl;
+            index = 0;
+            for(int i = 0; i < vertexCount; i++){
+                std::cout << std::endl;
+                for(int j = 0; j < vertexCount; j++){
+                std::cout << " " << terrain.terrainBaseMesh.vertices[index].Position.y << " ";
+                index++;
+                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
+                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
+                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
+            /*    }
+            }   
+            std::cout << std::endl;
+            index = 0;
+             for(int i = 0; i < vertexCount; i++){
+                std::cout << std::endl;
+                for(int j = 0; j < vertexCount; j++){
+                std::cout << " " << terrain2.terrainBaseMesh.vertices[index].Position.y << " ";
+                index++;
+                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
+                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
+                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
+            /*    }
+            } */
+
             lerpMesh(&terrain.terrainBaseMesh,&terrain2.terrainBaseMesh);
-            lerpMesh3(&terrain.terrainBaseMesh);
             lerpMesh2(&terrain2.terrainBaseMesh);
-            index = 0;
-            for(int i = 0; i < vertexCount; i++){
-                std::cout << std::endl;
-                for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrain.terrainBaseMesh.vertices[index].Position.y << " ";
-                index++;
-                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
-                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
-                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
-                }
-            }   
-            std::cout << std::endl;
-            index = 0;
-             for(int i = 0; i < vertexCount; i++){
-                std::cout << std::endl;
-                for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrain2.terrainBaseMesh.vertices[index].Position.y << " ";
-                index++;
-                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
-                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
-                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
-                }
-            } 
+            lerpMesh3(&terrain.terrainBaseMesh);
+            lerpMesh(&terrain3.terrainBaseMesh,&terrain.terrainBaseMesh);
+            lerpMesh2(&terrain.terrainBaseMesh);
+            lerpMesh3(&terrain3.terrainBaseMesh);
             
             std::cout << std::endl;
+            /*lerpMesh(&terrain3.terrainBaseMesh,&terrain.terrainBaseMesh);
+            lerpMesh2(&terrain.terrainBaseMesh);
+            lerpMesh3(&terrain3.terrainBaseMesh);*/
             terrain.terrainBaseMesh.SetupMesh();
             terrain2.terrainBaseMesh.SetupMesh(); 
+            terrain3.terrainBaseMesh.SetupMesh(); 
             first = true;
         }
         shader.setMat4("model", modelMatrix);
@@ -399,7 +411,7 @@ int main(){
         //terrain.drawXMesh();
 
         shader.setMat4("model", modelMatrix5);
-        //terrain.drawXMesh();
+        terrain3.draw();
 
         shader.setMat4("model", modelMatrix6);
         //terrain.drawXYMesh();
@@ -623,11 +635,11 @@ void createNoise(Mesh *m){
  void lerpMesh2(Mesh *a){
      int size = a->vertices.size() - vertexCount - 1;
      float value1,value2,value3,value4;
-    for(int i = 0; i <= size; i++){
+    for(int i = 0; i < size; i++){
         /*if(((size - i) - vertexCount) >= 0)
             value1 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - vertexCount].Position.y,0.5f);
         if(((size - i) + vertexCount) <= (a->vertices.size() - 1))*/
-        value2 =  lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + vertexCount].Position.y,0.5f);
+        value2 =  lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + vertexCount].Position.y,0.2f + ((0.8f/(vertexCount - 1))* ((int)(i / vertexCount)+1))); //((0.8f/vertexCount)(vertexCount*((int)i / vertexCount)+1)));
         /*if(((size - i) - 1) >= 0)
             value3 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - 1].Position.y,0.5f);
         if(((size - i) + 1) <= (a->vertices.size() - 1))
@@ -643,12 +655,46 @@ void createNoise(Mesh *m){
         /*if(((size - i) - vertexCount) >= 0)
             value1 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - vertexCount].Position.y,0.5f);
         if(((size - i) + vertexCount) <= (a->vertices.size() - 1))*/
-        value2 =  lerp(a->vertices[i].Position.y,a->vertices[i - vertexCount].Position.y,0.5f);
+        value2 =  lerp(a->vertices[i].Position.y,a->vertices[i - vertexCount].Position.y,0.2f + ((0.8f/(vertexCount - 1))* ((int)(i / vertexCount))));
         /*if(((size - i) - 1) >= 0)
             value3 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - 1].Position.y,0.5f);
         if(((size - i) + 1) <= (a->vertices.size() - 1))
             value4 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + 1].Position.y,0.5f);*/
         a->vertices[i].Position.y = value2;
+    }    
+ }
+
+ void lerpMesh4(Mesh *a){
+     
+     int size = a->vertices.size() - vertexCount - 1;
+     //int size = a->vertices.size() - vertexCount - 1;
+     float value2;
+    for(int i = vertexCount; i < size; i++){
+        /*if(((size - i) - vertexCount) >= 0)
+            value1 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - vertexCount].Position.y,0.5f);
+        if(((size - i) + vertexCount) <= (a->vertices.size() - 1))*/
+        value2 =  lerp(a->vertices[i].Position.y,a->vertices[i - vertexCount].Position.y,0.2f);
+        /*if(((size - i) - 1) >= 0)
+            value3 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - 1].Position.y,0.5f);
+        if(((size - i) + 1) <= (a->vertices.size() - 1))
+            value4 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + 1].Position.y,0.5f);*/
+        a->vertices[i].Position.y = value2;
+    }    
+ }
+
+ void lerpMesh5(Mesh *a){
+     int size = a->vertices.size() - vertexCount - 1;
+     float value1,value2,value3,value4;
+    for(int i = 0; i < (size - vertexCount); i++){
+        /*if(((size - i) - vertexCount) >= 0)
+            value1 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - vertexCount].Position.y,0.5f);
+        if(((size - i) + vertexCount) <= (a->vertices.size() - 1))*/
+        value2 =  lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + vertexCount].Position.y,0.2f);
+        /*if(((size - i) - 1) >= 0)
+            value3 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - 1].Position.y,0.5f);
+        if(((size - i) + 1) <= (a->vertices.size() - 1))
+            value4 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + 1].Position.y,0.5f);*/
+        a->vertices[(size - i)].Position.y = value2;
     }    
  }
 
