@@ -124,7 +124,7 @@ GLfloat orientationY = 0.0f;
 // rotation speed on Y axis
 GLfloat spin_speed = 30.0f;
 
-int vertexCount = 32;
+int vertexCount = 64;
 
 /////////////////// MAIN function ///////////////////////
 int main(){
@@ -215,33 +215,36 @@ int main(){
     TerrainGeneration terrain4(5);
     TerrainGeneration terrain5(6);
     TerrainGeneration terrain6(7);
+    TerrainGeneration terrain7(8);
+    TerrainGeneration terrain8(9);
+    TerrainGeneration terrain9(10);
 
     glm::mat4 modelMatrix = glm::mat4(1.0f);     
     modelMatrix = glm::translate(modelMatrix, glm::vec3(0, 0.0f, 0));
 
     glm::mat4 modelMatrix2 = glm::mat4(1.0f);     
-    modelMatrix2 = glm::translate(modelMatrix2, glm::vec3(-5, 0.0f, 0));
+    modelMatrix2 = glm::translate(modelMatrix2, glm::vec3(-500000, 0.0f, 0));
 
     glm::mat4 modelMatrix3 = glm::mat4(1.0f);     
-    modelMatrix3 = glm::translate(modelMatrix3, glm::vec3(+5, 0.0f, 0));
+    modelMatrix3 = glm::translate(modelMatrix3, glm::vec3(+500000, 0.0f, 0));
 
     glm::mat4 modelMatrix4 = glm::mat4(1.0f);    
-    modelMatrix4 = glm::translate(modelMatrix4, glm::vec3(0.0f, 0.0f, -5.0f));
+    modelMatrix4 = glm::translate(modelMatrix4, glm::vec3(0.0f, 0.0f, -500000.0f));
 
     glm::mat4 modelMatrix5 = glm::mat4(1.0f);     
-    modelMatrix5 = glm::translate(modelMatrix5, glm::vec3(0.0f, 0.0f, 5.0f));
+    modelMatrix5 = glm::translate(modelMatrix5, glm::vec3(0.0f, 0.0f, 500000.0f));
     
     glm::mat4 modelMatrix6 = glm::mat4(1.0f);     
-    modelMatrix6 = glm::translate(modelMatrix6, glm::vec3(5.0f, 0.0f, 5.0f));
+    modelMatrix6 = glm::translate(modelMatrix6, glm::vec3(500000.0f, 0.0f, 500000.0f));
 
     glm::mat4 modelMatrix7 = glm::mat4(1.0f);     
-    modelMatrix7 = glm::translate(modelMatrix7, glm::vec3(-5.0f, 0.0f, 5.0f));
+    modelMatrix7 = glm::translate(modelMatrix7, glm::vec3(-500000.0f, 0.0f, 500000.0f));
 
     glm::mat4 modelMatrix8 = glm::mat4(1.0f);     
-    modelMatrix8 = glm::translate(modelMatrix8, glm::vec3(5.0f, 0.0f, -5.0f));
+    modelMatrix8 = glm::translate(modelMatrix8, glm::vec3(500000.0f, 0.0f, -500000.0f));
 
     glm::mat4 modelMatrix9 = glm::mat4(1.0f);     
-    modelMatrix9 = glm::translate(modelMatrix9, glm::vec3(-5.0f, 0.0f, -5.0f));
+    modelMatrix9 = glm::translate(modelMatrix9, glm::vec3(-500000.0f, 0.0f, -500000.0f));
 
    
     //modelMatrix4 = glm::rotate(modelMatrix4,glm::radians(orientationY),glm::vec3(0.0f,1.0f,0.0f));
@@ -408,15 +411,50 @@ int main(){
             lerpMesh(&terrain3.terrainBaseMesh,&terrain.terrainBaseMesh);
             lerpMesh2(&terrain.terrainBaseMesh);
             lerpMesh3(&terrain3.terrainBaseMesh);
+            
             lerpMesh(&terrain4.terrainBaseMesh,&terrain5.terrainBaseMesh);
             lerpMesh2(&terrain5.terrainBaseMesh);
             lerpMesh3(&terrain4.terrainBaseMesh);
+            
+            lerpMesh(&terrain5.terrainBaseMesh,&terrain9.terrainBaseMesh);
+            lerpMesh2(&terrain9.terrainBaseMesh);
+            lerpMesh3(&terrain5.terrainBaseMesh);
+
+            lerpMesh(&terrain.terrainBaseMesh,&terrain2.terrainBaseMesh);
+            lerpMesh2(&terrain2.terrainBaseMesh);
+            lerpMesh3(&terrain.terrainBaseMesh);  
+
+            lerpMesh(&terrain6.terrainBaseMesh,&terrain7.terrainBaseMesh);
+            lerpMesh2(&terrain7.terrainBaseMesh);
+            lerpMesh3(&terrain6.terrainBaseMesh); 
+
+            lerpMesh(&terrain7.terrainBaseMesh,&terrain8.terrainBaseMesh);
+            lerpMesh2(&terrain8.terrainBaseMesh);
+            lerpMesh3(&terrain7.terrainBaseMesh); 
+   
             lerpMeshOther(&terrain3.terrainBaseMesh,&terrain4.terrainBaseMesh);
             lerpMeshOther2(&terrain3.terrainBaseMesh);
             lerpMeshOther3(&terrain4.terrainBaseMesh);
+            
             lerpMeshOther(&terrain.terrainBaseMesh,&terrain5.terrainBaseMesh);
             lerpMeshOther2(&terrain.terrainBaseMesh);
             lerpMeshOther3(&terrain5.terrainBaseMesh);
+            
+            lerpMeshOther(&terrain2.terrainBaseMesh,&terrain9.terrainBaseMesh);
+            lerpMeshOther2(&terrain2.terrainBaseMesh);
+            lerpMeshOther3(&terrain9.terrainBaseMesh);
+
+            lerpMeshOther(&terrain8.terrainBaseMesh,&terrain2.terrainBaseMesh);
+            lerpMeshOther2(&terrain8.terrainBaseMesh);
+            lerpMeshOther3(&terrain2.terrainBaseMesh);
+
+            lerpMeshOther(&terrain6.terrainBaseMesh,&terrain3.terrainBaseMesh);
+            lerpMeshOther2(&terrain6.terrainBaseMesh);
+            lerpMeshOther3(&terrain3.terrainBaseMesh);
+
+            lerpMeshOther(&terrain7.terrainBaseMesh,&terrain.terrainBaseMesh);
+            lerpMeshOther2(&terrain7.terrainBaseMesh);
+            lerpMeshOther3(&terrain.terrainBaseMesh);
             
             std::cout << std::endl;
             /*lerpMesh(&terrain3.terrainBaseMesh,&terrain.terrainBaseMesh);
@@ -428,14 +466,16 @@ int main(){
             terrain4.terrainBaseMesh.SetupMesh();  
             terrain5.terrainBaseMesh.SetupMesh();  
             terrain6.terrainBaseMesh.SetupMesh();  
+            terrain7.terrainBaseMesh.SetupMesh();  
+            terrain8.terrainBaseMesh.SetupMesh();  
+            terrain9.terrainBaseMesh.SetupMesh(); 
             first = true;
         }
         shader.setMat4("model", modelMatrix);
         terrain.draw();
 
         shader.setMat4("model", modelMatrix4);
-        //terrain2.draw();
-
+        terrain2.draw();
 
         shader.setMat4("model", modelMatrix7);
         terrain4.draw();
@@ -447,16 +487,16 @@ int main(){
         terrain3.draw();
 
         shader.setMat4("model", modelMatrix6);
-        //terrain6.draw();
+        terrain6.draw();
 
-        shader.setMat4("model", modelMatrix7);
-        //terrain.drawXYMesh();
+        shader.setMat4("model", modelMatrix3);
+        terrain7.draw();
 
         shader.setMat4("model", modelMatrix8);
-        //terrain.drawXYMesh();
+        terrain8.draw();
 
         shader.setMat4("model", modelMatrix9);
-        //terrain.drawXYMesh();
+        terrain9.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -709,7 +749,7 @@ void createNoise(Mesh *m){
   void lerpMeshOther2(Mesh *a){
     for(int i = 1; i < vertexCount; i++){
         for(int j = 0; j < a->vertices.size(); j = j + vertexCount){
-            float value = lerp(a->vertices[j + i].Position.y,a->vertices[j].Position.y,0.2f);          
+            float value = lerp(a->vertices[j + i].Position.y,a->vertices[j].Position.y,0.2f + ((0.8 / (vertexCount - 1)) * (i - 1)));          
             a->vertices[j + i].Position.y = value;
         }
     }
@@ -718,7 +758,8 @@ void createNoise(Mesh *m){
   void lerpMeshOther3(Mesh *a){
     for(int i = 1; i < vertexCount; i++){
         for(int j = 0; j < a->vertices.size(); j = j + vertexCount){
-            float value = lerp(a->vertices[j + vertexCount - 1 - i].Position.y,a->vertices[j + vertexCount - i].Position.y,0.2f);          
+            float value = lerp(a->vertices[j + vertexCount - 1 - i].Position.y,a->vertices[j + vertexCount - i].Position.y,0.2f 
+                + ((0.8 / (vertexCount - 1)) * (i - 1)));          
             a->vertices[j + vertexCount - 1 - i].Position.y = value;
         }
     }
