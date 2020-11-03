@@ -34,7 +34,8 @@
 
 #include <utils/FastNoiseLite.h>
 
-#include <utils/terrainGeneration.h>
+#include <utils/terrain.h>
+#include <utils/terrainManagement.h>
 
 // dimensions of application's window
 GLuint screenWidth = 800, screenHeight = 600;
@@ -198,90 +199,55 @@ int main(){
 
     std::cout << "After 2 texture" << std::endl;
     
-    GLint grassTexture = LoadTexture("../../textures/plane/ground2.jpg");
+    GLint grassTexture = LoadTexture("../../textures/plane/ground4.jpg");
 
     std::cout << "After 3 texture" << std::endl;
 
-    //Terrain terrain(0,0,vertices);
-    //vector<Terrain> terrains = generateTerrains(10,10);
-    //createNoise(&terrain.terrainMesh);
-    //terrain.terrainMesh.SetupMesh();
-
     GLfloat orientationY = -90.0f;
 
-    TerrainGeneration terrain(2);
-    TerrainGeneration terrain2(3);
-    TerrainGeneration terrain3(4);
-    TerrainGeneration terrain4(5);
-    TerrainGeneration terrain5(6);
-    TerrainGeneration terrain6(7);
-    TerrainGeneration terrain7(8);
-    TerrainGeneration terrain8(9);
-    TerrainGeneration terrain9(10);
+    //Create terrains and iterpolate them.
+    Terrain terrain(2);
+    Terrain terrain2(3);
+    Terrain terrain3(4);
+    Terrain terrain4(5);
+    Terrain terrain5(6);
+    Terrain terrain6(7);
+    Terrain terrain7(8);
+    Terrain terrain8(9);
+    Terrain terrain9(10);
+
+    GLfloat size = terrain.getSize();
+    //vector<Terrain> terrains{terrain,terrain2,terrain3,terrain4,terrain5,terrain6,terrain7,terrain8,terrain9};
 
     glm::mat4 modelMatrix = glm::mat4(1.0f);     
     modelMatrix = glm::translate(modelMatrix, glm::vec3(0, 0.0f, 0));
 
     glm::mat4 modelMatrix2 = glm::mat4(1.0f);     
-    modelMatrix2 = glm::translate(modelMatrix2, glm::vec3(-500000, 0.0f, 0));
+    modelMatrix2 = glm::translate(modelMatrix2, glm::vec3(-size, 0.0f, 0));
 
     glm::mat4 modelMatrix3 = glm::mat4(1.0f);     
-    modelMatrix3 = glm::translate(modelMatrix3, glm::vec3(+500000, 0.0f, 0));
+    modelMatrix3 = glm::translate(modelMatrix3, glm::vec3(+size, 0.0f, 0));
 
     glm::mat4 modelMatrix4 = glm::mat4(1.0f);    
-    modelMatrix4 = glm::translate(modelMatrix4, glm::vec3(0.0f, 0.0f, -500000.0f));
+    modelMatrix4 = glm::translate(modelMatrix4, glm::vec3(0.0f, 0.0f, -size));
 
     glm::mat4 modelMatrix5 = glm::mat4(1.0f);     
-    modelMatrix5 = glm::translate(modelMatrix5, glm::vec3(0.0f, 0.0f, 500000.0f));
+    modelMatrix5 = glm::translate(modelMatrix5, glm::vec3(0.0f, 0.0f, size));
     
     glm::mat4 modelMatrix6 = glm::mat4(1.0f);     
-    modelMatrix6 = glm::translate(modelMatrix6, glm::vec3(500000.0f, 0.0f, 500000.0f));
+    modelMatrix6 = glm::translate(modelMatrix6, glm::vec3(size, 0.0f,size));
 
     glm::mat4 modelMatrix7 = glm::mat4(1.0f);     
-    modelMatrix7 = glm::translate(modelMatrix7, glm::vec3(-500000.0f, 0.0f, 500000.0f));
+    modelMatrix7 = glm::translate(modelMatrix7, glm::vec3(-size, 0.0f, size));
 
     glm::mat4 modelMatrix8 = glm::mat4(1.0f);     
-    modelMatrix8 = glm::translate(modelMatrix8, glm::vec3(500000.0f, 0.0f, -500000.0f));
+    modelMatrix8 = glm::translate(modelMatrix8, glm::vec3(size, 0.0f, -size));
 
     glm::mat4 modelMatrix9 = glm::mat4(1.0f);     
-    modelMatrix9 = glm::translate(modelMatrix9, glm::vec3(-500000.0f, 0.0f, -500000.0f));
+    modelMatrix9 = glm::translate(modelMatrix9, glm::vec3(-size, 0.0f, -size));
 
-   
-    //modelMatrix4 = glm::rotate(modelMatrix4,glm::radians(orientationY),glm::vec3(0.0f,1.0f,0.0f));
+    TerrainManagement terrainManagement(&terrain,&terrain2,&terrain3,&terrain4,&terrain5,&terrain6,&terrain7,&terrain8,&terrain9);
 
-
- /*int index = 0;
-    for(int i=0;i<4;i++){
-        std::cout << std::endl;
-		for(int j=0;j<4;j++){
-            std::cout << terrain.terrainBaseMesh.indices[index] << " ";
-            index++;
-		}
-	}
-
-    /*std::cout <<  std::endl;
-
-    index = 0;
-    for(int i=0;i<vertices;i++){
-		for(int j=0;j<4;j++){
-            std::cout << terrain.terrainYMirroredBaseMesh.vertices[index].Position.x << " " << terrain.terrainYMirroredBaseMesh.vertices[index].Position.y 
-                << " " << terrain.terrainYMirroredBaseMesh.vertices[index].Position.z << std::endl;
-            index++;
-		}
-	}
-
-/*for(int p = 0; p < terrains.size(); p++){
-    std::cout << std::endl << std::endl;
-    for(int i = 0; i < 4; i++){
-        std::cout << std::endl;
-        for(int j = 0; j < 4; j++){
-            std::cout << terrains[p].getModelMatrix()[i][j] << " ";
-        }
-    }
-}    */
-    // Rendering loop: this code is executed at each frame
-
-    bool first = false;
     while(!glfwWindowShouldClose(window)){
 
         calculateFPS();
@@ -325,152 +291,6 @@ int main(){
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, grassTexture);
 
-        /*for(int i = 0; i < terrains.size(); i++){
-            //std::cout << "prova " << terrains[i].getModelMatrix()[0][0] << std::endl;
-            shader.setMat4("model", terrains[i].getModelMatrix());
-            terrains[i].draw(); 
-        } */   
-
-
-        /*
-        shader.setMat4("model", modelMatrix8);
-        terrain.draw();
-
-        shader.setMat4("model", modelMatrix9);
-        terrain2.draw();
-*/
-        if(!first){
-            
-            /*int index = 0;
-            for(int i = 0; i < vertexCount; i++){
-                std::cout << std::endl;
-                for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrain3.terrainBaseMesh.vertices[index].Position.y << " ";
-                index++;
-                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
-                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
-                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
-            /*    }
-            }   
-            std::cout << std::endl;
-            index = 0;
-             for(int i = 0; i < vertexCount; i++){
-                std::cout << std::endl;
-                for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrain4.terrainBaseMesh.vertices[index].Position.y << " ";
-                index++;
-                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
-                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
-                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
-            /*    }
-            } */
-
-            /*lerpMeshOther(&terrain3.terrainBaseMesh,&terrain4.terrainBaseMesh);
-            lerpMeshOther2(&terrain3.terrainBaseMesh);
-            lerpMeshOther3(&terrain4.terrainBaseMesh);
-
-            /*std::cout << std::endl;
-            index = 0;
-            for(int i = 0; i < vertexCount; i++){
-                std::cout << std::endl;
-                for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrain3.terrainBaseMesh.vertices[index].Position.y << " ";
-                index++;
-                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
-                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
-                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
-            /*    }
-            }   
-            std::cout << std::endl;
-            index = 0;
-             for(int i = 0; i < vertexCount; i++){
-                std::cout << std::endl;
-                for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrain4.terrainBaseMesh.vertices[index].Position.y << " ";
-                index++;
-                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
-                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
-                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
-            /*    }
-            } */
-
-            /*lerpMesh(&terrain.terrainBaseMesh,&terrain2.terrainBaseMesh);
-            lerpMesh2(&terrain2.terrainBaseMesh);
-            lerpMesh3(&terrain.terrainBaseMesh);
-            lerpMesh(&terrain3.terrainBaseMesh,&terrain.terrainBaseMesh);
-            lerpMesh2(&terrain.terrainBaseMesh);
-            lerpMesh3(&terrain3.terrainBaseMesh);*/
-
-            /*lerpMesh(&terrain5.terrainBaseMesh,&terrain4.terrainBaseMesh);
-            lerpMesh2(&terrain4.terrainBaseMesh);
-            lerpMesh3(&terrain5.terrainBaseMesh);
-            lerpMesh(&terrain6.terrainBaseMesh,&terrain5.terrainBaseMesh);
-            lerpMesh2(&terrain5.terrainBaseMesh);
-            lerpMesh3(&terrain6.terrainBaseMesh);*/
-            
-            lerpMesh(&terrain3.terrainBaseMesh,&terrain.terrainBaseMesh);
-            lerpMesh2(&terrain.terrainBaseMesh);
-            lerpMesh3(&terrain3.terrainBaseMesh);
-            
-            lerpMesh(&terrain4.terrainBaseMesh,&terrain5.terrainBaseMesh);
-            lerpMesh2(&terrain5.terrainBaseMesh);
-            lerpMesh3(&terrain4.terrainBaseMesh);
-            
-            lerpMesh(&terrain5.terrainBaseMesh,&terrain9.terrainBaseMesh);
-            lerpMesh2(&terrain9.terrainBaseMesh);
-            lerpMesh3(&terrain5.terrainBaseMesh);
-
-            lerpMesh(&terrain.terrainBaseMesh,&terrain2.terrainBaseMesh);
-            lerpMesh2(&terrain2.terrainBaseMesh);
-            lerpMesh3(&terrain.terrainBaseMesh);  
-
-            lerpMesh(&terrain6.terrainBaseMesh,&terrain7.terrainBaseMesh);
-            lerpMesh2(&terrain7.terrainBaseMesh);
-            lerpMesh3(&terrain6.terrainBaseMesh); 
-
-            lerpMesh(&terrain7.terrainBaseMesh,&terrain8.terrainBaseMesh);
-            lerpMesh2(&terrain8.terrainBaseMesh);
-            lerpMesh3(&terrain7.terrainBaseMesh); 
-   
-            lerpMeshOther(&terrain3.terrainBaseMesh,&terrain4.terrainBaseMesh);
-            lerpMeshOther2(&terrain3.terrainBaseMesh);
-            lerpMeshOther3(&terrain4.terrainBaseMesh);
-            
-            lerpMeshOther(&terrain.terrainBaseMesh,&terrain5.terrainBaseMesh);
-            lerpMeshOther2(&terrain.terrainBaseMesh);
-            lerpMeshOther3(&terrain5.terrainBaseMesh);
-            
-            lerpMeshOther(&terrain2.terrainBaseMesh,&terrain9.terrainBaseMesh);
-            lerpMeshOther2(&terrain2.terrainBaseMesh);
-            lerpMeshOther3(&terrain9.terrainBaseMesh);
-
-            lerpMeshOther(&terrain8.terrainBaseMesh,&terrain2.terrainBaseMesh);
-            lerpMeshOther2(&terrain8.terrainBaseMesh);
-            lerpMeshOther3(&terrain2.terrainBaseMesh);
-
-            lerpMeshOther(&terrain6.terrainBaseMesh,&terrain3.terrainBaseMesh);
-            lerpMeshOther2(&terrain6.terrainBaseMesh);
-            lerpMeshOther3(&terrain3.terrainBaseMesh);
-
-            lerpMeshOther(&terrain7.terrainBaseMesh,&terrain.terrainBaseMesh);
-            lerpMeshOther2(&terrain7.terrainBaseMesh);
-            lerpMeshOther3(&terrain.terrainBaseMesh);
-            
-            std::cout << std::endl;
-            /*lerpMesh(&terrain3.terrainBaseMesh,&terrain.terrainBaseMesh);
-            lerpMesh2(&terrain.terrainBaseMesh);
-            lerpMesh3(&terrain3.terrainBaseMesh);*/
-            terrain.terrainBaseMesh.SetupMesh();
-            terrain2.terrainBaseMesh.SetupMesh(); 
-            terrain3.terrainBaseMesh.SetupMesh();
-            terrain4.terrainBaseMesh.SetupMesh();  
-            terrain5.terrainBaseMesh.SetupMesh();  
-            terrain6.terrainBaseMesh.SetupMesh();  
-            terrain7.terrainBaseMesh.SetupMesh();  
-            terrain8.terrainBaseMesh.SetupMesh();  
-            terrain9.terrainBaseMesh.SetupMesh(); 
-            first = true;
-        }
         shader.setMat4("model", modelMatrix);
         terrain.draw();
 
@@ -614,20 +434,6 @@ GLint LoadTexture(const char* path){
 
 }
 
-/*vector<Terrain> generateTerrains(int x, int y){
-    vector<Terrain> terrains;
-
-    for(int i = 0; i < x; i++){
-        for(int j = 0; j < y; j++){
-            Terrain terrain(i,j,vertices);
-            createNoise(&terrain.terrainMesh);
-            terrain.terrainMesh.SetupMesh();
-            terrains.push_back(terrain);
-        }
-    }
-    return terrains;
-}*/
-
 void createNoise(Mesh *m){
 
     int width = vertices;
@@ -691,113 +497,4 @@ void createNoise(Mesh *m){
             frameCount = 0;
             initialTime = finalTime;
         }
- }
-
-
- //Lerp vertex
- void lerpMesh(Mesh *a, Mesh *b){
-    for(int i = 0; i < b->vertices.size() / vertexCount; i++){
-        //std::cout << " prima: " <<i << " , " << (b->vertices.size() - 1) - (vertexCount * ((int)(i / vertexCount) + 1) - 1) + i % vertexCount << std::endl;
-        float value = lerp(a->vertices[i].Position.y,b->vertices[(b->vertices.size() - 1) - (vertexCount * ((int)(i / vertexCount) + 1) - 1) + i % vertexCount].Position.y,0.5f);          
-        //std::cout << " Dopo: " << (b->vertices.size() - 2) - ((4 * ((int)i / 4) + 1)) + (i % 4 - 1) << std::endl;
-        a->vertices[i].Position.y = value;
-        b->vertices[(b->vertices.size() - 1) - (vertexCount * ((int)(i / vertexCount) + 1) - 1) + i % vertexCount].Position.y = value;
-    }
- }
-
- void lerpMesh2(Mesh *a){
-     int size = a->vertices.size() - vertexCount - 1;
-     float value1,value2,value3,value4;
-    for(int i = 0; i < size; i++){
-        /*if(((size - i) - vertexCount) >= 0)
-            value1 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - vertexCount].Position.y,0.5f);
-        if(((size - i) + vertexCount) <= (a->vertices.size() - 1))*/
-        value2 =  lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + vertexCount].Position.y,0.2f + ((0.8f/(vertexCount - 1))* ((int)(i / vertexCount)+1))); //((0.8f/vertexCount)(vertexCount*((int)i / vertexCount)+1)));
-        /*if(((size - i) - 1) >= 0)
-            value3 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - 1].Position.y,0.5f);
-        if(((size - i) + 1) <= (a->vertices.size() - 1))
-            value4 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + 1].Position.y,0.5f);*/
-        a->vertices[(size - i)].Position.y = value2;
-    }    
- }
-
-  void lerpMesh3(Mesh *a){
-     //int size = a->vertices.size() - vertexCount - 1;
-     float value1,value2,value3,value4;
-    for(int i = vertexCount; i < a->vertices.size(); i++){
-        /*if(((size - i) - vertexCount) >= 0)
-            value1 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - vertexCount].Position.y,0.5f);
-        if(((size - i) + vertexCount) <= (a->vertices.size() - 1))*/
-        value2 =  lerp(a->vertices[i].Position.y,a->vertices[i - vertexCount].Position.y,0.2f + ((0.8f/(vertexCount - 1))* ((int)(i / vertexCount))));
-        /*if(((size - i) - 1) >= 0)
-            value3 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - 1].Position.y,0.5f);
-        if(((size - i) + 1) <= (a->vertices.size() - 1))
-            value4 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + 1].Position.y,0.5f);*/
-        a->vertices[i].Position.y = value2;
-    }    
- }
-
-  //Lerp vertex
- void lerpMeshOther(Mesh *a, Mesh *b){
-    for(int i = 0; i < b->vertices.size(); i = i + vertexCount){
-        float value = lerp(a->vertices[i].Position.y,b->vertices[i + vertexCount - 1].Position.y,0.5f);          
-        a->vertices[i].Position.y = value;
-        b->vertices[i + vertexCount - 1].Position.y = value;
-    }
- }
-
-  void lerpMeshOther2(Mesh *a){
-    for(int i = 1; i < vertexCount; i++){
-        for(int j = 0; j < a->vertices.size(); j = j + vertexCount){
-            float value = lerp(a->vertices[j + i].Position.y,a->vertices[j].Position.y,0.2f + ((0.8 / (vertexCount - 1)) * (i - 1)));          
-            a->vertices[j + i].Position.y = value;
-        }
-    }
-  }
-
-  void lerpMeshOther3(Mesh *a){
-    for(int i = 1; i < vertexCount; i++){
-        for(int j = 0; j < a->vertices.size(); j = j + vertexCount){
-            float value = lerp(a->vertices[j + vertexCount - 1 - i].Position.y,a->vertices[j + vertexCount - i].Position.y,0.2f 
-                + ((0.8 / (vertexCount - 1)) * (i - 1)));          
-            a->vertices[j + vertexCount - 1 - i].Position.y = value;
-        }
-    }
-  }
- /*void lerpMesh4(Mesh *a){
-     
-     int size = a->vertices.size() - vertexCount - 1;
-     //int size = a->vertices.size() - vertexCount - 1;
-     float value2;
-    for(int i = vertexCount; i < size; i++){
-        /*if(((size - i) - vertexCount) >= 0)
-            value1 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - vertexCount].Position.y,0.5f);
-        if(((size - i) + vertexCount) <= (a->vertices.size() - 1))*/
- //       value2 =  lerp(a->vertices[i].Position.y,a->vertices[i - vertexCount].Position.y,0.2f);
-        /*if(((size - i) - 1) >= 0)
-            value3 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - 1].Position.y,0.5f);
-        if(((size - i) + 1) <= (a->vertices.size() - 1))
-            value4 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + 1].Position.y,0.5f);*/
-/*        a->vertices[i].Position.y = value2;
-    }    
- }
-
- void lerpMesh5(Mesh *a){
-     int size = a->vertices.size() - vertexCount - 1;
-     float value1,value2,value3,value4;
-    for(int i = 0; i < (size - vertexCount); i++){
-        /*if(((size - i) - vertexCount) >= 0)
-            value1 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - vertexCount].Position.y,0.5f);
-        if(((size - i) + vertexCount) <= (a->vertices.size() - 1))*/
-  //      value2 =  lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + vertexCount].Position.y,0.2f);
-        /*if(((size - i) - 1) >= 0)
-            value3 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) - 1].Position.y,0.5f);
-        if(((size - i) + 1) <= (a->vertices.size() - 1))
-            value4 = lerp(a->vertices[(size - i)].Position.y,a->vertices[(size - i) + 1].Position.y,0.5f);*/
-   /*     a->vertices[(size - i)].Position.y = value2;
-    }    
- }*/
-
-float lerp(float a, float b, float c){
-     return a * c + b * (1-c);
  }

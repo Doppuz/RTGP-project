@@ -41,15 +41,15 @@ in vec3 vNormal;
 void main(){
     //if(h < -15.0f)
     //    FragColor = texture(groundTexture, outTexture);
-    float interpolation =  h - 15; 
+    float interpolation =  h; 
     FragColor = texture(grassTexture, outTexture);
-    /*if (h > 35)
+    if (h > 16015)
         FragColor = texture(snowTexture, outTexture);
     else if (h < 15)
         FragColor = texture(grassTexture, outTexture);
     else 
-        FragColor = (interpolation / 20) * texture(snowTexture, outTexture) +
-         (1 - (interpolation / 20)) * texture(grassTexture, outTexture) ;
+        FragColor = (interpolation / 16000) * texture(snowTexture, outTexture) +
+         (1 - (interpolation / 16000)) * texture(grassTexture, outTexture) ;
     /*else if (h >= -50 && h <= -20)
         FragColor = ((abs(h) - 20) / 30) * texture(groundTexture, outTexture) +
          (1 - ((abs(h) - 20) / 30)) * texture(grassTexture, outTexture) ;
