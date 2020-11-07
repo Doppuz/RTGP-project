@@ -79,10 +79,6 @@ GLfloat lastX, lastY;
 void apply_camera_movements(GLFWwindow* window);
 void light_movements(GLFWwindow* window);
 
-// parameters for time calculation (for animations)
-GLfloat deltaTime = 0.0f;
-GLfloat lastFrame = 0.0f;  
-
 //Projection matrix
 glm::mat4 projection;
 
@@ -90,14 +86,16 @@ glm::mat4 projection;
 glm::mat4 view = glm::mat4(1.0f);
 
 //Camera
-Camera camera(glm::vec3(0.0f, 50.0f, 0.0f), GL_FALSE);
-//Camera camera(glm::vec3(0.0f, 600.0f, 2000.0f), GL_FALSE);
+Camera camera(glm::vec3(0.0f, 25000.0f, 25000.0f), GL_FALSE);
+Camera farCamera(glm::vec3(0.0f,50000.0f,200000.0f),GL_FALSE);
+Camera actualCamera = camera;
 
 // vector for the textures IDs
 vector<GLint> textureID;
 
-//Texture
-//GLint texture = LoadTexture("../../textures/UV_Grid_Sm.png");
+// parameters for time calculation (for animations)
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
 
 //FPS
 double lastTime = glfwGetTime();
@@ -126,6 +124,8 @@ GLfloat orientationY = 0.0f;
 GLfloat spin_speed = 30.0f;
 
 int vertexCount = 64;
+
+int cam = 0;
 
 /////////////////// MAIN function ///////////////////////
 int main(){
@@ -180,14 +180,8 @@ int main(){
 
     // we create and compile shaders (code of Shader class is in include/utils/shader_v1.h)
     Shader shader("00_basic.vert", "00_basic.frag");
-    shader.Use();  
 
-    //projection = glm::perspective(45.0f, (float)screenWidth/(float)screenHeight, 0.1f, 10000.0f);
-    projection = glm::perspective(45.0f, (float)screenWidth/(float)screenHeight, 0.1f, 5000000.0f);
-    shader.setMat4("projection", projection); 
-    
-    /*glm::mat4 modelMatrix = glm::mat4(1.0f);     
-    modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));*/
+    Shader shaderSphere("01_sphere.vert", "01_sphere.frag");
 
     std::cout << "Before texture" << std::endl;
 
@@ -199,25 +193,21 @@ int main(){
 
     std::cout << "After 2 texture" << std::endl;
     
-    GLint grassTexture = LoadTexture("../../textures/plane/ground4.jpg");
+    GLint grassTexture = LoadTexture("../../textures/plane/ground2.jpg");
 
     std::cout << "After 3 texture" << std::endl;
 
+    GLint redTexture = LoadTexture("../../textures/plane/redTexture.jpg");
+
     GLfloat orientationY = -90.0f;
 
-    //Create terrains and iterpolate them.
-    Terrain terrain(2);
-    Terrain terrain2(3);
-    Terrain terrain3(4);
-    Terrain terrain4(5);
-    Terrain terrain5(6);
-    Terrain terrain6(7);
-    Terrain terrain7(8);
-    Terrain terrain8(9);
-    Terrain terrain9(10);
+    Model sphere = Model("../../models/sphere.obj");
+    sphere.meshes[0].SetupMesh();
 
-    GLfloat size = terrain.getSize();
-    //vector<Terrain> terrains{terrain,terrain2,terrain3,terrain4,terrain5,terrain6,terrain7,terrain8,terrain9};
+    //terrain
+    TerrainManagement terrainManagement;
+
+    GLfloat size = terrainManagement.terrains[0].getSize();
 
     glm::mat4 modelMatrix = glm::mat4(1.0f);     
     modelMatrix = glm::translate(modelMatrix, glm::vec3(0, 0.0f, 0));
@@ -246,11 +236,29 @@ int main(){
     glm::mat4 modelMatrix9 = glm::mat4(1.0f);     
     modelMatrix9 = glm::translate(modelMatrix9, glm::vec3(-size, 0.0f, -size));
 
-    TerrainManagement terrainManagement(&terrain,&terrain2,&terrain3,&terrain4,&terrain5,&terrain6,&terrain7,&terrain8,&terrain9);
+    //TerrainManagement terrainManagement(&terrain,&terrain2,&terrain3,&terrain4,&terrain5,&terrain6,&terrain7,&terrain8,&terrain9);
+
+    bool first = false;
 
     while(!glfwWindowShouldClose(window)){
 
-        calculateFPS();
+        //std::cout << actualCamera.Position.x << " " <<  actualCamera.Position.y << " " <<  actualCamera.Position.z << std::endl;
+
+        if(actualCamera.Position.z <= -25000 && !first){
+            first = true;
+            
+            modelMatrix5 = glm::translate(modelMatrix5, glm::vec3(0.0f, 0.0f, size - 200000));
+            modelMatrix6 = glm::translate(modelMatrix6, glm::vec3(0, 0.0f,size - 200000));
+            modelMatrix7 = glm::translate(modelMatrix7, glm::vec3(0, 0.0f, +size - 200000));
+        }
+            
+
+        shader.Use();  
+
+        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,10000000.0f);
+        shader.setMat4("projection", projection);   
+
+        //calculateFPS();
 
         if (spinning)
             orientationY+=(deltaTime*spin_speed);
@@ -259,7 +267,7 @@ int main(){
         light_movements(window);
 
         // View matrix (=camera): position, view direction, camera "up" vector
-        view = camera.GetViewMatrix();
+        view = actualCamera.GetViewMatrix();
         shader.setMat4("view", view);
 
         //light
@@ -292,31 +300,51 @@ int main(){
         glBindTexture(GL_TEXTURE_2D, grassTexture);
 
         shader.setMat4("model", modelMatrix);
-        terrain.draw();
+        terrainManagement.terrains[0].draw();
 
         shader.setMat4("model", modelMatrix4);
-        terrain2.draw();
-
-        shader.setMat4("model", modelMatrix7);
-        terrain4.draw();
-
-        shader.setMat4("model", modelMatrix2);
-        terrain5.draw();
+        terrainManagement.terrains[1].draw();
 
         shader.setMat4("model", modelMatrix5);
-        terrain3.draw();
+        terrainManagement.terrains[2].draw();
+
+        shader.setMat4("model", modelMatrix7);
+        terrainManagement.terrains[3].draw();
+
+        shader.setMat4("model", modelMatrix2);
+        terrainManagement.terrains[4].draw();
 
         shader.setMat4("model", modelMatrix6);
-        terrain6.draw();
+        terrainManagement.terrains[5].draw();
 
         shader.setMat4("model", modelMatrix3);
-        terrain7.draw();
+        terrainManagement.terrains[6].draw();
 
         shader.setMat4("model", modelMatrix8);
-        terrain8.draw();
+        terrainManagement.terrains[7].draw();
 
         shader.setMat4("model", modelMatrix9);
-        terrain9.draw();
+        terrainManagement.terrains[8].draw();
+
+       /*shaderSphere.Use();
+
+        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,10000000.0f);
+        shaderSphere.setMat4("projection", projection); 
+
+        view = camera.GetViewMatrix();
+        shaderSphere.setMat4("view", view);  
+
+        shaderSphere.setInt("redTexture",0);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, redTexture);
+
+        glm::mat4 modelSphereMatrix = glm::mat4(1.0f);     
+        modelSphereMatrix = glm::translate(modelSphereMatrix, glm::vec3(0.0f, 25000.0f, 1500.0f));
+        modelSphereMatrix = glm::scale(modelSphereMatrix, glm::vec3(100.0f, 100.0f, 100.0f));
+
+        shaderSphere.setMat4("model", modelSphereMatrix);
+        sphere.Draw();*/
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -348,20 +376,26 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         wireframe=!wireframe;
 
          // if P is pressed, we start/stop the animated rotation of models
-    if(key == GLFW_KEY_P && action == GLFW_PRESS)
-        spinning=!spinning;
+    if(key == GLFW_KEY_P && action == GLFW_PRESS){
+        if(cam == 0)
+            actualCamera = farCamera;
+        else  
+            actualCamera = camera;
+        cam = (cam + 1) % 2;    
+    }    
 }
 
 //Camera key movement.
 void apply_camera_movements(GLFWwindow* window){
-    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        camera.ProcessKeyboard(FORWARD, deltaTime);
-    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        camera.ProcessKeyboard(BACKWARD, deltaTime);
-    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        camera.ProcessKeyboard(LEFT, deltaTime);
-    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        camera.ProcessKeyboard(RIGHT, deltaTime);
+    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
+        actualCamera.ProcessKeyboard(FORWARD, deltaTime);
+    }if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
+        actualCamera.ProcessKeyboard(BACKWARD, deltaTime);
+    }if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        actualCamera.ProcessKeyboard(LEFT, deltaTime);
+    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
+        actualCamera.ProcessKeyboard(RIGHT, deltaTime);
+    }    
 }
 
 //Light key movement.
@@ -395,7 +429,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
       lastY = ypos;
 
       // we pass the offset to the Camera class instance in order to update the rendering
-      camera.ProcessMouseMovement(xoffset, yoffset);
+      actualCamera.ProcessMouseMovement(xoffset, yoffset);
 
 }
 
