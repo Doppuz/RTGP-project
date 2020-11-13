@@ -57,5 +57,11 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-include/
+include/assimp/
+include/bullet/
+include/glad/
+include/glfw/
+include/glm/
+include/noise/
+stb_image
 libs/
