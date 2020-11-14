@@ -55,16 +55,9 @@ void setupMesh(Mesh m);
 void calculateFPS();
 //ComputeNormal
 void calculateNormal(vector<vector<Vertex>> m, Mesh *mesh);
-//lerp
-void lerpMesh(Mesh *a, Mesh *b);
-void lerpMeshOther(Mesh *a, Mesh *b);
-void lerpMeshOther2(Mesh *a);
-void lerpMeshOther3(Mesh *a);
-void lerpMesh2(Mesh *a);
-void lerpMesh3(Mesh *a);
-void lerpMesh4(Mesh *a);
-void lerpMesh5(Mesh *a);
-float lerp(float a, float b, float c);
+//TerrainPos
+void changeTerrainPos(TerrainManagement* manager);
+
 
 //First movement bool
 bool firstMouse = true;
@@ -163,6 +156,9 @@ int main(){
         return -1;
     }
 
+    
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
       // configure global opengl state
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
@@ -193,7 +189,7 @@ int main(){
 
     std::cout << "After 2 texture" << std::endl;
     
-    GLint grassTexture = LoadTexture("../../textures/plane/ground2.jpg");
+    GLint grassTexture = LoadTexture("../../textures/plane/ground4.jpg");
 
     std::cout << "After 3 texture" << std::endl;
 
@@ -205,45 +201,22 @@ int main(){
     sphere.meshes[0].SetupMesh();
 
     //terrain
-    TerrainManagement terrainManagement;
+    TerrainManagement terrainManager;
 
     bool first = false;
 
     while(!glfwWindowShouldClose(window)){
 
-        std::cout << actualCamera.Position.x << " " <<  actualCamera.Position.y << " " <<  actualCamera.Position.z << std::endl;
+        //std::cout << actualCamera.Position.x << " " <<  actualCamera.Position.y << " " <<  actualCamera.Position.z << std::endl;
 
-        if(actualCamera.Position.x >= +25000 && !first){
-            first = true;
-            //up -25000
-            /*modelMatrix5 = glm::translate(modelMatrix5, glm::vec3(0.0f, 0.0f, size - 200000));
-            modelMatrix6 = glm::translate(modelMatrix6, glm::vec3(0, 0.0f,size - 200000));
-            modelMatrix7 = glm::translate(modelMatrix7, glm::vec3(0, 0.0f, +size - 200000));*/
-
-            //down 50000
-            /*modelMatrix9 = glm::translate(modelMatrix9, glm::vec3(0.0f, 0.0f, size + 100000));
-            modelMatrix4 = glm::translate(modelMatrix4, glm::vec3(0, 0.0f,size + 100000));
-            modelMatrix8 = glm::translate(modelMatrix8, glm::vec3(0, 0.0f, +size + 100000));*/
-
-            //right +25000
-            /*terrainManagement.terrains[0].translateModelMatrix(glm::vec3(+150000.0f, 0.0f, 0.0f));
-            terrainManagement.terrains[3].translateModelMatrix(glm::vec3(+150000.0f, 0.0f, 0.0f));
-            terrainManagement.terrains[6].translateModelMatrix(glm::vec3(+150000.0f, 0.0f, 0.0f));*/
-
-            //left -25000
-            /*modelMatrix8 = glm::translate(modelMatrix8, glm::vec3(-150000.0f, 0.0f, 0.0f));
-            modelMatrix3 = glm::translate(modelMatrix3, glm::vec3(-150000.0f, 0.0f, 0.0f));
-            modelMatrix6 = glm::translate(modelMatrix6, glm::vec3(-150000.0f, 0.0f, 0.0f));*/
+        changeTerrainPos(&terrainManager);
             
-        }
-            
-
         shader.Use();  
 
         projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,10000000.0f);
         shader.setMat4("projection", projection);   
 
-        //calculateFPS();
+        calculateFPS();
 
         if (spinning)
             orientationY+=(deltaTime*spin_speed);
@@ -284,32 +257,32 @@ int main(){
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, grassTexture);
 
-        shader.setMat4("model", terrainManagement.terrains[0].getModelMatrix());
-        terrainManagement.terrains[0].draw(); 
+        shader.setMat4("model", terrainManager.terrains[0].getModelMatrix());
+        terrainManager.terrains[0].draw(); 
 
-        shader.setMat4("model", terrainManagement.terrains[1].getModelMatrix());
-        terrainManagement.terrains[1].draw(); 
+        shader.setMat4("model", terrainManager.terrains[1].getModelMatrix());
+        terrainManager.terrains[1].draw(); 
 
-        shader.setMat4("model",terrainManagement.terrains[2].getModelMatrix());
-        terrainManagement.terrains[2].draw(); 
+        shader.setMat4("model",terrainManager.terrains[2].getModelMatrix());
+        terrainManager.terrains[2].draw(); 
 
-        shader.setMat4("model", terrainManagement.terrains[3].getModelMatrix());
-        terrainManagement.terrains[3].draw(); 
+        shader.setMat4("model", terrainManager.terrains[3].getModelMatrix());
+        terrainManager.terrains[3].draw(); 
 
-        shader.setMat4("model", terrainManagement.terrains[4].getModelMatrix());
-        terrainManagement.terrains[4].draw(); 
+        shader.setMat4("model", terrainManager.terrains[4].getModelMatrix());
+        terrainManager.terrains[4].draw(); 
 
-        shader.setMat4("model", terrainManagement.terrains[5].getModelMatrix());
-        terrainManagement.terrains[5].draw();
+        shader.setMat4("model", terrainManager.terrains[5].getModelMatrix());
+        terrainManager.terrains[5].draw();
 
-        shader.setMat4("model", terrainManagement.terrains[6].getModelMatrix());
-        terrainManagement.terrains[6].draw(); 
+        shader.setMat4("model", terrainManager.terrains[6].getModelMatrix());
+        terrainManager.terrains[6].draw(); 
 
-        shader.setMat4("model", terrainManagement.terrains[7].getModelMatrix());
-        terrainManagement.terrains[7].draw(); 
+        shader.setMat4("model", terrainManager.terrains[7].getModelMatrix());
+        terrainManager.terrains[7].draw(); 
 
-        shader.setMat4("model", terrainManagement.terrains[8].getModelMatrix());
-        terrainManagement.terrains[8].draw(); 
+        shader.setMat4("model", terrainManager.terrains[8].getModelMatrix());
+        terrainManager.terrains[8].draw(); 
 
        /*shaderSphere.Use();
 
@@ -518,8 +491,21 @@ void createNoise(Mesh *m){
         }
  }
 
-void changeTerrainPos(){
-    if(abs(actualCamera.Position.x - )){
+void changeTerrainPos(TerrainManagement* manager){
+    
+    if(actualCamera.Position.z - manager->getLastZ() <= 0){
+        manager->translateTerrain(manager->BACKWARD);
+        manager->increaseZ(true);
+    }else if(actualCamera.Position.z - manager->getLastZ() >= Terrain::getSize()){
+        manager->translateTerrain(manager->FORWARD);
+        manager->increaseZ(false);
+    }
 
+    if(actualCamera.Position.x - manager->getLastX() <= 0){
+        manager->translateTerrain(manager->RIGHT);
+        manager->increaseX(true);
+    }else if(actualCamera.Position.x - manager->getLastX() >= Terrain::getSize()){
+        manager->translateTerrain(manager->LEFT);
+        manager->increaseX(false);
     }
 }

@@ -12,13 +12,20 @@
 
 class TerrainManagement{
 public:
+
+    enum direction{
+        BACKWARD,
+        FORWARD,
+        RIGHT,
+        LEFT
+    };
+
     vector<Terrain> terrains;
 
-    //TerrainManagement(vector<Terrain> terrains){
-    //TerrainManagement(Terrain* terrain,Terrain* terrain2,Terrain* terrain3,Terrain* terrain4,Terrain* terrain5,Terrain* terrain6,
-    //    Terrain* terrain7,Terrain* terrain8,Terrain* terrain9){
     TerrainManagement()
-        :size{Terrain::getSize()}{
+        :size{Terrain::getSize()},lastXPosition{0}, lastZPosition{0}, indexLastRow{6},
+            indexLastColumn{2}{
+
         Terrain terrain(0, glm::vec3(-size, 0.0f, -size));
         Terrain terrain1(1, glm::vec3(0.0f, 0.0f, -size));
         Terrain terrain2(2, glm::vec3(size, 0.0f, -size));
@@ -48,9 +55,64 @@ public:
 
     }
 
+    GLint getLastX(){
+        return lastXPosition;
+    }
+
+    GLint getLastZ(){
+        return lastZPosition;
+    }
+
+    void increaseZ(bool negative) {
+        negative ? lastZPosition -= size : lastZPosition += size;
+    }
+
+    void increaseX(bool negative) {
+        negative ? lastXPosition -= size : lastXPosition += size;
+    }
+
+    void translateTerrain(int i){
+        switch(i){
+            case BACKWARD:
+                terrains[indexLastRow].translateModelMatrix( glm::vec3(0.0f, 0.0f, -(size * 3)));
+                terrains[indexLastRow+1].translateModelMatrix( glm::vec3(0.0f, 0.0f, -(size * 3)));
+                terrains[indexLastRow+2].translateModelMatrix( glm::vec3(0.0f, 0.0f, -(size * 3)));
+                indexLastRow = (indexLastRow + 6) % 9;
+                break;
+            case FORWARD:
+                {
+                    int indexFirstRow = (indexLastRow + 3) % 9;
+                    terrains[indexFirstRow].translateModelMatrix( glm::vec3(0.0f, 0.0f, +(size * 3)));
+                    terrains[indexFirstRow + 1].translateModelMatrix( glm::vec3(0.0f, 0.0f, +(size * 3)));
+                    terrains[indexFirstRow + 2].translateModelMatrix( glm::vec3(0.0f, 0.0f, +(size * 3)));
+                    indexLastRow = indexFirstRow;
+                }
+                break;
+            case RIGHT:
+                terrains[indexLastColumn].translateModelMatrix( glm::vec3(-(size * 3), 0.0f,0.0f));
+                terrains[indexLastColumn + 3].translateModelMatrix( glm::vec3(-(size * 3), 0.0f,0.0f));
+                terrains[indexLastColumn + 6].translateModelMatrix( glm::vec3(-(size * 3), 0.0f,0.0f));
+                indexLastColumn = (indexLastColumn + 2) % 3;
+                break;
+            case LEFT:
+                {
+                    int indexFirstColoumn = (indexLastColumn + 1) % 3;
+                    terrains[indexFirstColoumn].translateModelMatrix( glm::vec3(+(size * 3), 0.0f, 0.0f));
+                    terrains[indexFirstColoumn + 3].translateModelMatrix( glm::vec3(+(size * 3), 0.0f, 0.0f));
+                    terrains[indexFirstColoumn + 6].translateModelMatrix( glm::vec3(+(size * 3), 0.0f, 0.0f));
+                    indexLastColumn = indexFirstColoumn;
+                }
+                break;
+        }
+    }
+
 private:
     GLint vertexCount;
     GLint size;
+    GLint lastXPosition;
+    GLint lastZPosition;
+    GLint indexLastRow;
+    GLint indexLastColumn;
 
     void initialSetUp(){
         

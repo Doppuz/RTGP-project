@@ -33,12 +33,12 @@ enum Camera_Movement {
 
 // Default camera settings
 // Initial camera orientation on Y and X (Z not considered)
-const GLfloat YAW        = -90.0f; //Y
+const GLfloat YAW        = 90.0f; //Y
 const GLfloat PITCH      =  0.0f; //X
 
 // parameters to manage mouse movement
 const GLfloat SPEED      =  20000.0f;
-const GLfloat SENSITIVITY =  0.1f;
+const GLfloat SENSITIVITY =  0.25f;
 
 ///////////////////  CAMERA class ///////////////////////
 class Camera
