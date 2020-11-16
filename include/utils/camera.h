@@ -19,10 +19,6 @@ Universita' degli Studi di Milano
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <glad/glad.h>
-
-#include <glfw/glfw3.h>
-
 // possible camera movements
 enum Camera_Movement {
     FORWARD,
@@ -33,7 +29,7 @@ enum Camera_Movement {
 
 // Default camera settings
 // Initial camera orientation on Y and X (Z not considered)
-const GLfloat YAW        = 90.0f; //Y
+const GLfloat YAW        = -90.0f; //Y
 const GLfloat PITCH      =  0.0f; //X
 
 // parameters to manage mouse movement

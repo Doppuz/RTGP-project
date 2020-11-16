@@ -23,6 +23,11 @@ out vec3 vNormal;
 out vec2 outTexture;
 out float h;
 
+out float visibility;
+
+const float density = 0.007;
+const float gradient = 1.5;
+
 /*vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
 vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
 vec3 fade(vec3 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
@@ -153,6 +158,8 @@ float noise (in vec2 st) {
             (d - b) * u.x * u.y;
 }
 
+vec4 positionRelativeToCam;
+
 void main() {
 	//float height = noise(pos.xz);
 	outTexture = texCoord;
@@ -161,7 +168,13 @@ void main() {
   vec4 lightPos = view  * vec4(pointLightPosition, 1.0);
   lightDir = lightPos.xyz - pos.xyz;
   h = pos.y;
-  gl_Position = projection * view * model * vec4(pos, 1.0f);
+  
+  vec4 positionRelativeToCam = view * model;
+  float distance = length(positionRelativeToCam.xyz);
+  visibility = exp(-pow((distance*density),gradient));
+  visibility = clamp(visibility.0.0f,1.0f);
+
+  gl_Position = projection * positionRelativeToCam * vec4(pos, 1.0f);
 }
 
 

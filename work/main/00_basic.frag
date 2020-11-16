@@ -7,6 +7,9 @@ out vec4 FragColor;
 in vec2 outTexture;
 
 in float h;
+in float visibility;
+
+uniform vec3 skyColor;
 
 uniform sampler2D groundTexture;
 uniform sampler2D snowTexture;
@@ -50,6 +53,8 @@ void main(){
     else 
         FragColor = (interpolation / 8015) * texture(snowTexture, outTexture) +
          (1 - (interpolation / 8015)) * texture(grassTexture, outTexture) ;
+
+    FragColor = mix(vec4(skyColor,1.0),FragColor,visibility);
     /*else if (h >= -50 && h <= -20)
         FragColor = ((abs(h) - 20) / 30) * texture(groundTexture, outTexture) +
          (1 - ((abs(h) - 20) / 30)) * texture(grassTexture, outTexture) ;

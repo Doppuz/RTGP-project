@@ -38,7 +38,7 @@
 #include <utils/terrainManagement.h>
 
 // dimensions of application's window
-GLuint screenWidth = 800, screenHeight = 600;
+GLuint screenWidth = 1600, screenHeight = 800;
 
 // callback function for keyboard events
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -79,7 +79,7 @@ glm::mat4 projection;
 glm::mat4 view = glm::mat4(1.0f);
 
 //Camera
-Camera camera(glm::vec3(25000.0f, 25000.0f, 25000.0f), GL_FALSE);
+Camera camera(glm::vec3(25000.0f, 20000.0f, 25000.0f), GL_TRUE);
 Camera farCamera(glm::vec3(0.0f,50000.0f,200000.0f),GL_FALSE);
 Camera actualCamera = camera;
 
@@ -197,23 +197,31 @@ int main(){
 
     GLfloat orientationY = -90.0f;
 
-    Model sphere = Model("../../models/sphere.obj");
-    sphere.meshes[0].SetupMesh();
+
+    Model planeModel("../../models/plane.obj");
+    planeModel.meshes[0].SetupMesh();
 
     //terrain
     TerrainManagement terrainManager;
 
     bool first = false;
+    
+    
+    glm::mat4 planeModelMatrix = glm::mat4(1.0f);
 
     while(!glfwWindowShouldClose(window)){
 
         //std::cout << actualCamera.Position.x << " " <<  actualCamera.Position.y << " " <<  actualCamera.Position.z << std::endl;
 
+        GLfloat currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         changeTerrainPos(&terrainManager);
             
         shader.Use();  
 
-        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,10000000.0f);
+        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,100000.0f);
         shader.setMat4("projection", projection);   
 
         calculateFPS();
@@ -221,8 +229,7 @@ int main(){
         if (spinning)
             orientationY+=(deltaTime*spin_speed);
 
-        apply_camera_movements(window);
-        light_movements(window);
+        //light_movements(window);
 
         // View matrix (=camera): position, view direction, camera "up" vector
         view = actualCamera.GetViewMatrix();
@@ -236,13 +243,14 @@ int main(){
         // Check is an I/O event is happening
         glfwPollEvents();
 
-        GLfloat currentFrame = glfwGetTime();
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
+        apply_camera_movements(window);
+        
 
         // we "clear" the frame and z  buffer
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        shader.setVec3("skyColor",glm::vec3(0.5f,0.5f,0.5f));
 
         shader.setInt("groundTexture",0);
         shader.setInt("snowTexture",1);
@@ -303,15 +311,15 @@ int main(){
 
         shaderSphere.setMat4("model", modelSphereMatrix);
         sphere.Draw();*/
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-
+        
         if (wireframe)
             // Draw in wireframe
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         else
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+        
+        glfwSwapBuffers(window);
 
     }
 
