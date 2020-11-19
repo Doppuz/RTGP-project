@@ -25,8 +25,8 @@ out float h;
 
 out float visibility;
 
-const float density = 0.007;
-const float gradient = 1.5;
+const float density = 0.000009; //0.000008
+const float gradient = 10;
 
 /*vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
 vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
@@ -165,16 +165,16 @@ void main() {
 	outTexture = texCoord;
   vNormal = normal;
   // light incidence direction (in view coordinate)
-  vec4 lightPos = view  * vec4(pointLightPosition, 1.0);
-  lightDir = lightPos.xyz - pos.xyz;
+  //vec4 lightPos = view  * vec4(pointLightPosition, 1.0);
+  //lightDir = lightPos.xyz - pos.xyz;
   h = pos.y;
   
-  vec4 positionRelativeToCam = view * model;
+  vec4 positionRelativeToCam = view * model * vec4(pos, 1.0f);
   float distance = length(positionRelativeToCam.xyz);
   visibility = exp(-pow((distance*density),gradient));
-  visibility = clamp(visibility.0.0f,1.0f);
+  visibility = clamp(visibility,0.0f,1.0f);
 
-  gl_Position = projection * positionRelativeToCam * vec4(pos, 1.0f);
+  gl_Position = projection * positionRelativeToCam;
 }
 
 
