@@ -79,7 +79,7 @@ glm::mat4 projection;
 glm::mat4 view = glm::mat4(1.0f);
 
 //Camera
-Camera camera(glm::vec3(25000.0f, 8000.0f, 25000.0f), GL_TRUE); //25000,20000,25000
+Camera camera(glm::vec3(25000.0f, 8000.0f, 25000.0f), GL_FALSE); //25000,20000,25000
 Camera farCamera(glm::vec3(0.0f,50000.0f,200000.0f),GL_FALSE);
 Camera actualCamera = camera;
 
@@ -221,7 +221,7 @@ int main(){
             
         shader.Use();  
 
-        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,150000.0f); //100000
+        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,1500000.0f); //150000
         shader.setMat4("projection", projection);   
 
         calculateFPS();

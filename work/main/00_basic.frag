@@ -28,7 +28,8 @@ in vec3 lightDir;
 // the transformed normal has been calculated per-vertex in the vertex shader
 in vec3 vNormal;
 
-/*vec3 Lambert(sampler2D texture){ // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
+vec3 Lambert() // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
+{
     // normalization of the per-fragment normal
     vec3 N = normalize(vNormal);
     // normalization of the per-fragment light incidence direction
@@ -38,14 +39,15 @@ in vec3 vNormal;
     float lambertian = max(dot(L,N), 0.0);
 
     // Lambert illumination model  
-    return vec3(Kd * lambertian * texture(texture, outTexture));
-}*/
+    return vec3(Kd * lambertian * texture(grassTexture, outTexture));
+}
 
 void main(){
     //if(h < -15.0f)
     //    FragColor = texture(groundTexture, outTexture);
     float interpolation =  h; 
-    FragColor = texture(grassTexture, outTexture);
+    FragColor = vec4(Lambert(), 1.0);
+    //FragColor = texture(grassTexture, outTexture);
     /*if (h > 8015)
         FragColor = texture(snowTexture, outTexture);
     else if (h < 15)
@@ -54,7 +56,7 @@ void main(){
         FragColor = (interpolation / 8015) * texture(snowTexture, outTexture) +
          (1 - (interpolation / 8015)) * texture(grassTexture, outTexture) ;*/
 
-    FragColor = mix(vec4(skyColor,1.0),FragColor,visibility);
+    //FragColor = mix(vec4(skyColor,1.0),FragColor,visibility);
     /*else if (h >= -50 && h <= -20)
         FragColor = ((abs(h) - 20) / 30) * texture(groundTexture, outTexture) +
          (1 - ((abs(h) - 20) / 30)) * texture(grassTexture, outTexture) ;
@@ -69,7 +71,6 @@ void main(){
     else //if(h >= 15 && h <= 35)
         FragColor = (interpolation / 30) * vec4(Lambert(snowTexture), 1.0) +
          (1 - (interpolation / 30)) * vec4(Lambert(grassTexture), 1.0) ;*/
-    //FragColor = vec4(Lambert(), 1.0);
     //FragColor = texture(grassTexture, outTexture);
     //FragColor = vec4(Lambert(grassTexture), 1.0);
 }

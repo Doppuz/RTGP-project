@@ -138,6 +138,53 @@ private:
         lerpHorizontal(&terrains[5].mesh,&terrains[3].mesh);
         lerpHorizontal(&terrains[8].mesh,&terrains[6].mesh);
 
+        /*for(int i = 0; i < terrains.size(); i++)
+             calculateNormal(&terrains[i].mesh,i);*/
+
+
+        int index = 0;
+            for(int i = 0; i < vertexCount; i++){
+                std::cout << std::endl;
+                for(int j = 0; j < vertexCount; j++){
+                std::cout << " " << terrains[0].mesh.vertices[index].Position.y << " ";
+                index++;
+                }
+            }   
+            
+            std::cout << std::endl;
+
+         index = 0;
+            for(int i = 0; i < vertexCount; i++){
+                std::cout << std::endl;
+                for(int j = 0; j < vertexCount; j++){
+                std::cout << " " << terrains[8].mesh.vertices[index].Position.y << " ";
+                index++;
+                }
+            } 
+
+            std::cout << std::endl;
+            index = 0;
+             for(int i = 0; i < vertexCount; i++){
+                std::cout << std::endl;
+                for(int j = 0; j < vertexCount; j++){
+                std::cout << " ( " << terrains[0].mesh.vertices[index].Normal.x << " " << terrains[0].mesh.vertices[index].Normal.y << " " 
+                    << terrains[0].mesh.vertices[index].Normal.z << " ) ";
+                index++;
+                }
+            } 
+
+        calculateNormal(&terrains[0].mesh,0);
+
+         std::cout << std::endl;
+            index = 0;
+             for(int i = 0; i < vertexCount; i++){
+                std::cout << std::endl;
+                for(int j = 0; j < vertexCount; j++){
+                std::cout << " ( " << terrains[0].mesh.vertices[index].Normal.x << " " << terrains[0].mesh.vertices[index].Normal.y << " " 
+                    << terrains[0].mesh.vertices[index].Normal.z << " ) ";
+                index++;
+                }
+            }
     }
 
     void lerpVertical(Mesh *b, Mesh *a){
@@ -223,6 +270,25 @@ private:
     float lerp(float a, float b, float c)
     {
         return a * c + b * (1 - c);
+    }
+
+    void calculateNormal(Mesh *mesh, int pos){
+        vector<Vertex> vertex = mesh -> vertices;
+        for(int i = 0; i < vertex.size(); i++){
+            float heightL = 0,heightR = 0,heightD = 0,heightU = 0;
+
+            heightL = i % vertexCount != 0 ? vertex[i-1].Position.y : this->terrains[(pos + (terrains.size() - 1)) % terrains.size()].mesh.vertices[(vertexCount - 1)*(i+1)].Position.y;
+            
+            if(i % vertexCount != (vertexCount - 1))
+                heightR =  vertex[i+1].Position.y;
+            if(i >= vertexCount)
+                heightD =  vertex[i - vertexCount].Position.y;
+            if(i <= (vertex.size() - vertexCount))
+                heightU =  vertex[i + vertexCount].Position.y;
+            glm::vec3 normal = glm::vec3(heightL - heightR, 2.0f, heightD - heightU);
+            glm::normalize(normal);
+            mesh->vertices[i].Normal = normal;
+        }
     }
 
     //float lerp(float a, float b, float t) { return a + t * (b - a); }

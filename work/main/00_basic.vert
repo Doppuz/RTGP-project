@@ -165,8 +165,8 @@ void main() {
 	outTexture = texCoord;
   vNormal = normal;
   // light incidence direction (in view coordinate)
-  //vec4 lightPos = view  * vec4(pointLightPosition, 1.0);
-  //lightDir = lightPos.xyz - pos.xyz;
+  vec4 lightPos = view  * vec4(pointLightPosition, 1.0);
+  lightDir = lightPos.xyz - pos.xyz;
   h = pos.y;
   
   vec4 positionRelativeToCam = view * model * vec4(pos, 1.0f);
