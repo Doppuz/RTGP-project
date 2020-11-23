@@ -138,8 +138,8 @@ private:
         lerpHorizontal(&terrains[5].mesh,&terrains[3].mesh);
         lerpHorizontal(&terrains[8].mesh,&terrains[6].mesh);
 
-        /*for(int i = 0; i < terrains.size(); i++)
-             calculateNormal(&terrains[i].mesh,i);*/
+        for(int i = 0; i < terrains.size(); i++)
+             calculateNormal(&terrains[i].mesh,i);
 
 
         int index = 0;
@@ -157,7 +157,7 @@ private:
             for(int i = 0; i < vertexCount; i++){
                 std::cout << std::endl;
                 for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrains[8].mesh.vertices[index].Position.y << " ";
+                std::cout << " " << terrains[3].mesh.vertices[index].Position.y << " ";
                 index++;
                 }
             } 
@@ -173,7 +173,7 @@ private:
                 }
             } 
 
-        calculateNormal(&terrains[0].mesh,0);
+        //calculateNormal(&terrains[0].mesh,0);
 
          std::cout << std::endl;
             index = 0;
@@ -273,18 +273,22 @@ private:
     }
 
     void calculateNormal(Mesh *mesh, int pos){
+        int predecessor = pos % 3 == 0 ? pos + 2: pos -1;
+        int successor = pos % 3 == 2 ? pos - 2 : pos + 1;
         vector<Vertex> vertex = mesh -> vertices;
         for(int i = 0; i < vertex.size(); i++){
             float heightL = 0,heightR = 0,heightD = 0,heightU = 0;
 
-            heightL = i % vertexCount != 0 ? vertex[i-1].Position.y : this->terrains[(pos + (terrains.size() - 1)) % terrains.size()].mesh.vertices[(vertexCount - 1)*(i+1)].Position.y;
-            
-            if(i % vertexCount != (vertexCount - 1))
-                heightR =  vertex[i+1].Position.y;
-            if(i >= vertexCount)
-                heightD =  vertex[i - vertexCount].Position.y;
-            if(i <= (vertex.size() - vertexCount))
-                heightU =  vertex[i + vertexCount].Position.y;
+            heightL = i % vertexCount != 0 ? vertex[i-1].Position.y : this->terrains[predecessor]
+                .mesh.vertices[(vertexCount)*((int)(i/vertexCount)+1) - 1].Position.y;
+
+            heightR = i % vertexCount != (vertexCount - 1) ? vertex[i+1].Position.y : this->terrains[successor]
+                .mesh.vertices[(vertexCount)*((int)(i/vertexCount))].Position.y;
+
+            heightD = i >= vertexCount ? vertex[i - vertexCount].Position.y : vertex[i].Position.y;
+             
+            heightU = i <= (vertex.size() - vertexCount) ? vertex[i + vertexCount].Position.y :  vertex[i].Position.y;
+
             glm::vec3 normal = glm::vec3(heightL - heightR, 2.0f, heightD - heightU);
             glm::normalize(normal);
             mesh->vertices[i].Normal = normal;

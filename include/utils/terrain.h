@@ -52,7 +52,7 @@ class Terrain{
 
     private:
         const static GLint size = 120000;
-        const static GLint vertex_count = 4; //32
+        const static GLint vertex_count = 32; //32
         FastNoiseLite noise;
         glm::mat4 modelMatrix;
 

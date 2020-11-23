@@ -101,7 +101,7 @@ GLfloat lightMovement = 10.0f;
 
 //diffuseComponent
 glm::vec3 diffuseColor = glm::vec3(1.0f,0.0f,0.0f);
-GLfloat Kd = 0.7f;
+GLfloat Kd = 0.9f;
 
 // boolean to activate/deactivate wireframe rendering
 GLboolean wireframe = GL_FALSE;
