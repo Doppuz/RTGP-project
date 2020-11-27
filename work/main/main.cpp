@@ -57,6 +57,9 @@ void calculateFPS();
 void calculateNormal(vector<vector<Vertex>> m, Mesh *mesh);
 //TerrainPos
 void changeTerrainPos(TerrainManagement* manager);
+//SkyBox
+void LoadTextureCubeSide(string path, string side_image, GLuint side_name);
+GLint LoadTextureCube(string path);
 
 
 //First movement bool
@@ -101,7 +104,7 @@ GLfloat lightMovement = 10.0f;
 
 //diffuseComponent
 glm::vec3 diffuseColor = glm::vec3(1.0f,0.0f,0.0f);
-GLfloat Kd = 0.9f;
+GLfloat Kd = 0.4f;
 
 // boolean to activate/deactivate wireframe rendering
 GLboolean wireframe = GL_FALSE;
@@ -119,6 +122,9 @@ GLfloat spin_speed = 30.0f;
 int vertexCount = 64;
 
 int cam = 0;
+
+// texture unit for the cube map
+GLuint textureCube;
 
 /////////////////// MAIN function ///////////////////////
 int main(){
@@ -176,8 +182,7 @@ int main(){
 
     // we create and compile shaders (code of Shader class is in include/utils/shader_v1.h)
     Shader shader("00_basic.vert", "00_basic.frag");
-
-    Shader shaderSphere("01_sphere.vert", "01_sphere.frag");
+    Shader skybox_shader("17_skybox.vert", "18_skybox.frag");
 
     std::cout << "Before texture" << std::endl;
 
@@ -195,11 +200,15 @@ int main(){
 
     GLint redTexture = LoadTexture("../../textures/plane/redTexture.jpg");
 
+    textureCube = LoadTextureCube("../../textures/cube/skybox3/");
+
     GLfloat orientationY = -90.0f;
 
 
     Model planeModel("../../models/plane.obj");
     planeModel.meshes[0].SetupMesh();
+    Model cubeModel("../../models/cube.obj"); // used for the environment map
+    cubeModel.meshes[0].SetupMesh();
 
     //terrain
     TerrainManagement terrainManager;
@@ -319,6 +328,30 @@ int main(){
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         
+        /////////////////// SKYBOX ////////////////////////////////////////////////
+        // we use the cube to attach the 6 textures of the environment map.
+        // we render it after all the other objects, in order to avoid the depth tests as much as possible.
+        // we will set, in the vertex shader for the skybox, all the values to the maximum depth. Thus, the environment map is rendered only where there are no other objects in the image (so, only on the background). Thus, we set the depth test to GL_LEQUAL, in order to let the fragments of the background pass the depth test (because they have the maximum depth possible, and the default setting is GL_LESS)
+        glDepthFunc(GL_LEQUAL);
+        skybox_shader.Use();
+        // we activate the cube map
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
+         // we pass projection and view matrices to the Shader Program of the skybox
+        glUniformMatrix4fv(glGetUniformLocation(skybox_shader.Program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(projection));
+        // to have the background fixed during camera movements, we have to remove the translations from the view matrix
+        // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
+        view = glm::mat4(glm::mat3(camera.GetViewMatrix()));    // Remove any translation component of the view matrix
+        glUniformMatrix4fv(glGetUniformLocation(skybox_shader.Program, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(view));
+
+        // we determine the position in the Shader Program of the uniform variables
+        skybox_shader.setInt("textureCube",0);
+
+        // we render the cube with the environment map
+        cubeModel.Draw();
+        // we set again the depth test to the default operation for the next frame
+        glDepthFunc(GL_LESS);
+
         glfwSwapBuffers(window);
 
     }
@@ -516,4 +549,59 @@ void changeTerrainPos(TerrainManagement* manager){
         manager->translateTerrain(manager->LEFT);
         manager->increaseX(false);
     }
+}
+
+void LoadTextureCubeSide(string path, string side_image, GLuint side_name)
+{
+    int w, h;
+    unsigned char* image;
+    string fullname;
+
+    // full name and path of the side of the cubemap
+    fullname = path + side_image;
+    // we load the image file
+    image = stbi_load(fullname.c_str(), &w, &h, 0, STBI_rgb);
+    if (image == nullptr)
+        std::cout << "Failed to load texture!" << std::endl;
+    // we set the image file as one of the side of the cubemap (passed as a parameter)
+    glTexImage2D(side_name, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    // we free the memory once we have created an OpenGL texture
+    stbi_image_free(image);
+}
+
+//////////////////////////////////////////
+// we load the 6 images from disk and we create an OpenGL cube map
+GLint LoadTextureCube(string path)
+{
+    GLuint textureImage;
+    
+    // we create and activate the OpenGL cubemap texture
+    glGenTextures(1, &textureImage);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureImage);
+
+    // we load and set the 6 images corresponding to the 6 views of the cubemap
+    // we use as convention that the names of the 6 images are "posx, negx, posy, negy, posz, negz", placed at the path passed as parameter
+    // we load the images individually and we assign them to the correct side of the cube map
+    LoadTextureCubeSide(path, std::string("posx.jpg"), GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+    LoadTextureCubeSide(path, std::string("negx.jpg"), GL_TEXTURE_CUBE_MAP_NEGATIVE_X);
+    LoadTextureCubeSide(path, std::string("posy.jpg"), GL_TEXTURE_CUBE_MAP_POSITIVE_Y);
+    LoadTextureCubeSide(path, std::string("negy.jpg"), GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
+    LoadTextureCubeSide(path, std::string("posz.jpg"), GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
+    LoadTextureCubeSide(path, std::string("negz.jpg"), GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
+
+    // we set the filtering for minification and magnification
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    // we set how to consider the texture coordinates outside [0,1] range
+    // in this case we have a cube map, so
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    
+    // we set the binding to 0 once we have finished
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    return textureImage;
+
 }

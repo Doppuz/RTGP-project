@@ -142,7 +142,7 @@ private:
              calculateNormal(&terrains[i].mesh,i);
 
 
-        int index = 0;
+        /*int index = 0;
             for(int i = 0; i < vertexCount; i++){
                 std::cout << std::endl;
                 for(int j = 0; j < vertexCount; j++){
@@ -164,16 +164,15 @@ private:
 
             std::cout << std::endl;
             index = 0;
-             for(int i = 0; i < vertexCount; i++){
+            for(int i = 0; i < vertexCount; i++){
                 std::cout << std::endl;
                 for(int j = 0; j < vertexCount; j++){
-                std::cout << " ( " << terrains[0].mesh.vertices[index].Normal.x << " " << terrains[0].mesh.vertices[index].Normal.y << " " 
-                    << terrains[0].mesh.vertices[index].Normal.z << " ) ";
+                std::cout << " " << terrains[6].mesh.vertices[index].Position.y << " ";
                 index++;
                 }
             } 
 
-        //calculateNormal(&terrains[0].mesh,0);
+        calculateNormal(&terrains[0].mesh,0);
 
          std::cout << std::endl;
             index = 0;
@@ -184,7 +183,7 @@ private:
                     << terrains[0].mesh.vertices[index].Normal.z << " ) ";
                 index++;
                 }
-            }
+            }*/
     }
 
     void lerpVertical(Mesh *b, Mesh *a){
@@ -273,23 +272,28 @@ private:
     }
 
     void calculateNormal(Mesh *mesh, int pos){
-        int predecessor = pos % 3 == 0 ? pos + 2: pos -1;
-        int successor = pos % 3 == 2 ? pos - 2 : pos + 1;
+        int predecessorLeft = pos % 3 == 0 ? pos + 2: pos -1;
+        int predecessorRight = pos % 3 == 2 ? pos - 2 : pos + 1;
+        int predecessorDown = pos < 3 ? pos + 6: pos - 3;
+        int predecessorUp = pos > 5 ? pos - 6: pos + 3;
+
         vector<Vertex> vertex = mesh -> vertices;
         for(int i = 0; i < vertex.size(); i++){
             float heightL = 0,heightR = 0,heightD = 0,heightU = 0;
 
-            heightL = i % vertexCount != 0 ? vertex[i-1].Position.y : this->terrains[predecessor]
-                .mesh.vertices[(vertexCount)*((int)(i/vertexCount)+1) - 1].Position.y;
+            heightL = i % vertexCount != 0 ? vertex[i-1].Position.y : this->terrains[predecessorLeft]
+                .mesh.vertices[(vertexCount)*((int)(i/vertexCount)+1) - 2].Position.y;
 
-            heightR = i % vertexCount != (vertexCount - 1) ? vertex[i+1].Position.y : this->terrains[successor]
-                .mesh.vertices[(vertexCount)*((int)(i/vertexCount))].Position.y;
+            heightR = i % vertexCount != (vertexCount - 1) ? vertex[i+1].Position.y : this->terrains[predecessorRight]
+                .mesh.vertices[(vertexCount)*((int)(i/vertexCount))+1].Position.y;
 
-            heightD = i >= vertexCount ? vertex[i - vertexCount].Position.y : vertex[i].Position.y;
+            heightD = i >= vertexCount ? vertex[i - vertexCount].Position.y : this->terrains[predecessorDown]
+                .mesh.vertices[(vertexCount * vertexCount) - 2 * vertexCount + i].Position.y;
              
-            heightU = i <= (vertex.size() - vertexCount) ? vertex[i + vertexCount].Position.y :  vertex[i].Position.y;
+            heightU = i < (vertex.size() - vertexCount) ? vertex[i + vertexCount].Position.y :  this->terrains[predecessorUp]
+                .mesh.vertices[vertexCount + i - (vertex.size() - vertexCount)].Position.y;
 
-            glm::vec3 normal = glm::vec3(heightL - heightR, 2.0f, heightD - heightU);
+            glm::vec3 normal = glm::vec3(heightL - heightR, 2.0f, heightU - heightD);
             glm::normalize(normal);
             mesh->vertices[i].Normal = normal;
         }
