@@ -182,7 +182,7 @@ int main(){
 
     // we create and compile shaders (code of Shader class is in include/utils/shader_v1.h)
     Shader shader("00_basic.vert", "00_basic.frag");
-    Shader skybox_shader("17_skybox.vert", "18_skybox.frag");
+    Shader skybox_shader("skyboxVert.vert", "skyboxFrag.frag");
 
     std::cout << "Before texture" << std::endl;
 
@@ -200,7 +200,7 @@ int main(){
 
     GLint redTexture = LoadTexture("../../textures/plane/redTexture.jpg");
 
-    textureCube = LoadTextureCube("../../textures/cube/skybox3/");
+    textureCube = LoadTextureCube("../../textures/cube/skybox/");;
 
     GLfloat orientationY = -90.0f;
 
@@ -226,6 +226,11 @@ int main(){
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        // Check is an I/O event is happening
+        glfwPollEvents();
+
+        apply_camera_movements(window);
+
         changeTerrainPos(&terrainManager);
             
         shader.Use();  
@@ -234,9 +239,6 @@ int main(){
         shader.setMat4("projection", projection);   
 
         calculateFPS();
-
-        if (spinning)
-            orientationY+=(deltaTime*spin_speed);
 
         //light_movements(window);
 
@@ -247,13 +249,7 @@ int main(){
         //light
         shader.setVec3("pointLightPosition",lightPos);
         shader.setVec3("diffuseColor",diffuseColor);
-        shader.setFloat("Kd",Kd);
-
-        // Check is an I/O event is happening
-        glfwPollEvents();
-
-        apply_camera_movements(window);
-        
+        shader.setFloat("Kd",Kd); 
 
         // we "clear" the frame and z  buffer
         glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
@@ -338,11 +334,11 @@ int main(){
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
          // we pass projection and view matrices to the Shader Program of the skybox
-        glUniformMatrix4fv(glGetUniformLocation(skybox_shader.Program, "projectionMatrix"), 1, GL_FALSE, glm::value_ptr(projection));
+        skybox_shader.setMat4("projection", projection);   
         // to have the background fixed during camera movements, we have to remove the translations from the view matrix
         // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
-        view = glm::mat4(glm::mat3(camera.GetViewMatrix()));    // Remove any translation component of the view matrix
-        glUniformMatrix4fv(glGetUniformLocation(skybox_shader.Program, "viewMatrix"), 1, GL_FALSE, glm::value_ptr(view));
+        view =  glm::mat4(glm::mat3(actualCamera.GetViewMatrix()));    // Remove any translation component of the view matrix
+        skybox_shader.setMat4("view", view);
 
         // we determine the position in the Shader Program of the uniform variables
         skybox_shader.setInt("textureCube",0);
@@ -357,6 +353,7 @@ int main(){
     }
 
     shader.Delete();
+    skybox_shader.Delete();
 
     glfwTerminate();
     return 0;
