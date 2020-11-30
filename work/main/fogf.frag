@@ -48,9 +48,11 @@ vec3 Lambert() // this name is the one which is detected by the SetupShaders() f
 void main(){
     //if(h < -15.0f)
     //    FragColor = texture(groundTexture, outTexture);
-    float interpolation =  h; 
+    //float interpolation =  h; 
     //FragColor = vec4(Lambert(), 1.0);
-    FragColor = texture(grassTexture, outTexture);
+    //FragColor = texture(grassTexture, outTexture);
+    FragColor = vec4(0,0,0,0.1);
+    //FragColor = mix(vec4(0,0,0,0),FragColor,visibility);
     /*if (h > 8015)
         FragColor = texture(snowTexture, outTexture);
     else if (h < 15)
@@ -59,7 +61,7 @@ void main(){
         FragColor = (interpolation / 8015) * texture(snowTexture, outTexture) +
          (1 - (interpolation / 8015)) * texture(grassTexture, outTexture) ;*/
 
-    FragColor = mix(vec4(0.5,0.5,0.5,1),FragColor,visibility);
+    //FragColor = mix(vec4(0.5,0.5,0.5,1),FragColor,visibility);
     /*else if (h >= -50 && h <= -20)
         FragColor = ((abs(h) - 20) / 30) * texture(groundTexture, outTexture) +
          (1 - ((abs(h) - 20) / 30)) * texture(grassTexture, outTexture) ;

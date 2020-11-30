@@ -169,6 +169,10 @@ int main(){
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
+    
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // we define the viewport dimensions
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
@@ -183,6 +187,7 @@ int main(){
     // we create and compile shaders (code of Shader class is in include/utils/shader_v1.h)
     Shader shader("00_basic.vert", "00_basic.frag");
     Shader skybox_shader("skyboxVert.vert", "skyboxFrag.frag");
+    Shader fog_shader("fogv.vert", "fogf.frag");
 
     std::cout << "Before texture" << std::endl;
 
@@ -200,7 +205,7 @@ int main(){
 
     GLint redTexture = LoadTexture("../../textures/plane/redTexture.jpg");
 
-    textureCube = LoadTextureCube("../../textures/cube/skybox/");;
+    textureCube = LoadTextureCube("../../textures/cube/MySkyBox/");;
 
     GLfloat orientationY = -90.0f;
 
@@ -210,13 +215,18 @@ int main(){
     Model cubeModel("../../models/cube.obj"); // used for the environment map
     cubeModel.meshes[0].SetupMesh();
 
+    Model cubeModel2("../../models/cube.obj"); // used for the environment map
+    cubeModel2.meshes[0].SetupMesh();
+
     //terrain
     TerrainManagement terrainManager;
 
     bool first = false;
     
     
-    glm::mat4 planeModelMatrix = glm::mat4(1.0f);
+    glm::mat4 cubeModelMatrix = glm::mat4(1.0f);
+    cubeModelMatrix = glm::translate(cubeModelMatrix,glm::vec3(0.0f, 8000.0f,120000));
+    cubeModelMatrix = glm::scale(cubeModelMatrix, glm::vec3(500000,50000,250000));
 
     while(!glfwWindowShouldClose(window)){
 
@@ -235,7 +245,7 @@ int main(){
             
         shader.Use();  
 
-        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,1500000.0f); //150000
+        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,15000000.0f); //150000
         shader.setMat4("projection", projection);   
 
         calculateFPS();
@@ -323,6 +333,11 @@ int main(){
         else
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+        fog_shader.Use();
+        fog_shader.setMat4("projection", projection);  
+        fog_shader.setMat4("view", view);
+        fog_shader.setMat4("model", cubeModelMatrix);
+        cubeModel2.Draw();
         
         /////////////////// SKYBOX ////////////////////////////////////////////////
         // we use the cube to attach the 6 textures of the environment map.
@@ -580,12 +595,12 @@ GLint LoadTextureCube(string path)
     // we load and set the 6 images corresponding to the 6 views of the cubemap
     // we use as convention that the names of the 6 images are "posx, negx, posy, negy, posz, negz", placed at the path passed as parameter
     // we load the images individually and we assign them to the correct side of the cube map
-    LoadTextureCubeSide(path, std::string("posx.jpg"), GL_TEXTURE_CUBE_MAP_POSITIVE_X);
-    LoadTextureCubeSide(path, std::string("negx.jpg"), GL_TEXTURE_CUBE_MAP_NEGATIVE_X);
-    LoadTextureCubeSide(path, std::string("posy.jpg"), GL_TEXTURE_CUBE_MAP_POSITIVE_Y);
-    LoadTextureCubeSide(path, std::string("negy.jpg"), GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
-    LoadTextureCubeSide(path, std::string("posz.jpg"), GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
-    LoadTextureCubeSide(path, std::string("negz.jpg"), GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
+    LoadTextureCubeSide(path, std::string("posx.png"), GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+    LoadTextureCubeSide(path, std::string("negx.png"), GL_TEXTURE_CUBE_MAP_NEGATIVE_X);
+    LoadTextureCubeSide(path, std::string("posy.png"), GL_TEXTURE_CUBE_MAP_POSITIVE_Y);
+    LoadTextureCubeSide(path, std::string("negy.png"), GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
+    LoadTextureCubeSide(path, std::string("posz.png"), GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
+    LoadTextureCubeSide(path, std::string("negz.png"), GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
 
     // we set the filtering for minification and magnification
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

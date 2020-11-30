@@ -24,9 +24,10 @@ out vec2 outTexture;
 out float h;
 
 out float visibility;
+out vec3 interp_UVW;
 
-const float density = 0.000009; //0.000008
-const float gradient = 10;
+const float density = 0.000009; //0.000009
+const float gradient = 5;
 
 /*vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
 vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
@@ -162,6 +163,7 @@ vec4 positionRelativeToCam;
 
 void main() {
 	//float height = noise(pos.xz);
+  interp_UVW = pos;
 	outTexture = texCoord;
   vNormal = normal;
   // light incidence direction (in view coordinate)
