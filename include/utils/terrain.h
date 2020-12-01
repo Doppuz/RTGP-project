@@ -67,7 +67,7 @@ class Terrain{
 		    for(int i=0;i<vertex_count;i++){
                 Vertex vertex;
 			    for(int j=0;j<vertex_count;j++){
-                    vector = glm::vec3((float)j/((float)vertex_count - 1) * size, 1000 *  noise.GetNoise((float)j, (float)i)
+                    vector = glm::vec3((float)j/((float)vertex_count - 1) * size, 2000 *  noise.GetNoise((float)j, (float)i)
                         ,(float)i/((float)vertex_count - 1) * size);
                     vertex.Position = vector;
 

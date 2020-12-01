@@ -23,28 +23,39 @@ public:
     vector<Terrain> terrains;
 
     TerrainManagement()
-        :size{Terrain::getSize()},lastXPosition{0}, lastZPosition{0}, indexLastRow{6},
-            indexLastColumn{2}{
+        :size{Terrain::getSize()},lastXPosition{Terrain::getSize()}, lastZPosition{Terrain::getSize()}, indexLastRow{20},
+            indexLastColumn{4}{
+        
+        rowLength = 5;
 
-        Terrain terrain(0, glm::vec3(-size, 0.0f, -size));
+        int index = 0;
+
+        for(int j = 0; j < rowLength; j++){
+            for(int i = 0; i < rowLength; i++){
+                Terrain terrain(index, glm::vec3(-size + i *size, 0.0f, -size + j *size));
+                terrains.push_back(terrain);
+                index ++;
+            }
+        }
+
+        /*Terrain terrain(0, glm::vec3(-size, 0.0f, -size));
         Terrain terrain1(1, glm::vec3(0.0f, 0.0f, -size));
         Terrain terrain2(2, glm::vec3(size, 0.0f, -size));
-        Terrain terrain3(3, glm::vec3(-size, 0.0f, 0));
-        Terrain terrain4(4, glm::vec3(0, 0.0f, 0));
-        Terrain terrain5(5, glm::vec3(+size, 0.0f, 0));
-        Terrain terrain6(6, glm::vec3(-size, 0.0f, size));
-        Terrain terrain7(7, glm::vec3(0.0f, 0.0f, size));
-        Terrain terrain8(8, glm::vec3(size, 0.0f,size));
+        Terrain terrain3(3, glm::vec3(2 * size, 0.0f, -size));
 
-        terrains.push_back(terrain);
-        terrains.push_back(terrain1);
-        terrains.push_back(terrain2);
-        terrains.push_back(terrain3);
-        terrains.push_back(terrain4);
-        terrains.push_back(terrain5);
-        terrains.push_back(terrain6);
-        terrains.push_back(terrain7);
-        terrains.push_back(terrain8);
+
+        Terrain terrain4(4, glm::vec3(-size, 0.0f, 0));
+        Terrain terrain5(5, glm::vec3(0, 0.0f, 0));
+        Terrain terrain6(6, glm::vec3(+size, 0.0f, 0));
+        Terrain terrain7(7, glm::vec3(+2*size, 0.0f, 0));
+        Terrain terrain8(8, glm::vec3(-size, 0.0f, size));
+        Terrain terrain9(9, glm::vec3(0.0f, 0.0f, size));
+        Terrain terrain10(10, glm::vec3(size, 0.0f,size));
+        Terrain terrain11(11, glm::vec3(2*size, 0.0f,size));
+        Terrain terrain12(12, glm::vec3(-size, 0.0f, 2*size));
+        Terrain terrain13(13, glm::vec3(0.0f, 0.0f, 2*size));
+        Terrain terrain14(14, glm::vec3(size, 0.0f,2*size));
+        Terrain terrain15(15, glm::vec3(2*size, 0.0f,2*size));*/
         
         this->vertexCount = Terrain::getVertexCount();
         initialSetUp();
@@ -71,35 +82,79 @@ public:
         negative ? lastXPosition -= size : lastXPosition += size;
     }
 
-    void translateTerrain(int i){
-        switch(i){
+/*switch(i){
             case BACKWARD:
-                terrains[indexLastRow].translateModelMatrix( glm::vec3(0.0f, 0.0f, -(size * 3)));
-                terrains[indexLastRow+1].translateModelMatrix( glm::vec3(0.0f, 0.0f, -(size * 3)));
-                terrains[indexLastRow+2].translateModelMatrix( glm::vec3(0.0f, 0.0f, -(size * 3)));
-                indexLastRow = (indexLastRow + 6) % 9;
+                for(int i = 0; i < rowLength; i++){
+                    
+                }
+                
+                terrains[indexLastRow+1].translateModelMatrix( glm::vec3(0.0f, 0.0f, -(size * rowLength)));
+                terrains[indexLastRow+2].translateModelMatrix( glm::vec3(0.0f, 0.0f, -(size * rowLength)));               
+                terrains[indexLastRow+3].translateModelMatrix( glm::vec3(0.0f, 0.0f, -(size * rowLength)));
+                terrains[indexLastRow+4].translateModelMatrix( glm::vec3(0.0f, 0.0f, -(size * rowLength)));
+                indexLastRow = (indexLastRow + rowLength * (rowLength - 1)) % terrains.size();
                 break;
             case FORWARD:
                 {
-                    int indexFirstRow = (indexLastRow + 3) % 9;
-                    terrains[indexFirstRow].translateModelMatrix( glm::vec3(0.0f, 0.0f, +(size * 3)));
-                    terrains[indexFirstRow + 1].translateModelMatrix( glm::vec3(0.0f, 0.0f, +(size * 3)));
-                    terrains[indexFirstRow + 2].translateModelMatrix( glm::vec3(0.0f, 0.0f, +(size * 3)));
+                   int indexFirstRow = (indexLastRow + rowLength) % terrains.size();
+                    terrains[indexFirstRow].translateModelMatrix( glm::vec3(0.0f, 0.0f, +(size * rowLength)));
+                    terrains[indexFirstRow + 1].translateModelMatrix( glm::vec3(0.0f, 0.0f, +(size * rowLength)));
+                    terrains[indexFirstRow + 2].translateModelMatrix( glm::vec3(0.0f, 0.0f, +(size * rowLength)));
+                    terrains[indexFirstRow + 3].translateModelMatrix( glm::vec3(0.0f, 0.0f, +(size * rowLength)));
+                    terrains[indexFirstRow + 4].translateModelMatrix( glm::vec3(0.0f, 0.0f, +(size * rowLength)));
                     indexLastRow = indexFirstRow;
                 }
                 break;
             case RIGHT:
-                terrains[indexLastColumn].translateModelMatrix( glm::vec3(-(size * 3), 0.0f,0.0f));
-                terrains[indexLastColumn + 3].translateModelMatrix( glm::vec3(-(size * 3), 0.0f,0.0f));
-                terrains[indexLastColumn + 6].translateModelMatrix( glm::vec3(-(size * 3), 0.0f,0.0f));
-                indexLastColumn = (indexLastColumn + 2) % 3;
+                terrains[indexLastColumn].translateModelMatrix( glm::vec3(-(size * rowLength), 0.0f,0.0f));
+                terrains[indexLastColumn + 5].translateModelMatrix( glm::vec3(-(size * rowLength), 0.0f,0.0f));
+                terrains[indexLastColumn + 10].translateModelMatrix( glm::vec3(-(size * rowLength), 0.0f,0.0f));
+                terrains[indexLastColumn + 15].translateModelMatrix( glm::vec3(-(size * rowLength), 0.0f,0.0f));
+                terrains[indexLastColumn + 20].translateModelMatrix( glm::vec3(-(size * rowLength), 0.0f,0.0f));
+                indexLastColumn = (indexLastColumn + (rowLength - 1)) % rowLength;
                 break;
             case LEFT:
                 {
-                    int indexFirstColoumn = (indexLastColumn + 1) % 3;
-                    terrains[indexFirstColoumn].translateModelMatrix( glm::vec3(+(size * 3), 0.0f, 0.0f));
-                    terrains[indexFirstColoumn + 3].translateModelMatrix( glm::vec3(+(size * 3), 0.0f, 0.0f));
-                    terrains[indexFirstColoumn + 6].translateModelMatrix( glm::vec3(+(size * 3), 0.0f, 0.0f));
+                  int indexFirstColoumn = (indexLastColumn + 1) % rowLength;
+                    terrains[indexFirstColoumn].translateModelMatrix( glm::vec3(+(size * rowLength), 0.0f, 0.0f));
+                    terrains[indexFirstColoumn + 5].translateModelMatrix( glm::vec3(+(size * rowLength), 0.0f, 0.0f));
+                    terrains[indexFirstColoumn + 10].translateModelMatrix( glm::vec3(+(size * rowLength), 0.0f, 0.0f));
+                    terrains[indexFirstColoumn + 15].translateModelMatrix( glm::vec3(+(size * rowLength), 0.0f, 0.0f));
+                    terrains[indexFirstColoumn + 20].translateModelMatrix( glm::vec3(+(size * rowLength), 0.0f, 0.0f));
+                    indexLastColumn = indexFirstColoumn;
+                }
+                break;
+        }*/
+
+    void translateTerrain(int index){
+        switch(index){
+            case BACKWARD:
+                for(int i = 0; i < rowLength; i++){
+                    terrains[indexLastRow+i].translateModelMatrix( glm::vec3(0.0f, 0.0f, -(size * rowLength)));
+                }
+                indexLastRow = (indexLastRow + rowLength * (rowLength - 1)) % terrains.size();
+                break;
+            case FORWARD:
+                {
+                   int indexFirstRow = (indexLastRow + rowLength) % terrains.size();
+                    for(int i = 0; i < rowLength; i++){
+                        terrains[indexFirstRow+i].translateModelMatrix( glm::vec3(0.0f, 0.0f, +(size * rowLength)));
+                    }
+                    indexLastRow = indexFirstRow;
+                }
+                break;
+            case RIGHT:
+                for(int i = 0; i < rowLength; i++){
+                    terrains[indexLastColumn + rowLength].translateModelMatrix( glm::vec3(-(size * rowLength), 0.0f,0.0f));
+                }
+                indexLastColumn = (indexLastColumn + (rowLength - 1)) % rowLength;
+                break;
+            case LEFT:
+                {
+                    int indexFirstColoumn = (indexLastColumn + 1) % rowLength;
+                    for(int i = 0; i < rowLength; i++){
+                        terrains[indexFirstColoumn + rowLength].translateModelMatrix( glm::vec3(+(size * rowLength), 0.0f, 0.0f));
+                    }
                     indexLastColumn = indexFirstColoumn;
                 }
                 break;
@@ -113,33 +168,29 @@ private:
     GLint lastZPosition;
     GLint indexLastRow;
     GLint indexLastColumn;
-
+    int rowLength;
+    
     void initialSetUp(){
-        
-        lerpVertical(&terrains[0].mesh,&terrains[3].mesh);
-        lerpVertical(&terrains[1].mesh,&terrains[4].mesh);
-        lerpVertical(&terrains[2].mesh,&terrains[5].mesh);
-        lerpVertical(&terrains[3].mesh,&terrains[6].mesh);
-        lerpVertical(&terrains[4].mesh,&terrains[7].mesh);
-        lerpVertical(&terrains[5].mesh,&terrains[8].mesh);
 
-        lerpVertical(&terrains[6].mesh,&terrains[0].mesh);
-        lerpVertical(&terrains[7].mesh,&terrains[1].mesh);
-        lerpVertical(&terrains[8].mesh,&terrains[2].mesh);
+        for(int i=0; i < terrains.size(); i++){
+            if(i >= (rowLength - 1) && (i+1) % (rowLength) == 0){
+                std::cout << i - (rowLength - 1) << std::endl;
+                lerpHorizontal(&terrains[i].mesh,&terrains[i - (rowLength - 1)].mesh);
+            }else{
+                lerpHorizontal(&terrains[i].mesh,&terrains[i + 1].mesh);
+            }       
+        }
 
-        lerpHorizontal(&terrains[0].mesh,&terrains[1].mesh);
-        lerpHorizontal(&terrains[1].mesh,&terrains[2].mesh);
-        lerpHorizontal(&terrains[3].mesh,&terrains[4].mesh);
-        lerpHorizontal(&terrains[4].mesh,&terrains[5].mesh);
-        lerpHorizontal(&terrains[6].mesh,&terrains[7].mesh);
-        lerpHorizontal(&terrains[7].mesh,&terrains[8].mesh);
-   
-        lerpHorizontal(&terrains[2].mesh,&terrains[0].mesh);
-        lerpHorizontal(&terrains[5].mesh,&terrains[3].mesh);
-        lerpHorizontal(&terrains[8].mesh,&terrains[6].mesh);
+        for(int i=0; i < terrains.size(); i++){
+            if(i >= rowLength * (rowLength - 1)){
+                lerpVertical(&terrains[i].mesh,&terrains[i - rowLength * (rowLength - 1)].mesh);
+            }else{
+                lerpVertical(&terrains[i].mesh,&terrains[i + rowLength].mesh);
+            }       
+        }
 
-        for(int i = 0; i < terrains.size(); i++)
-             calculateNormal(&terrains[i].mesh,i);
+        //for(int i = 0; i < terrains.size(); i++)
+            //calculateNormal(&terrains[i].mesh,i);
 
 
         /*int index = 0;

@@ -59,7 +59,7 @@ void main(){
         FragColor = (interpolation / 8015) * texture(snowTexture, outTexture) +
          (1 - (interpolation / 8015)) * texture(grassTexture, outTexture) ;*/
 
-    FragColor = mix(vec4(0.5,0.5,0.5,1),FragColor,visibility);
+    //FragColor = mix(vec4(0.5,0.5,0.5,1),FragColor,visibility);
     /*else if (h >= -50 && h <= -20)
         FragColor = ((abs(h) - 20) / 30) * texture(groundTexture, outTexture) +
          (1 - ((abs(h) - 20) / 30)) * texture(grassTexture, outTexture) ;

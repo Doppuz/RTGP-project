@@ -82,7 +82,7 @@ glm::mat4 projection;
 glm::mat4 view = glm::mat4(1.0f);
 
 //Camera
-Camera camera(glm::vec3(25000.0f, 50.0f, 25000.0f), GL_FALSE); //25000,20000,25000
+Camera camera(glm::vec3(0.0f, 50.0f, 0.0f), GL_FALSE); //25000,20000,25000
 Camera farCamera(glm::vec3(0.0f,50000.0f,200000.0f),GL_FALSE);
 Camera actualCamera = camera;
 
@@ -199,7 +199,7 @@ int main(){
 
     std::cout << "After 2 texture" << std::endl;
     
-    GLint grassTexture = LoadTexture("../../textures/plane/ground4.jpg");
+    GLint grassTexture = LoadTexture("../../textures/plane/ground2.jpg");
 
     std::cout << "After 3 texture" << std::endl;
 
@@ -245,7 +245,7 @@ int main(){
             
         shader.Use();  
 
-        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,2000.0f); //150000
+        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 10.0f,5000.0f); //150000
         shader.setMat4("projection", projection);   
 
         calculateFPS();
@@ -280,32 +280,10 @@ int main(){
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, grassTexture);
 
-        shader.setMat4("model", terrainManager.terrains[0].getModelMatrix());
-        terrainManager.terrains[0].draw(); 
-
-        shader.setMat4("model", terrainManager.terrains[1].getModelMatrix());
-        terrainManager.terrains[1].draw(); 
-
-        shader.setMat4("model",terrainManager.terrains[2].getModelMatrix());
-        terrainManager.terrains[2].draw(); 
-
-        shader.setMat4("model", terrainManager.terrains[3].getModelMatrix());
-        terrainManager.terrains[3].draw(); 
-
-        shader.setMat4("model", terrainManager.terrains[4].getModelMatrix());
-        terrainManager.terrains[4].draw(); 
-
-        shader.setMat4("model", terrainManager.terrains[5].getModelMatrix());
-        terrainManager.terrains[5].draw();
-
-        shader.setMat4("model", terrainManager.terrains[6].getModelMatrix());
-        terrainManager.terrains[6].draw(); 
-
-        shader.setMat4("model", terrainManager.terrains[7].getModelMatrix());
-        terrainManager.terrains[7].draw(); 
-
-        shader.setMat4("model", terrainManager.terrains[8].getModelMatrix());
-        terrainManager.terrains[8].draw();
+        for(int i = 0; i < terrainManager.terrains.size(); i++){     
+            shader.setMat4("model", terrainManager.terrains[i].getModelMatrix());
+            terrainManager.terrains[i].draw(); 
+        }
 
        /*shaderSphere.Use();
 
