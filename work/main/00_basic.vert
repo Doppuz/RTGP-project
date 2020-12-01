@@ -26,7 +26,7 @@ out float h;
 out float visibility;
 out vec3 interp_UVW;
 
-const float density = 0.000009; //0.000009
+const float density = 0.002; //0.000009
 const float gradient = 5;
 
 /*vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}

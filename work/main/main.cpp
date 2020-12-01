@@ -82,7 +82,7 @@ glm::mat4 projection;
 glm::mat4 view = glm::mat4(1.0f);
 
 //Camera
-Camera camera(glm::vec3(25000.0f, 8000.0f, 25000.0f), GL_FALSE); //25000,20000,25000
+Camera camera(glm::vec3(25000.0f, 50.0f, 25000.0f), GL_FALSE); //25000,20000,25000
 Camera farCamera(glm::vec3(0.0f,50000.0f,200000.0f),GL_FALSE);
 Camera actualCamera = camera;
 
@@ -245,7 +245,7 @@ int main(){
             
         shader.Use();  
 
-        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,15000000.0f); //150000
+        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,2000.0f); //150000
         shader.setMat4("projection", projection);   
 
         calculateFPS();
@@ -333,11 +333,11 @@ int main(){
         else
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-        fog_shader.Use();
+        /*fog_shader.Use();
         fog_shader.setMat4("projection", projection);  
         fog_shader.setMat4("view", view);
         fog_shader.setMat4("model", cubeModelMatrix);
-        cubeModel2.Draw();
+        cubeModel2.Draw();*/
         
         /////////////////// SKYBOX ////////////////////////////////////////////////
         // we use the cube to attach the 6 textures of the environment map.

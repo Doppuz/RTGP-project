@@ -51,7 +51,7 @@ class Terrain{
         }
 
     private:
-        const static GLint size = 120000;
+        const static GLint size = 1000;
         const static GLint vertex_count = 32; //32
         FastNoiseLite noise;
         glm::mat4 modelMatrix;
@@ -67,7 +67,7 @@ class Terrain{
 		    for(int i=0;i<vertex_count;i++){
                 Vertex vertex;
 			    for(int j=0;j<vertex_count;j++){
-                    vector = glm::vec3((float)j/((float)vertex_count - 1) * size, 120000 *  noise.GetNoise((float)j, (float)i)
+                    vector = glm::vec3((float)j/((float)vertex_count - 1) * size, 1000 *  noise.GetNoise((float)j, (float)i)
                         ,(float)i/((float)vertex_count - 1) * size);
                     vertex.Position = vector;
 

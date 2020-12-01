@@ -33,7 +33,7 @@ const GLfloat YAW        = -90.0f; //Y
 const GLfloat PITCH      =  0.0f; //X
 
 // parameters to manage mouse movement
-const GLfloat SPEED      =  40000.0f;
+const GLfloat SPEED      =  500.0f;
 const GLfloat SENSITIVITY =  0.25f;
 
 ///////////////////  CAMERA class ///////////////////////
