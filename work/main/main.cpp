@@ -82,7 +82,7 @@ glm::mat4 projection;
 glm::mat4 view = glm::mat4(1.0f);
 
 //Camera
-Camera camera(glm::vec3(0.0f, 50.0f, 0.0f), GL_FALSE); //25000,20000,25000
+Camera camera(glm::vec3(0.0f, 1000.0f, 0.0f), GL_FALSE); //25000,20000,25000
 Camera farCamera(glm::vec3(0.0f,50000.0f,200000.0f),GL_FALSE);
 Camera actualCamera = camera;
 
@@ -104,13 +104,10 @@ GLfloat lightMovement = 10.0f;
 
 //diffuseComponent
 glm::vec3 diffuseColor = glm::vec3(1.0f,0.0f,0.0f);
-GLfloat Kd = 0.4f;
+GLfloat Kd = 0.9f;
 
 // boolean to activate/deactivate wireframe rendering
 GLboolean wireframe = GL_FALSE;
-
-//Terrain
-int vertices = 64;
 
 // boolean to start/stop animated rotation on Y angle
 GLboolean spinning = GL_FALSE;
@@ -182,7 +179,7 @@ int main(){
     glEnable(GL_DEPTH_TEST);
 
     // the "clear" color for the frame buffer
-    glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+    glClearColor(0.07f, 0.07f, 0.07f, 1.0f);
 
     // we create and compile shaders (code of Shader class is in include/utils/shader_v1.h)
     Shader shader("00_basic.vert", "00_basic.frag");
@@ -199,7 +196,7 @@ int main(){
 
     std::cout << "After 2 texture" << std::endl;
     
-    GLint grassTexture = LoadTexture("../../textures/plane/ground2.jpg");
+    GLint grassTexture = LoadTexture("../../textures/plane/ground4.jpg");
 
     std::cout << "After 3 texture" << std::endl;
 
@@ -245,7 +242,7 @@ int main(){
             
         shader.Use();  
 
-        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 10.0f,5000.0f); //150000
+        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 10.0f,150000.0f); //150000
         shader.setMat4("projection", projection);   
 
         calculateFPS();
@@ -262,7 +259,7 @@ int main(){
         shader.setFloat("Kd",Kd); 
 
         // we "clear" the frame and z  buffer
-        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+        glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.setVec3("skyColor",glm::vec3(0.5f,0.5f,0.5f));
@@ -456,61 +453,6 @@ GLint LoadTexture(const char* path){
     return textureImage;
 
 }
-
-void createNoise(Mesh *m){
-
-    int width = vertices;
-    int height = vertices;
-    int w, h, channels;
-    unsigned char* image;
-
-    vector<vector<Vertex>> matrix;
-
-    FastNoiseLite noise;
-    noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-    srand((unsigned) time(0));
-    noise.SetSeed(rand() % 1000000);
-    noise.SetFrequency(0.008f);
-    noise.SetFractalType(FastNoiseLite::FractalType_FBm);
-    noise.SetFractalOctaves(5);
-    noise.SetFractalLacunarity(2.0f);
-    noise.SetFractalGain(0.5f);
-
-    int index = 0;
-    for (int y = 0; y < width; y++){
-        vector<Vertex> temp;
-        for (int x = 0; x < height; x++){
-            m->vertices[index].Position.y = 1500 *  noise.GetNoise((float)x, (float)y);
-            temp.push_back(m->vertices[index]);
-            index += 1;
-        }
-        matrix.push_back(temp);
-    }
-
-    
-
-    index = 0;
-
-    calculateNormal(matrix, m);
-}
-
-
-    void calculateNormal(vector<vector<Vertex>> m, Mesh *mesh){
-        int index = 0;
-        for(int i = 0; i < m.size(); i++){
-            for(int j = 0; j < m[i].size(); j++){
-                float hL,hR,hD,hU = 0;
-                hL =  m[i][(j-1)%m[i].size()].Position.y;
-                hR =  m[i][(j+1)%m[i].size()].Position.y;
-                hD =  m[(i-1)%m.size()][j].Position.y;
-                hU =  m[(i+1)%m.size()][j].Position.y;
-                glm::vec3 normal = glm::vec3(hL - hR, 2.0f, hD - hU);
-                glm::normalize(normal);
-                mesh->vertices[index].Normal = normal;
-                index = index + 1;
-            }
-        }
-    }
 
  void calculateFPS(){
         frameCount++;
