@@ -82,7 +82,7 @@ glm::mat4 projection;
 glm::mat4 view = glm::mat4(1.0f);
 
 //Camera
-Camera camera(glm::vec3(0.0f, 1000.0f, 0.0f), GL_FALSE); //25000,20000,25000
+Camera camera(glm::vec3(0.0f, 10000.0f, 0.0f), GL_FALSE); //25000,20000,25000
 Camera farCamera(glm::vec3(0.0f,50000.0f,200000.0f),GL_FALSE);
 Camera actualCamera = camera;
 
@@ -99,12 +99,19 @@ int nbFrames = 0;
 int initialTime = time(NULL), finalTime, frameCount;
 
 //light
-glm::vec3 lightPos = glm::vec3(0.0f, 1000.0f,300.0f);
-GLfloat lightMovement = 10.0f;
+glm::vec3 lightPos = glm::vec3(150000.0f, 1000.0f,150000.0f);
+GLfloat lightMovement = 100.0f;
 
-//diffuseComponent
-glm::vec3 diffuseColor = glm::vec3(1.0f,0.0f,0.0f);
-GLfloat Kd = 0.9f;
+// diffusive, specular and ambient components
+glm::vec3 diffuseColor = {1.0f,0.0f,0.0f};
+glm::vec3 specularColor = {0.2f,1.0f,0.7f};
+glm::vec3 ambientColor = {0.5f,0.1f,0.7f};
+// weights for the diffusive, specular and ambient components
+GLfloat Kd = 0.5f;
+GLfloat Ks = 0.4f;
+GLfloat Ka = 0.1f;
+// shininess coefficient for Phong and Blinn-Phong shaders
+GLfloat shininess = 25.0f;
 
 // boolean to activate/deactivate wireframe rendering
 GLboolean wireframe = GL_FALSE;
@@ -242,12 +249,20 @@ int main(){
             
         shader.Use();  
 
-        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 10.0f,150000.0f); //150000
+        shader.setFloat("kd",Kd);
+        shader.setFloat("ks",Ks);
+        shader.setFloat("ka",Ka);
+        shader.setVec3("ambientColor",ambientColor);
+        shader.setVec3("diffuseColor",diffuseColor);
+        shader.setVec3("specularColor",specularColor);
+        shader.setFloat("shininess",shininess);
+
+        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 10.0f,200000.0f); //150000
         shader.setMat4("projection", projection);   
 
         calculateFPS();
 
-        //light_movements(window);
+        light_movements(window);
 
         // View matrix (=camera): position, view direction, camera "up" vector
         view = actualCamera.GetViewMatrix();
@@ -279,6 +294,7 @@ int main(){
 
         for(int i = 0; i < terrainManager.terrains.size(); i++){     
             shader.setMat4("model", terrainManager.terrains[i].getModelMatrix());
+            shader.setMat3("normalMatrix",terrainManager.terrains[i].getNormalMatrix(view));
             terrainManager.terrains[i].draw(); 
         }
 

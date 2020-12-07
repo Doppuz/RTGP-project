@@ -23,7 +23,7 @@ public:
     vector<Terrain> terrains;
 
     TerrainManagement()
-        :size{Terrain::getSize()},lastXPosition{100000}, lastZPosition{100000}{
+        :size{Terrain::getSize()},lastXPosition{150000}, lastZPosition{150000}{
         
         rowLength = 21;
         indexLastRow  = rowLength * (rowLength - 1);
@@ -38,13 +38,16 @@ public:
                 index ++;
             }
         }
-        
+
         this->vertexCount = Terrain::getVertexCount();
         initialSetUp();
         
         for(int i = 0; i < terrains.size();i++){
             terrains[i].mesh.SetupMesh(); 
         }
+
+        
+        std::cout << terrains.size() << std::endl;
 
     }
 
@@ -126,8 +129,8 @@ private:
             }       
         }
 
-        //for(int i = 0; i < terrains.size(); i++)
-            //calculateNormal(&terrains[i].mesh,i);
+        for(int i = 0; i < terrains.size(); i++)
+            calculateNormal(&terrains[i].mesh,i);
 
 
         /*int index = 0;
@@ -145,7 +148,7 @@ private:
             for(int i = 0; i < vertexCount; i++){
                 std::cout << std::endl;
                 for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrains[3].mesh.vertices[index].Position.y << " ";
+                std::cout << " " << terrains[1].mesh.vertices[index].Position.y << " ";
                 index++;
                 }
             } 
@@ -155,7 +158,7 @@ private:
             for(int i = 0; i < vertexCount; i++){
                 std::cout << std::endl;
                 for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrains[6].mesh.vertices[index].Position.y << " ";
+                std::cout << " " << terrains[3].mesh.vertices[index].Position.y << " ";
                 index++;
                 }
             } 
@@ -260,10 +263,14 @@ private:
     }
 
     void calculateNormal(Mesh *mesh, int pos){
-        int predecessorLeft = pos % 3 == 0 ? pos + 2: pos -1;
+        /*int predecessorLeft = pos % 3 == 0 ? pos + 2: pos -1;
         int predecessorRight = pos % 3 == 2 ? pos - 2 : pos + 1;
         int predecessorDown = pos < 3 ? pos + 6: pos - 3;
-        int predecessorUp = pos > 5 ? pos - 6: pos + 3;
+        int predecessorUp = pos > 5 ? pos - 6: pos + 3;*/
+        int predecessorLeft = pos % rowLength == 0 ? pos + (rowLength -1): pos -1;
+        int predecessorRight = pos % rowLength == (rowLength -1) ? pos - (rowLength -1) : pos + 1;
+        int predecessorDown = pos < rowLength ? pos + (terrains.size() - rowLength) : pos - rowLength;
+        int predecessorUp = pos > (terrains.size() - rowLength - 1) ? pos - (terrains.size() - rowLength): pos + rowLength;
 
         vector<Vertex> vertex = mesh -> vertices;
         for(int i = 0; i < vertex.size(); i++){
@@ -282,7 +289,7 @@ private:
                 .mesh.vertices[vertexCount + i - (vertex.size() - vertexCount)].Position.y;
 
             glm::vec3 normal = glm::vec3(heightL - heightR, 2.0f, heightU - heightD);
-            glm::normalize(normal);
+            normal = glm::normalize(normal);
             mesh->vertices[i].Normal = normal;
         }
     }
