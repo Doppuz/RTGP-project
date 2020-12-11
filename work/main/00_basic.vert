@@ -30,7 +30,7 @@ out vec3 interp_UVW;
 
 out vec3 vViewPosition;
 
-const float density = 0.000015; //0.000009
+const float density = 0.000009; //0.000009
 const float gradient = 3;
 
 float random (in vec2 st) {
@@ -69,11 +69,12 @@ void main() {
 	outTexture = texCoord;
   vNormal = normalize( normalMatrix * normal );;
   // light incidence direction (in view coordinate)
+  vec4 positionRelativeToCam = view * model * vec4(pos, 1.0f);
   vec4 lightPos = view  * vec4(pointLightPosition, 1.0);
-  lightDir = lightPos.xyz - pos.xyz;
+  
+  lightDir = lightPos.xyz - positionRelativeToCam.xyz;
   h = pos.y;
   
-  vec4 positionRelativeToCam = view * model * vec4(pos, 1.0f);
   vViewPosition = -positionRelativeToCam.xyz;
   float distance = length(positionRelativeToCam.xyz);
   visibility = exp(-pow((distance*density),gradient));

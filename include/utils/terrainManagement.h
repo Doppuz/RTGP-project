@@ -132,6 +132,12 @@ private:
         for(int i = 0; i < terrains.size(); i++)
             calculateNormal(&terrains[i].mesh,i);
 
+        /*for(int i = 0; i < vertexCount; i++){
+            std::cout << std::endl;
+            for(int j = 0; j < vertexCount; j++){
+                std::cout << terrains[i].mesh.indices[j] << " ";
+            }
+        } */
 
         /*int index = 0;
             for(int i = 0; i < vertexCount; i++){
@@ -187,6 +193,10 @@ private:
         lerpMeshOther(a,b);
         lerpMeshOther2(a);
         lerpMeshOther3(b);
+    }
+
+    float lerp(float a, float b, float c){
+        return a * c + b * (1 - c);
     }
 
     //Lerp vertex
@@ -257,16 +267,7 @@ private:
         }
     }
 
-    float lerp(float a, float b, float c)
-    {
-        return a * c + b * (1 - c);
-    }
-
     void calculateNormal(Mesh *mesh, int pos){
-        /*int predecessorLeft = pos % 3 == 0 ? pos + 2: pos -1;
-        int predecessorRight = pos % 3 == 2 ? pos - 2 : pos + 1;
-        int predecessorDown = pos < 3 ? pos + 6: pos - 3;
-        int predecessorUp = pos > 5 ? pos - 6: pos + 3;*/
         int predecessorLeft = pos % rowLength == 0 ? pos + (rowLength -1): pos -1;
         int predecessorRight = pos % rowLength == (rowLength -1) ? pos - (rowLength -1) : pos + 1;
         int predecessorDown = pos < rowLength ? pos + (terrains.size() - rowLength) : pos - rowLength;
@@ -278,17 +279,25 @@ private:
 
             heightL = i % vertexCount != 0 ? vertex[i-1].Position.y : this->terrains[predecessorLeft]
                 .mesh.vertices[(vertexCount)*((int)(i/vertexCount)+1) - 2].Position.y;
+            
+            heightL = lerp(heightL,vertex[i].Position.y,0.9f);
 
             heightR = i % vertexCount != (vertexCount - 1) ? vertex[i+1].Position.y : this->terrains[predecessorRight]
                 .mesh.vertices[(vertexCount)*((int)(i/vertexCount))+1].Position.y;
 
+            heightR = lerp(heightR,vertex[i].Position.y,0.9f);
+
             heightD = i >= vertexCount ? vertex[i - vertexCount].Position.y : this->terrains[predecessorDown]
                 .mesh.vertices[(vertexCount * vertexCount) - 2 * vertexCount + i].Position.y;
+                
+            heightD = lerp(heightD,vertex[i].Position.y,0.9f);
              
             heightU = i < (vertex.size() - vertexCount) ? vertex[i + vertexCount].Position.y :  this->terrains[predecessorUp]
                 .mesh.vertices[vertexCount + i - (vertex.size() - vertexCount)].Position.y;
+    
+            heightU = lerp(heightU, vertex[i].Position.y ,0.9f);    
 
-            glm::vec3 normal = glm::vec3(heightL - heightR, 2.0f, heightU - heightD);
+            glm::vec3 normal = glm::vec3(heightL - heightR, 2.0f, -heightU + heightD);
             normal = glm::normalize(normal);
             mesh->vertices[i].Normal = normal;
         }
@@ -296,6 +305,8 @@ private:
 
     //float lerp(float a, float b, float t) { return a + t * (b - a); }
 };
+
+
 
 //------------------------------------------------------------------------------------------------------------------
 

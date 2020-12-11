@@ -27,5 +27,5 @@ in vec3 vNormal;
 
 void main(){
 	 // we sample the cube map
-    FragColor = texture(textureCube, interp_UVW);
+    //FragColor = texture(textureCube, interp_UVW);
 }

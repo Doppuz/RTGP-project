@@ -99,7 +99,7 @@ int nbFrames = 0;
 int initialTime = time(NULL), finalTime, frameCount;
 
 //light
-glm::vec3 lightPos = glm::vec3(150000.0f, 1000.0f,150000.0f);
+glm::vec3 lightPos = glm::vec3(0.0f, 15000.0f, 0.0f);
 GLfloat lightMovement = 100.0f;
 
 // diffusive, specular and ambient components
@@ -323,6 +323,11 @@ int main(){
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         else
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+        if (spinning)
+            orientationY+=(deltaTime*spin_speed);
+
+        lightPos = glm::vec3(actualCamera.Position.x,lightPos.y,actualCamera.Position.z);
 
         /*fog_shader.Use();
         fog_shader.setMat4("projection", projection);  
