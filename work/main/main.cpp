@@ -60,7 +60,9 @@ void changeTerrainPos(TerrainManagement* manager);
 //SkyBox
 void LoadTextureCubeSide(string path, string side_image, GLuint side_name);
 GLint LoadTextureCube(string path);
-
+//subroutine
+void SetupShader(int program);
+void PrintCurrentShader(int subroutine);
 
 //First movement bool
 bool firstMouse = true;
@@ -82,7 +84,7 @@ glm::mat4 projection;
 glm::mat4 view = glm::mat4(1.0f);
 
 //Camera
-Camera camera(glm::vec3(0.0f, 10000.0f, 0.0f), GL_FALSE); //25000,20000,25000
+Camera camera(glm::vec3(0.0f, 300.0f, 0.0f), GL_FALSE); //25000,20000,25000
 Camera farCamera(glm::vec3(0.0f,50000.0f,200000.0f),GL_FALSE);
 Camera actualCamera = camera;
 
@@ -99,7 +101,7 @@ int nbFrames = 0;
 int initialTime = time(NULL), finalTime, frameCount;
 
 //light
-glm::vec3 lightPos = glm::vec3(0.0f, 15000.0f, 0.0f);
+glm::vec3 lightPos = glm::vec3(0, 0.0f, 0);
 GLfloat lightMovement = 100.0f;
 
 // diffusive, specular and ambient components
@@ -129,6 +131,10 @@ int cam = 0;
 
 // texture unit for the cube map
 GLuint textureCube;
+
+//Subroutine
+GLuint current_subroutine = 0;
+vector<std::string> shaders;
 
 /////////////////// MAIN function ///////////////////////
 int main(){
@@ -191,7 +197,10 @@ int main(){
     // we create and compile shaders (code of Shader class is in include/utils/shader_v1.h)
     Shader shader("00_basic.vert", "00_basic.frag");
     Shader skybox_shader("skyboxVert.vert", "skyboxFrag.frag");
-    Shader fog_shader("fogv.vert", "fogf.frag");
+
+    SetupShader(shader.Program);
+    // we print on console the name of the first subroutine used
+    PrintCurrentShader(current_subroutine);
 
     std::cout << "Before texture" << std::endl;
 
@@ -257,8 +266,12 @@ int main(){
         shader.setVec3("specularColor",specularColor);
         shader.setFloat("shininess",shininess);
 
-        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 10.0f,200000.0f); //150000
+        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 10.0f,20000.0f); //150000
         shader.setMat4("projection", projection);   
+
+        GLuint index = glGetSubroutineIndex(shader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());
+        // we activate the subroutine using the index (this is where shaders swapping happens)
+        glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &index);
 
         calculateFPS();
 
@@ -326,6 +339,7 @@ int main(){
 
         if (spinning)
             orientationY+=(deltaTime*spin_speed);
+
 
         lightPos = glm::vec3(actualCamera.Position.x,lightPos.y,actualCamera.Position.z);
 
@@ -557,4 +571,52 @@ GLint LoadTextureCube(string path)
 
     return textureImage;
 
+}
+
+void SetupShader(int program)
+{
+    int maxSub,maxSubU,countActiveSU;
+    GLchar name[256]; 
+    int len, numCompS;
+    
+    // global parameters about the Subroutines parameters of the system
+    glGetIntegerv(GL_MAX_SUBROUTINES, &maxSub);
+    glGetIntegerv(GL_MAX_SUBROUTINE_UNIFORM_LOCATIONS, &maxSubU);
+    std::cout << "Max Subroutines:" << maxSub << " - Max Subroutine Uniforms:" << maxSubU << std::endl;
+
+    // get the number of Subroutine uniforms (only for the Fragment shader, due to the nature of the exercise)
+    // it is possible to add similar calls also for the Vertex shader
+    glGetProgramStageiv(program, GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORMS, &countActiveSU);
+    
+    // print info for every Subroutine uniform
+    for (int i = 0; i < countActiveSU; i++) {
+        
+        // get the name of the Subroutine uniform (in this example, we have only one)
+        glGetActiveSubroutineUniformName(program, GL_FRAGMENT_SHADER, i, 256, &len, name);
+        // print index and name of the Subroutine uniform
+        std::cout << "Subroutine Uniform: " << i << " - name: " << name << std::endl;
+
+        // get the number of subroutines
+        glGetActiveSubroutineUniformiv(program, GL_FRAGMENT_SHADER, i, GL_NUM_COMPATIBLE_SUBROUTINES, &numCompS);
+        
+        // get the indices of the active subroutines info and write into the array s
+        int *s =  new int[numCompS];
+        glGetActiveSubroutineUniformiv(program, GL_FRAGMENT_SHADER, i, GL_COMPATIBLE_SUBROUTINES, s);
+        std::cout << "Compatible Subroutines:" << std::endl;
+        
+        // for each index, get the name of the subroutines, print info, and save the name in the shaders vector
+        for (int j=0; j < numCompS; ++j) {
+            glGetActiveSubroutineName(program, GL_FRAGMENT_SHADER, s[j], 256, &len, name);
+            std::cout << "\t" << s[j] << " - " << name << "\n";
+            shaders.push_back(name);
+        }
+        std::cout << std::endl;
+        
+        delete[] s;
+    }
+}
+
+void PrintCurrentShader(int subroutine)
+{
+    std::cout << "Current shader subroutine: " << shaders[subroutine]  << std::endl;
 }

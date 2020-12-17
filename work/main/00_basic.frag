@@ -92,7 +92,17 @@ vec4 BlinnPhong_ML_TX() // this name is the one which is detected by the SetupSh
 {
     // we repeat the UVs and we sample the texture
     //vec2 repeated_Uv = mod(outTexture*80, 1.0);
-    vec4 surfaceColor = texture(grassTexture, outTexture);
+    vec4 surfaceColor;
+    
+    float interpolation =  h; 
+
+    if (h > 115)
+        surfaceColor = texture(snowTexture, outTexture);
+    else if (h < 15)
+        surfaceColor = texture(grassTexture, outTexture);
+    else 
+        surfaceColor = (interpolation / 115) * texture(snowTexture, outTexture) +
+         (1 - (interpolation / 115)) * texture(grassTexture, outTexture) ; 
     
     // ambient component can be calculated at the beginning
     vec4 color = vec4(Ka*ambientColor,1.0);
@@ -158,9 +168,21 @@ vec4 GGX() // this name is the one which is detected by the SetupShaders() funct
     // cosine angle between direction of light and normal
     float NdotL = max(dot(N, L), 0.0);
 
-    // diffusive (Lambert) reflection component
-    vec4 lambert = (Kd*texture(grassTexture, outTexture))/PI;
+    vec4 surfaceColor;
+    
+    float interpolation =  h; 
 
+    if (h > 115)
+        surfaceColor = texture(snowTexture, outTexture);
+    else if (h < 15)
+        surfaceColor = texture(grassTexture, outTexture);
+    else 
+        surfaceColor = (interpolation / 115) * texture(snowTexture, outTexture) +
+         (1 - (interpolation / 115)) * texture(grassTexture, outTexture);
+
+    // diffusive (Lambert) reflection component
+    vec4 lambert = (Kd*surfaceColor)/PI;    
+    
     // we initialize the specular component
     vec3 specular = vec3(0.0);
 
@@ -213,19 +235,21 @@ void main(){
     float interpolation =  h; 
     //FragColor = vec4(Lambert(), 1.0);
     //FragColor = texture(grassTexture, outTexture); 
+    //FragColor =  BlinnPhong_ML_TX();
+
     vec4 temp =  GGX();
     temp.a = 1;
     FragColor = temp;
-    //FragColor =  BlinnPhong_ML_TX();
-    /*if (h > 8015)
+
+    /*    if (h > 115)
         FragColor = texture(snowTexture, outTexture);
     else if (h < 15)
         FragColor = texture(grassTexture, outTexture);
     else 
-        FragColor = (interpolation / 8015) * texture(snowTexture, outTexture) +
-         (1 - (interpolation / 8015)) * texture(grassTexture, outTexture) ;*/
+        FragColor = (interpolation / 115) * texture(snowTexture, outTexture) +
+         (1 - (interpolation / 115)) * texture(grassTexture, outTexture) ;*/
 
-    FragColor = mix(vec4(0.5f, 0.5f, 0.5f, 1.0f),FragColor,visibility);
+    FragColor = mix(vec4(0.7f, 0.7f, 0.7f, 1.0f),FragColor,visibility);
     /*else if (h >= -50 && h <= -20)
         FragColor = ((abs(h) - 20) / 30) * texture(groundTexture, outTexture) +
          (1 - ((abs(h) - 20) / 30)) * texture(grassTexture, outTexture) ;

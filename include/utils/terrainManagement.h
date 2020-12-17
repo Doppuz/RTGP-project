@@ -23,7 +23,7 @@ public:
     vector<Terrain> terrains;
 
     TerrainManagement()
-        :size{Terrain::getSize()},lastXPosition{150000}, lastZPosition{150000}{
+        :size{Terrain::getSize()},lastXPosition{4500}, lastZPosition{4500}{
         
         rowLength = 21;
         indexLastRow  = rowLength * (rowLength - 1);
