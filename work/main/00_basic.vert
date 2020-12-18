@@ -30,7 +30,7 @@ out vec3 interp_UVW;
 
 out vec3 vViewPosition;
 
-const float density = 0.00029; //0.000009
+const float density = 0.00032; //0.000009
 const float gradient = 3;
 
 vec4 positionRelativeToCam;

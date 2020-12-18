@@ -111,7 +111,7 @@ glm::vec3 ambientColor = {0.5f,0.1f,0.7f};
 // weights for the diffusive, specular and ambient components
 GLfloat Kd = 0.5f;
 GLfloat Ks = 0.4f;
-GLfloat Ka = 0.1f;
+GLfloat Ka = 0.9f;
 // shininess coefficient for Phong and Blinn-Phong shaders
 GLfloat shininess = 25.0f;
 
@@ -218,7 +218,7 @@ int main(){
 
     GLint redTexture = LoadTexture("../../textures/plane/redTexture.jpg");
 
-    textureCube = LoadTextureCube("../../textures/cube/MySkyBox/");;
+    textureCube = LoadTextureCube("../../textures/cube/MySkyBox2/");;
 
     GLfloat orientationY = -90.0f;
 
@@ -241,6 +241,8 @@ int main(){
     cubeModelMatrix = glm::translate(cubeModelMatrix,glm::vec3(0.0f, 8000.0f,120000));
     cubeModelMatrix = glm::scale(cubeModelMatrix, glm::vec3(500000,50000,250000));
 
+    glm::vec3 fogColor = {0.0f,0.0f,0.0f};
+
     while(!glfwWindowShouldClose(window)){
 
         //std::cout << actualCamera.Position.x << " " <<  actualCamera.Position.y << " " <<  actualCamera.Position.z << std::endl;
@@ -258,6 +260,9 @@ int main(){
             
         shader.Use();  
 
+        //glm::vec3 fogColor = glm::vec3(0.1f,0.3f,0.1f);
+        shader.setVec3("fogColor",fogColor);
+
         shader.setFloat("kd",Kd);
         shader.setFloat("ks",Ks);
         shader.setFloat("ka",Ka);
@@ -266,7 +271,7 @@ int main(){
         shader.setVec3("specularColor",specularColor);
         shader.setFloat("shininess",shininess);
 
-        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 10.0f,20000.0f); //150000
+        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 10.0f,10000.0f); //150000
         shader.setMat4("projection", projection);   
 
         GLuint index = glGetSubroutineIndex(shader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());
@@ -367,6 +372,8 @@ int main(){
 
         // we determine the position in the Shader Program of the uniform variables
         skybox_shader.setInt("textureCube",0);
+        
+        skybox_shader.setVec3("fogColor",fogColor);
 
         // we render the cube with the environment map
         cubeModel.Draw();
@@ -404,6 +411,27 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             actualCamera = camera;
         cam = (cam + 1) % 2;    
     }    
+
+    GLuint new_subroutine;
+    // pressing a key number, we change the shader applied to the models
+    // if the key is between 1 and 9, we proceed and check if the pressed key corresponds to
+    // a valid subroutine
+    if((key >= GLFW_KEY_1 && key <= GLFW_KEY_9) && action == GLFW_PRESS)
+    {
+        // "1" to "9" -> ASCII codes from 49 to 59
+        // we subtract 48 (= ASCII CODE of "0") to have integers from 1 to 9
+        // we subtract 1 to have indices from 0 to 8
+        new_subroutine = (key-'0'-1);
+        // if the new index is valid ( = there is a subroutine with that index in the shaders vector),
+        // we change the value of the current_subroutine variable
+        // NB: we can just check if the new index is in the range between 0 and the size of the shaders vector, 
+        // avoiding to use the std::find function on the vector
+        if (new_subroutine<shaders.size())
+        {
+            current_subroutine = new_subroutine;
+            PrintCurrentShader(current_subroutine);
+        }
+    }
 }
 
 //Camera key movement.

@@ -18,7 +18,8 @@ uniform vec3 diffuseColor;
 // weight of the components
 // in this case, we can pass separate values from the main application even if Ka+Kd+Ks>1. In more "realistic" situations, I have to set this sum = 1, or at least Kd+Ks = 1, by passing Kd as uniform, and then setting Ks = 1.0-Kd
 
-uniform float Kd;
+uniform vec3 fogColor;
+
 
 // light incidence direction (calculated in vertex shader, interpolated by rasterization)
 in vec3 lightDir;
@@ -27,5 +28,6 @@ in vec3 vNormal;
 
 void main(){
 	 // we sample the cube map
-    //FragColor = texture(textureCube, interp_UVW);
+    FragColor = texture(textureCube, interp_UVW);
+    FragColor = mix(vec4(fogColor,1),FragColor,0.25f);
 }

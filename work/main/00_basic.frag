@@ -28,6 +28,8 @@ uniform float Ka;
 uniform float Kd;
 uniform float Ks;
 
+uniform vec3 fogColor;
+
 // shininess coefficients (passed from the application)
 uniform float shininess;
 
@@ -38,7 +40,14 @@ in vec3 vNormal;
 
 in vec3 vViewPosition;
 
-vec3 Lambert() // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
+// the "type" of the Subroutine
+subroutine vec4 ill_model();
+
+// Subroutine Uniform (it is conceptually similar to a C pointer function)
+subroutine uniform ill_model Illumination_Model;
+
+subroutine(ill_model)
+vec4 Lambert() // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
 {
     // normalization of the per-fragment normal
     vec3 N = normalize(vNormal);
@@ -49,50 +58,8 @@ vec3 Lambert() // this name is the one which is detected by the SetupShaders() f
     float lambertian = max(dot(L,N), 0.0);
 
     // Lambert illumination model  
-    return vec3(Kd * lambertian * texture(grassTexture, outTexture));
-}
-
-vec4 BlinnPhong() // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
-{
-    // ambient component can be calculated at the beginning
-    vec4 color = vec4(Ka*ambientColor,1);
-
-    // normalization of the per-fragment normal
-    vec3 N = normalize(vNormal);
-    
-    // normalization of the per-fragment light incidence direction
-    vec3 L = normalize(lightDir.xyz);
-
-    // Lambert coefficient
-    float lambertian = max(dot(L,N), 0.0);
-
-    // if the lambert coefficient is positive, then I can calculate the specular component
-    if(lambertian > 0.0)
-    {
-      // the view vector has been calculated in the vertex shader, already negated to have direction from the mesh to the camera
-      vec3 V = normalize( vViewPosition );
-
-      // in the Blinn-Phong model we do not use the reflection vector, but the half vector
-      vec3 H = normalize(L + V);
-
-      // we use H to calculate the specular component
-      float specAngle = max(dot(H, N), 0.0);
-      // shininess application to the specular component
-      float specular = pow(specAngle, shininess);
-
-      // We add diffusive and specular components to the final color
-      // N.B. ): in this implementtion, the sum of the components can be different than 1
-      color += Kd * lambertian * texture(grassTexture, outTexture) +
-                      vec4(Ks * specular * specularColor,1);
-    }
-    return color;
-}
-
-vec4 BlinnPhong_ML_TX() // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
-{
-    // we repeat the UVs and we sample the texture
-    //vec2 repeated_Uv = mod(outTexture*80, 1.0);
     vec4 surfaceColor;
+
     
     float interpolation =  h; 
 
@@ -101,44 +68,10 @@ vec4 BlinnPhong_ML_TX() // this name is the one which is detected by the SetupSh
     else if (h < 15)
         surfaceColor = texture(grassTexture, outTexture);
     else 
-        surfaceColor = (interpolation / 115) * texture(snowTexture, outTexture) +
-         (1 - (interpolation / 115)) * texture(grassTexture, outTexture) ; 
-    
-    // ambient component can be calculated at the beginning
-    vec4 color = vec4(Ka*ambientColor,1.0);
-
-    // normalization of the per-fragment normal
-    vec3 N = normalize(vNormal);
-    
-    //for all the lights in the scene
-    for(int i = 0; i < 1; i++)
-    {
-        // normalization of the per-fragment light incidence direction
-        vec3 L = normalize(lightDir.xyz);
-
-        // Lambert coefficient
-        float lambertian = max(dot(L,N), 0.0);
-
-        // if the lambert coefficient is positive, then I can calculate the specular component
-        if(lambertian > 0.0)
-        {
-            // the view vector has been calculated in the vertex shader, already negated to have direction from the mesh to the camera
-            vec3 V = normalize( vViewPosition );
-
-            // in the Blinn-Phong model we do not use the reflection vector, but the half vector
-            vec3 H = normalize(L + V);
-
-            // we use H to calculate the specular component
-            float specAngle = max(dot(H, N), 0.0);
-            // shininess application to the specular component
-            float specular = pow(specAngle, shininess);
-
-            // We add diffusive (= color sampled from texture) and specular components to the final color
-            // N.B. ): in this implementation, the sum of the components can be different than 1
-            color += Kd * lambertian * surfaceColor + vec4(Ks * specular * specularColor,1.0);
-        }
-    }
-    return color;
+        surfaceColor = mix(texture(grassTexture, outTexture),texture(snowTexture, outTexture),(h - 15)/100);
+    vec4 illumination = vec4(Kd * lambertian * surfaceColor);
+    illumination.a = 1;
+    return illumination;
 }
 
 float G1(float angle, float alpha)
@@ -158,6 +91,7 @@ float alpha = 0.5f;
 float PI = 3.14;
 float F0 = 0.9;
 
+subroutine(ill_model)
 vec4 GGX() // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
 {
     // normalization of the per-fragment normal
@@ -169,16 +103,13 @@ vec4 GGX() // this name is the one which is detected by the SetupShaders() funct
     float NdotL = max(dot(N, L), 0.0);
 
     vec4 surfaceColor;
-    
-    float interpolation =  h; 
 
     if (h > 115)
         surfaceColor = texture(snowTexture, outTexture);
     else if (h < 15)
         surfaceColor = texture(grassTexture, outTexture);
     else 
-        surfaceColor = (interpolation / 115) * texture(snowTexture, outTexture) +
-         (1 - (interpolation / 115)) * texture(grassTexture, outTexture);
+        surfaceColor = mix(texture(grassTexture, outTexture),texture(snowTexture, outTexture),(h-15)/100);
 
     // diffusive (Lambert) reflection component
     vec4 lambert = (Kd*surfaceColor)/PI;    
@@ -226,44 +157,12 @@ vec4 GGX() // this name is the one which is detected by the SetupShaders() funct
     //integral of: BRDF * Li * (cosine angle between N and L)
     // BRDF in our case is: the sum of Lambert and GGX
     // Li is considered as equal to 1: light is white, and we have not applied attenuation. With colored lights, and with attenuation, the code must be modified and the Li factor must be multiplied to finalColor
-    return (lambert + vec4(specular,1))*NdotL;
+    vec4 illumination = (lambert + vec4(specular,1))*NdotL;
+    illumination.a = 1;
+    return illumination;
 }
 
 void main(){
-    //if(h < -15.0f)
-    //    FragColor = texture(groundTexture, outTexture);
-    float interpolation =  h; 
-    //FragColor = vec4(Lambert(), 1.0);
-    //FragColor = texture(grassTexture, outTexture); 
-    //FragColor =  BlinnPhong_ML_TX();
-
-    vec4 temp =  GGX();
-    temp.a = 1;
-    FragColor = temp;
-
-    /*    if (h > 115)
-        FragColor = texture(snowTexture, outTexture);
-    else if (h < 15)
-        FragColor = texture(grassTexture, outTexture);
-    else 
-        FragColor = (interpolation / 115) * texture(snowTexture, outTexture) +
-         (1 - (interpolation / 115)) * texture(grassTexture, outTexture) ;*/
-
-    FragColor = mix(vec4(0.7f, 0.7f, 0.7f, 1.0f),FragColor,visibility);
-    /*else if (h >= -50 && h <= -20)
-        FragColor = ((abs(h) - 20) / 30) * texture(groundTexture, outTexture) +
-         (1 - ((abs(h) - 20) / 30)) * texture(grassTexture, outTexture) ;
-    else if (h < -50)
-        FragColor = texture(groundTexture, outTexture);
-    
-    /*float interpolation =  h - 5; 
-    if (h > 35)
-        FragColor =  vec4(Lambert(snowTexture), 1.0);
-    else if (h < 5)
-        FragColor =  vec4(Lambert(grassTexture), 1.0);
-    else //if(h >= 15 && h <= 35)
-        FragColor = (interpolation / 30) * vec4(Lambert(snowTexture), 1.0) +
-         (1 - (interpolation / 30)) * vec4(Lambert(grassTexture), 1.0) ;*/
-    //FragColor = texture(grassTexture, outTexture);
-    //FragColor = vec4(Lambert(grassTexture), 1.0);
+    FragColor = Illumination_Model();
+    FragColor = mix(vec4(fogColor,1),FragColor,visibility);
 }
