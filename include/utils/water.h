@@ -1,37 +1,28 @@
 #pragma once
 
-
 #include <utils/mesh_v1.h>
-
-#include <utils/FastNoiseLite.h>
 #include <ctime>
+#include <glad/glad.h>
+#include <glfw/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-#include <utils/water.h>
-
-class Terrain{
+class Water{
     public:
         
         Mesh mesh;
-        Water water;
 
-        Terrain(GLfloat x, glm::vec3 translate)
-            :modelMatrix{glm::mat4(1.0f)}{
+        Water(GLfloat x, glm::vec3 translate,float ht)
+            :modelMatrix{glm::mat4(1.0f)},height{ht}{
             
             modelMatrix = glm::translate(modelMatrix,translate);
-            noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-            srand((unsigned) time(0));
-            int random = (rand() % 1000000) * x;
-            noise.SetSeed(random);
-            noise.SetFrequency(0.008f);
-            noise.SetFractalType(FastNoiseLite::FractalType_FBm);
-            noise.SetFractalOctaves(5);
-            noise.SetFractalLacunarity(2.0f);
-            noise.SetFractalGain(0.5f);
-            generateBaseTerrain();
-            water = Water(x,translate,-50);
+            generatePlane();
+
         }
 
-        Terrain(){}
+        Water(){}
 
         void draw(){
            mesh.Draw();
@@ -51,7 +42,6 @@ class Terrain{
 
         void translateModelMatrix(glm::vec3 translate){
             modelMatrix = glm::translate(modelMatrix,translate);
-            water.translateModelMatrix(translate);
         }
 
         glm::mat3 getNormalMatrix(glm::mat4 viewMatrix){
@@ -62,11 +52,10 @@ class Terrain{
     private:
         const static GLint size = 500; //10000
         const static GLint vertex_count = 16; //32
-        FastNoiseLite noise;
+        float height;
         glm::mat4 modelMatrix;
-        float height = 2000; 
 
-        void generateBaseTerrain(){
+        void generatePlane(){
             vector<Vertex> vertices;
 		    vector<GLuint> indices;
 
@@ -77,7 +66,7 @@ class Terrain{
 		    for(int i=0;i<vertex_count;i++){
                 Vertex vertex;
 			    for(int j=0;j<vertex_count;j++){
-                    vector = glm::vec3((float)j/((float)vertex_count - 1) * size, height *  noise.GetNoise((float)j, (float)i)
+                    vector = glm::vec3((float)j/((float)vertex_count - 1) * size, height
                         ,(float)i/((float)vertex_count - 1) * size);
                     vertex.Position = vector;
 
@@ -108,5 +97,6 @@ class Terrain{
 		    }
             
 		 this->mesh = Mesh(vertices, indices);
+         this->mesh.SetupMesh();
     }
 };

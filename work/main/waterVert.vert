@@ -13,20 +13,31 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform mat3 normalMatrix;
+
+out vec3 vNormal;
+
+uniform vec3 pointLightPosition;
+
+// light incidence direction (calculated in vertex shader, interpolated by rasterization)
+
 out vec2 outTexture;
+out float h;
 
 out float visibility;
 
-const float density = 0.000009; //0.000008
-const float gradient = 10;
+const float density = 0.00032; //0.000009
+const float gradient = 3;
 
 vec4 positionRelativeToCam;
 
 void main() {
-	//float height = noise(pos.xz);
-	outTexture = texCoord;
-  
+  // light incidence direction (in view coordinate)
   vec4 positionRelativeToCam = view * model * vec4(pos, 1.0f);
+
+	outTexture = texCoord;
+  h = pos.y;
+  
   float distance = length(positionRelativeToCam.xyz);
   visibility = exp(-pow((distance*density),gradient));
   visibility = clamp(visibility,0.0f,1.0f);

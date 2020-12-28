@@ -162,6 +162,12 @@ vec4 GGX() // this name is the one which is detected by the SetupShaders() funct
     return illumination;
 }
 
+subroutine(ill_model)
+vec4 Prova() // this name is the one which is detected by the SetupShaders() function in the main application, and the one used to swap subroutines
+{
+    return texture(grassTexture, outTexture);
+}
+
 void main(){
     FragColor = Illumination_Model();
     FragColor = mix(vec4(fogColor,1),FragColor,visibility);
