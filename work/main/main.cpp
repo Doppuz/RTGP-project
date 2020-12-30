@@ -239,7 +239,13 @@ int main(){
 
     bool first = false;
     
-    
+    glm::mat4 planeModelMatrix = glm::mat4(1.0f);
+    planeModelMatrix = glm::translate(planeModelMatrix,glm::vec3(0.0f, 300.0f,-800));
+    planeModelMatrix = glm::rotate(planeModelMatrix, glm::radians(orientationY), glm::vec3(1.0f, 0.0f, 0.0f));
+
+    planeModelMatrix = glm::rotate(planeModelMatrix, glm::radians(-orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
+    planeModelMatrix = glm::scale(planeModelMatrix, glm::vec3(50,50,50));
+
     glm::mat4 cubeModelMatrix = glm::mat4(1.0f);
     cubeModelMatrix = glm::translate(cubeModelMatrix,glm::vec3(0.0f, 8000.0f,120000));
     cubeModelMatrix = glm::scale(cubeModelMatrix, glm::vec3(500000,50000,250000));
@@ -460,11 +466,14 @@ int main(){
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, fbos.getReflectionTexture());
-        for(int i = 0; i < terrainManager.terrains.size(); i++){     
-            waterShader.setMat4("model", terrainManager.terrains[i].water.getModelMatrix());
-            waterShader.setMat3("normalMatrix",terrainManager.terrains[i].water.getNormalMatrix(view));
-            terrainManager.terrains[i].water.draw(); 
-        }
+        //for(int i = 0; i < terrainManager.terrains.size(); i++){     
+            //waterShader.setMat4("model", terrainManager.terrains[i].water.getModelMatrix());
+            //waterShader.setMat3("normalMatrix",terrainManager.terrains[i].water.getNormalMatrix(view));
+            //terrainManager.terrains[i].water.draw(); 
+        //}
+        
+        waterShader.setMat4("model", planeModelMatrix);
+        planeModel.Draw();
         waterShader.setVec3("fogColor",fogColor);
  
         
