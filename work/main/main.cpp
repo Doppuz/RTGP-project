@@ -62,6 +62,9 @@ void changeTerrainPos(TerrainManagement* manager);
 //SkyBox
 void LoadTextureCubeSide(string path, string side_image, GLuint side_name);
 GLint LoadTextureCube(string path);
+//Render
+void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, TerrainManagement terrainManager, glm::vec4 plane);
+void skyBoxRenderer(Shader skybox_shader, glm::vec3 fogColor,Model cubeModel);
 //subroutine
 void SetupShader(int program);
 void PrintCurrentShader(int subroutine);
@@ -138,6 +141,11 @@ GLuint textureCube;
 GLuint current_subroutine = 0;
 vector<std::string> shaders;
 
+//texture
+GLint groundTexture;
+GLint snowTexture;
+GLint grassTexture;
+
 /////////////////// MAIN function ///////////////////////
 int main(){
 
@@ -199,6 +207,7 @@ int main(){
     // we create and compile shaders (code of Shader class is in include/utils/shader_v1.h)
     Shader shader("00_basic.vert", "00_basic.frag");
     Shader waterShader("waterVert.vert", "waterFrag.frag");
+    Shader planeShader("planeVert.vert", "planeFrag.frag");
     Shader skybox_shader("skyboxVert.vert", "skyboxFrag.frag");
 
     SetupShader(shader.Program);
@@ -207,15 +216,15 @@ int main(){
 
     std::cout << "Before texture" << std::endl;
 
-    GLint groundTexture = LoadTexture("../../textures/plane/ground.jpg");
+    groundTexture = LoadTexture("../../textures/plane/ground.jpg");
     
     std::cout << "After 1 texture" << std::endl;
 
-    GLint snowTexture = LoadTexture("../../textures/plane/snow.jpg");
+    snowTexture = LoadTexture("../../textures/plane/snow.jpg");
 
     std::cout << "After 2 texture" << std::endl;
     
-    GLint grassTexture = LoadTexture("../../textures/plane/ground2.jpg");
+    grassTexture = LoadTexture("../../textures/plane/ground2.jpg");
 
     std::cout << "After 3 texture" << std::endl;
 
@@ -228,6 +237,8 @@ int main(){
 
     Model planeModel("../../models/plane.obj");
     planeModel.meshes[0].SetupMesh();
+    Model planeModel2("../../models/plane.obj");
+    planeModel2.meshes[0].SetupMesh();
     Model cubeModel("../../models/cube.obj"); // used for the environment map
     cubeModel.meshes[0].SetupMesh();
 
@@ -246,6 +257,13 @@ int main(){
     planeModelMatrix = glm::rotate(planeModelMatrix, glm::radians(-orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
     planeModelMatrix = glm::scale(planeModelMatrix, glm::vec3(50,50,50));
 
+    glm::mat4 planeModelMatrix2 = glm::mat4(1.0f);
+    planeModelMatrix2 = glm::translate(planeModelMatrix2,glm::vec3(300.0f, 300.0f,0.0f));
+    planeModelMatrix2 = glm::rotate(planeModelMatrix2, glm::radians(orientationY), glm::vec3(1.0f, 0.0f, 0.0f));
+
+    planeModelMatrix2 = glm::rotate(planeModelMatrix2, glm::radians(-orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
+    planeModelMatrix2 = glm::scale(planeModelMatrix2, glm::vec3(50,50,50));
+
     glm::mat4 cubeModelMatrix = glm::mat4(1.0f);
     cubeModelMatrix = glm::translate(cubeModelMatrix,glm::vec3(0.0f, 8000.0f,120000));
     cubeModelMatrix = glm::scale(cubeModelMatrix, glm::vec3(500000,50000,250000));
@@ -262,225 +280,17 @@ int main(){
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // Check is an I/O event is happening
-        glfwPollEvents();
-
-        apply_camera_movements(window);
-
-        changeTerrainPos(&terrainManager);
+        glEnable(GL_CLIP_DISTANCE0);
 
         fbos.bindReflectionFrameBuffer();
 
-        shader.Use();  
-
-        //glm::vec3 fogColor = glm::vec3(0.1f,0.3f,0.1f);
-        shader.setVec3("fogColor",fogColor);
-
-        shader.setFloat("kd",Kd);
-        shader.setFloat("ks",Ks);
-        shader.setFloat("ka",Ka);
-        shader.setVec3("ambientColor",ambientColor);
-        shader.setVec3("diffuseColor",diffuseColor);
-        shader.setVec3("specularColor",specularColor);
-        shader.setFloat("shininess",shininess);
-
-        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 10.0f,10000.0f); //150000
-        shader.setMat4("projection", projection);   
-
-        GLuint index = glGetSubroutineIndex(shader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());
-        // we activate the subroutine using the index (this is where shaders swapping happens)
-        glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &index);
-
-        calculateFPS();
-
-        light_movements(window);
-
-        // View matrix (=camera): position, view direction, camera "up" vector
-        view = actualCamera.GetViewMatrix();
-        shader.setMat4("view", view);
+        float distance = 2 * (actualCamera.Position.y - 10);
+        //actualCamera.Position.y -= distance;
+        //actualCamera.Pitch += +90;
+        terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,1,0,-10));
+        shader.setMat4("model", planeModelMatrix2);
+        planeModel2.Draw();
         
-        //light
-        shader.setVec3("pointLightPosition",lightPos);
-        shader.setVec3("diffuseColor",diffuseColor);
-        shader.setFloat("Kd",Kd); 
-
-        // we "clear" the frame and z  buffer
-        glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        shader.setVec3("skyColor",glm::vec3(0.5f,0.5f,0.5f));
-
-        shader.setInt("groundTexture",0);
-        shader.setInt("snowTexture",1);
-        shader.setInt("grassTexture",2);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, groundTexture);
-
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, snowTexture);
-
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, grassTexture);
-
-        
-
-        for(int i = 0; i < terrainManager.terrains.size(); i++){     
-            shader.setMat4("model", terrainManager.terrains[i].getModelMatrix());
-            shader.setMat3("normalMatrix",terrainManager.terrains[i].getNormalMatrix(view));
-            terrainManager.terrains[i].draw(); 
-        }
-
-         glDepthFunc(GL_LEQUAL);
-        skybox_shader.Use();
-        // we activate the cube map
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
-         // we pass projection and view matrices to the Shader Program of the skybox
-        skybox_shader.setMat4("projection", projection);   
-        // to have the background fixed during camera movements, we have to remove the translations from the view matrix
-        // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
-        view =  glm::mat4(glm::mat3(actualCamera.GetViewMatrix()));    // Remove any translation component of the view matrix
-        skybox_shader.setMat4("view", view);
-
-        // we determine the position in the Shader Program of the uniform variables
-        skybox_shader.setInt("textureCube",0);
-        
-        skybox_shader.setVec3("fogColor",fogColor);
-
-        // we render the cube with the environment map
-        cubeModel.Draw();
-        // we set again the depth test to the default operation for the next frame
-        glDepthFunc(GL_LESS);
-
-        fbos.unbindCurrentFrameBuffer();
-
-       
-
-        // Check is an I/O event is happening
-        glfwPollEvents();
-
-        apply_camera_movements(window);
-
-        changeTerrainPos(&terrainManager);
-            
-        shader.Use();  
-
-        //glm::vec3 fogColor = glm::vec3(0.1f,0.3f,0.1f);
-        shader.setVec3("fogColor",fogColor);
-
-        shader.setFloat("kd",Kd);
-        shader.setFloat("ks",Ks);
-        shader.setFloat("ka",Ka);
-        shader.setVec3("ambientColor",ambientColor);
-        shader.setVec3("diffuseColor",diffuseColor);
-        shader.setVec3("specularColor",specularColor);
-        shader.setFloat("shininess",shininess);
-
-        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 10.0f,10000.0f); //150000
-        shader.setMat4("projection", projection);   
-
-        index = glGetSubroutineIndex(shader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());
-        // we activate the subroutine using the index (this is where shaders swapping happens)
-        glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &index);
-
-        calculateFPS();
-
-        light_movements(window);
-
-        // View matrix (=camera): position, view direction, camera "up" vector
-        view = actualCamera.GetViewMatrix();
-        shader.setMat4("view", view);
-        
-        //light
-        shader.setVec3("pointLightPosition",lightPos);
-        shader.setVec3("diffuseColor",diffuseColor);
-        shader.setFloat("Kd",Kd); 
-
-        // we "clear" the frame and z  buffer
-        glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        shader.setVec3("skyColor",glm::vec3(0.5f,0.5f,0.5f));
-
-        shader.setInt("groundTexture",0);
-        shader.setInt("snowTexture",1);
-        shader.setInt("grassTexture",2);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, groundTexture);
-
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, snowTexture);
-
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, grassTexture);
-
-        for(int i = 0; i < terrainManager.terrains.size(); i++){     
-            shader.setMat4("model", terrainManager.terrains[i].getModelMatrix());
-            shader.setMat3("normalMatrix",terrainManager.terrains[i].getNormalMatrix(view));
-            terrainManager.terrains[i].draw(); 
-        }
-
-       /*shaderSphere.Use();
-
-        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,10000000.0f);
-        shaderSphere.setMat4("projection", projection); 
-
-        view = camera.GetViewMatrix();
-        shaderSphere.setMat4("view", view);  
-
-        shaderSphere.setInt("redTexture",0);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, redTexture);
-
-        glm::mat4 modelSphereMatrix = glm::mat4(1.0f);     
-        modelSphereMatrix = glm::translate(modelSphereMatrix, glm::vec3(0.0f, 25000.0f, 1500.0f));
-        modelSphereMatrix = glm::scale(modelSphereMatrix, glm::vec3(100.0f, 100.0f, 100.0f));
-
-        shaderSphere.setMat4("model", modelSphereMatrix);
-        sphere.Draw();*/
-        
-        if (wireframe)
-            // Draw in wireframe
-            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        else
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-        if (spinning)
-            orientationY+=(deltaTime*spin_speed);
-
-
-        lightPos = glm::vec3(actualCamera.Position.x,lightPos.y,actualCamera.Position.z);
-
-        /*fog_shader.Use();
-        fog_shader.setMat4("projection", projection);  
-        fog_shader.setMat4("view", view);
-        fog_shader.setMat4("model", cubeModelMatrix);
-        cubeModel2.Draw();*/
-        waterShader.Use();
-        waterShader.setMat4("view", view);
-        waterShader.setMat4("projection", projection);   
-        waterShader.setInt("waterTexture",0);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, fbos.getReflectionTexture());
-        //for(int i = 0; i < terrainManager.terrains.size(); i++){     
-            //waterShader.setMat4("model", terrainManager.terrains[i].water.getModelMatrix());
-            //waterShader.setMat3("normalMatrix",terrainManager.terrains[i].water.getNormalMatrix(view));
-            //terrainManager.terrains[i].water.draw(); 
-        //}
-        
-        waterShader.setMat4("model", planeModelMatrix);
-        planeModel.Draw();
-        waterShader.setVec3("fogColor",fogColor);
- 
-        
-        /////////////////// SKYBOX ////////////////////////////////////////////////
-        // we use the cube to attach the 6 textures of the environment map.
-        // we render it after all the other objects, in order to avoid the depth tests as much as possible.
-        // we will set, in the vertex shader for the skybox, all the values to the maximum depth. Thus, the environment map is rendered only where there are no other objects in the image (so, only on the background). Thus, we set the depth test to GL_LEQUAL, in order to let the fragments of the background pass the depth test (because they have the maximum depth possible, and the default setting is GL_LESS)
         glDepthFunc(GL_LEQUAL);
         skybox_shader.Use();
         // we activate the cube map
@@ -500,9 +310,103 @@ int main(){
 
         // we render the cube with the environment map
         cubeModel.Draw();
-        // we set again the depth test to the default operation for the next frame
         glDepthFunc(GL_LESS);
 
+        //actualCamera.Position.y += distance;
+        //actualCamera.Pitch += -90;
+
+        fbos.bindRefractionFrameBuffer();
+
+        terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,-1,0,10));
+        shader.setMat4("model", planeModelMatrix);
+        planeModel.Draw();
+
+        glDepthFunc(GL_LEQUAL);
+        skybox_shader.Use();
+        // we activate the cube map
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
+         // we pass projection and view matrices to the Shader Program of the skybox
+        skybox_shader.setMat4("projection", projection);   
+        // to have the background fixed during camera movements, we have to remove the translations from the view matrix
+        // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
+        view =  glm::mat4(glm::mat3(actualCamera.GetViewMatrix()));    // Remove any translation component of the view matrix
+        skybox_shader.setMat4("view", view);
+
+        // we determine the position in the Shader Program of the uniform variables
+        skybox_shader.setInt("textureCube",0);
+        
+        skybox_shader.setVec3("fogColor",fogColor);
+
+        // we render the cube with the environment map
+        cubeModel.Draw();
+        glDepthFunc(GL_LESS);
+        
+        fbos.unbindCurrentFrameBuffer();
+
+        terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,1,0,100000));
+        
+        //planeModelMatrix = glm::translate(planeModelMatrix,glm::vec3(-300.0f, 0.0f,-400));
+        shader.setMat4("model", planeModelMatrix2);
+        planeModel2.Draw();
+        
+        if (wireframe)
+            // Draw in wireframe
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        else
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+        if (spinning)
+            orientationY+=(deltaTime*spin_speed);
+
+
+        lightPos = glm::vec3(actualCamera.Position.x,lightPos.y,actualCamera.Position.z);
+
+        planeShader.Use();
+        planeShader.setMat4("view", view);
+        planeShader.setMat4("projection", projection);   
+        planeShader.setInt("waterTexture",0);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, fbos.getReflectionTexture());
+        planeShader.setMat4("model", planeModelMatrix);
+        planeModel.Draw();
+        planeShader.setVec3("fogColor",fogColor);
+
+        waterShader.Use();
+        waterShader.setMat4("view", view);
+        waterShader.setMat4("projection", projection);   
+        waterShader.setInt("waterTexture",0);
+
+        for(int i = 0; i < terrainManager.terrains.size(); i++){     
+            waterShader.setMat4("model", terrainManager.terrains[i].water.getModelMatrix());
+            waterShader.setMat3("normalMatrix",terrainManager.terrains[i].water.getNormalMatrix(view));
+            terrainManager.terrains[i].water.draw(); 
+        }
+        
+        waterShader.setMat4("model", planeModelMatrix);
+        waterShader.setVec3("fogColor",fogColor);
+ 
+        glDepthFunc(GL_LEQUAL);
+        skybox_shader.Use();
+        // we activate the cube map
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
+         // we pass projection and view matrices to the Shader Program of the skybox
+        skybox_shader.setMat4("projection", projection);   
+        // to have the background fixed during camera movements, we have to remove the translations from the view matrix
+        // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
+        view =  glm::mat4(glm::mat3(actualCamera.GetViewMatrix()));    // Remove any translation component of the view matrix
+        skybox_shader.setMat4("view", view);
+
+        // we determine the position in the Shader Program of the uniform variables
+        skybox_shader.setInt("textureCube",0);
+        
+        skybox_shader.setVec3("fogColor",fogColor);
+
+        // we render the cube with the environment map
+        cubeModel.Draw();
+        glDepthFunc(GL_LESS);
         glfwSwapBuffers(window);
 
     }
@@ -772,4 +676,97 @@ void SetupShader(int program)
 void PrintCurrentShader(int subroutine)
 {
     std::cout << "Current shader subroutine: " << shaders[subroutine]  << std::endl;
+}
+
+void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, TerrainManagement terrainManager, glm::vec4 plane){
+            // Check is an I/O event is happening
+        glfwPollEvents();
+
+        apply_camera_movements(window);
+
+        changeTerrainPos(&terrainManager);
+
+    shader.Use();  
+
+        //glm::vec3 fogColor = glm::vec3(0.1f,0.3f,0.1f);
+        shader.setVec3("fogColor",fogColor);
+
+        shader.setFloat("kd",Kd);
+        shader.setFloat("ks",Ks);
+        shader.setFloat("ka",Ka);
+        shader.setVec3("ambientColor",ambientColor);
+        shader.setVec3("diffuseColor",diffuseColor);
+        shader.setVec3("specularColor",specularColor);
+        shader.setFloat("shininess",shininess);
+        shader.setVec4("plane", plane);
+
+        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 10.0f,10000.0f); //150000
+        shader.setMat4("projection", projection);   
+
+        GLuint index = glGetSubroutineIndex(shader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());
+        // we activate the subroutine using the index (this is where shaders swapping happens)
+        glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &index);
+
+        calculateFPS();
+
+        light_movements(window);
+
+        // View matrix (=camera): position, view direction, camera "up" vector
+        view = actualCamera.GetViewMatrix();
+        shader.setMat4("view", view);
+        
+        //light
+        shader.setVec3("pointLightPosition",lightPos);
+        shader.setVec3("diffuseColor",diffuseColor);
+        shader.setFloat("Kd",Kd); 
+
+        // we "clear" the frame and z  buffer
+        glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        shader.setVec3("skyColor",glm::vec3(0.5f,0.5f,0.5f));
+
+        shader.setInt("groundTexture",0);
+        shader.setInt("snowTexture",1);
+        shader.setInt("grassTexture",2);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, groundTexture);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, snowTexture);
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, grassTexture);
+
+        
+
+        for(int i = 0; i < terrainManager.terrains.size(); i++){     
+            shader.setMat4("model", terrainManager.terrains[i].getModelMatrix());
+            shader.setMat3("normalMatrix",terrainManager.terrains[i].getNormalMatrix(view));
+            terrainManager.terrains[i].draw(); 
+        }
+
+}
+
+void skyBoxRenderer(Shader skybox_shader, glm::vec3 fogColor,Model cubeModel){
+        skybox_shader.Use();
+        // we activate the cube map
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
+         // we pass projection and view matrices to the Shader Program of the skybox
+        skybox_shader.setMat4("projection", projection);   
+        // to have the background fixed during camera movements, we have to remove the translations from the view matrix
+        // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
+        view =  glm::mat4(glm::mat3(actualCamera.GetViewMatrix()));    // Remove any translation component of the view matrix
+        skybox_shader.setMat4("view", view);
+
+        // we determine the position in the Shader Program of the uniform variables
+        skybox_shader.setInt("textureCube",0);
+        
+        skybox_shader.setVec3("fogColor",fogColor);
+
+        // we render the cube with the environment map
+        cubeModel.Draw();
+
 }

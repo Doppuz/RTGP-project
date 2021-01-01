@@ -17,7 +17,7 @@ uniform sampler2D waterTexture;
 uniform vec3 fogColor;
 
 void main(){
-    FragColor = vec4(0.0f,0.0f,1.0f,1.0f);
-    //FragColor = texture(waterTexture, outTexture);
+    //FragColor = vec4(0.0f,0.0f,1.0f,1.0f);
+    FragColor = texture(waterTexture, outTexture);
     //FragColor = mix(vec4(fogColor,1),FragColor,visibility);
 }

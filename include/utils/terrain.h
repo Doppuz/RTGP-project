@@ -28,7 +28,7 @@ class Terrain{
             noise.SetFractalLacunarity(2.0f);
             noise.SetFractalGain(0.5f);
             generateBaseTerrain();
-            water = Water(x,translate,-50);
+            water = Water(x,translate,10);
         }
 
         Terrain(){}
