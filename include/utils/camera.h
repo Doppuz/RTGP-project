@@ -115,6 +115,13 @@ public:
         this->updateCameraVectors();
     }
 
+    void InvertPitch(){
+        this->Pitch = -this->Pitch;
+
+        // Update Front, Right and Up Vectors using the updated Euler angles.
+        updateCameraVectors();
+    }
+
 private:
     //////////////////////////////////////////
     // it updates the camera reference system

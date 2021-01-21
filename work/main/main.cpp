@@ -63,7 +63,7 @@ void changeTerrainPos(TerrainManagement* manager);
 void LoadTextureCubeSide(string path, string side_image, GLuint side_name);
 GLint LoadTextureCube(string path);
 //Render
-void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, TerrainManagement terrainManager, glm::vec4 plane);
+void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, TerrainManagement terrainManager, glm::vec4 plane,bool boolCamera);
 void skyBoxRenderer(Shader skybox_shader, glm::vec3 fogColor,Model cubeModel);
 //subroutine
 void SetupShader(int program);
@@ -90,8 +90,8 @@ glm::mat4 view = glm::mat4(1.0f);
 
 //Camera
 Camera camera(glm::vec3(0.0f, 300.0f, 0.0f), GL_FALSE); //25000,20000,25000
-Camera farCamera(glm::vec3(0.0f,50000.0f,200000.0f),GL_FALSE);
-Camera actualCamera = camera;
+Camera farCamera(glm::vec3(0.0f,300.0f,0),GL_FALSE);
+Camera* actualCamera = &camera;
 
 // vector for the textures IDs
 vector<GLint> textureID;
@@ -284,27 +284,42 @@ int main(){
 
         fbos.bindReflectionFrameBuffer();
 
-        float distance = 2 * (actualCamera.Position.y - 10);
-        //actualCamera.Position.y -= distance;
+        float distance = 2 * (actualCamera->Position.y - 10);
+        actualCamera->Position.y -= distance;
         //actualCamera.Pitch += +90;
-        terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,1,0,-10));
+        
+        //camera.Position.x = actualCamera.Position.x;
+        //camera.Position.y = actualCamera.Position.y;
+        //camera.Position.z = actualCamera.Position.z;
+
+        //actualCamera = &farCamera;
+        //actualCamera->Pitch += 80;
+
+        //actualCamera->InvertPitch();
+
+        terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,1,0,-10),true);
+
+        //actualCamera->InvertPitch();
         shader.setMat4("model", planeModelMatrix2);
-        planeModel2.Draw();
+        //planeModel2.Draw();
         
         glDepthFunc(GL_LEQUAL);
         skybox_shader.Use();
         // we activate the cube map
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
+        glBindTexture(GL_TEXTURE_2D, fbos.getReflectionTexture());
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, fbos.getRefractionTexture());
          // we pass projection and view matrices to the Shader Program of the skybox
         skybox_shader.setMat4("projection", projection);   
         // to have the background fixed during camera movements, we have to remove the translations from the view matrix
         // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
-        view =  glm::mat4(glm::mat3(actualCamera.GetViewMatrix()));    // Remove any translation component of the view matrix
+        view =  glm::mat4(glm::mat3(actualCamera->GetViewMatrix()));    // Remove any translation component of the view matrix
         skybox_shader.setMat4("view", view);
 
         // we determine the position in the Shader Program of the uniform variables
-        skybox_shader.setInt("textureCube",0);
+        skybox_shader.setInt("reflTexture",0);
+        skybox_shader.setInt("refrTexture",1);
         
         skybox_shader.setVec3("fogColor",fogColor);
 
@@ -312,14 +327,21 @@ int main(){
         cubeModel.Draw();
         glDepthFunc(GL_LESS);
 
-        //actualCamera.Position.y += distance;
-        //actualCamera.Pitch += -90;
+        actualCamera->Position.y += distance;
+
+        //actualCamera->Position.y += distance;
+        //farCamera.Position.x = actualCamera.Position.x;
+        //farCamera.Position.y = actualCamera.Position.y;
+        //farCamera.Position.z = actualCamera.Position.z;
+
+        //actualCamera = &camera;
 
         fbos.bindRefractionFrameBuffer();
 
-        terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,-1,0,10));
+        //actualCamera->InvertPitch();
+        terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,-1,0,10),true);
         shader.setMat4("model", planeModelMatrix);
-        planeModel.Draw();
+        //planeModel.Draw();
 
         glDepthFunc(GL_LEQUAL);
         skybox_shader.Use();
@@ -330,7 +352,7 @@ int main(){
         skybox_shader.setMat4("projection", projection);   
         // to have the background fixed during camera movements, we have to remove the translations from the view matrix
         // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
-        view =  glm::mat4(glm::mat3(actualCamera.GetViewMatrix()));    // Remove any translation component of the view matrix
+        view =  glm::mat4(glm::mat3(actualCamera->GetViewMatrix()));    // Remove any translation component of the view matrix
         skybox_shader.setMat4("view", view);
 
         // we determine the position in the Shader Program of the uniform variables
@@ -344,11 +366,13 @@ int main(){
         
         fbos.unbindCurrentFrameBuffer();
 
-        terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,1,0,100000));
+        //actualCamera->Pitch += -80;
+
+        terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,1,0,100000),true);
         
         //planeModelMatrix = glm::translate(planeModelMatrix,glm::vec3(-300.0f, 0.0f,-400));
         shader.setMat4("model", planeModelMatrix2);
-        planeModel2.Draw();
+        //planeModel2.Draw();
         
         if (wireframe)
             // Draw in wireframe
@@ -360,7 +384,7 @@ int main(){
             orientationY+=(deltaTime*spin_speed);
 
 
-        lightPos = glm::vec3(actualCamera.Position.x,lightPos.y,actualCamera.Position.z);
+        lightPos = glm::vec3(actualCamera->Position.x,lightPos.y,actualCamera->Position.z);
 
         planeShader.Use();
         planeShader.setMat4("view", view);
@@ -375,14 +399,23 @@ int main(){
 
         waterShader.Use();
         waterShader.setMat4("view", view);
-        waterShader.setMat4("projection", projection);   
-        waterShader.setInt("waterTexture",0);
+        waterShader.setMat4("projection", projection);
+        
+        GLint cameraLocation = glGetUniformLocation(waterShader.Program, "cameraPosition");
+        glUniform3fv(cameraLocation, 1, glm::value_ptr(camera.Position));  
+        
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, fbos.getReflectionTexture());
 
-        for(int i = 0; i < terrainManager.terrains.size(); i++){     
-            waterShader.setMat4("model", terrainManager.terrains[i].water.getModelMatrix());
-            waterShader.setMat3("normalMatrix",terrainManager.terrains[i].water.getNormalMatrix(view));
-            terrainManager.terrains[i].water.draw(); 
-        }
+        waterShader.setInt("waterTexture",0);
+        planeModelMatrix = glm::scale(planeModelMatrix, glm::vec3(50,50,50));
+
+        //for(int i = 0; i < terrainManager.terrains.size(); i++){   
+            glm::mat4 m = glm::scale(terrainManager.terrains[0].water.getModelMatrix(), glm::vec3(2,0,2));
+            waterShader.setMat4("model", m);
+            waterShader.setMat3("normalMatrix",terrainManager.terrains[0].water.getNormalMatrix(view));
+            terrainManager.terrains[0].water.draw(); 
+        //}
         
         waterShader.setMat4("model", planeModelMatrix);
         waterShader.setVec3("fogColor",fogColor);
@@ -396,7 +429,7 @@ int main(){
         skybox_shader.setMat4("projection", projection);   
         // to have the background fixed during camera movements, we have to remove the translations from the view matrix
         // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
-        view =  glm::mat4(glm::mat3(actualCamera.GetViewMatrix()));    // Remove any translation component of the view matrix
+        view =  glm::mat4(glm::mat3(actualCamera->GetViewMatrix()));    // Remove any translation component of the view matrix
         skybox_shader.setMat4("view", view);
 
         // we determine the position in the Shader Program of the uniform variables
@@ -433,13 +466,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         wireframe=!wireframe;
 
          // if P is pressed, we start/stop the animated rotation of models
-    if(key == GLFW_KEY_P && action == GLFW_PRESS){
+    /*if(key == GLFW_KEY_P && action == GLFW_PRESS){
         if(cam == 0)
             actualCamera = farCamera;
         else  
             actualCamera = camera;
         cam = (cam + 1) % 2;    
-    }    
+    }    */
 
     GLuint new_subroutine;
     // pressing a key number, we change the shader applied to the models
@@ -466,13 +499,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 //Camera key movement.
 void apply_camera_movements(GLFWwindow* window){
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-        actualCamera.ProcessKeyboard(FORWARD, deltaTime);
+        actualCamera->ProcessKeyboard(FORWARD, deltaTime);
     }if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-        actualCamera.ProcessKeyboard(BACKWARD, deltaTime);
+        actualCamera->ProcessKeyboard(BACKWARD, deltaTime);
     }if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        actualCamera.ProcessKeyboard(LEFT, deltaTime);
+        actualCamera->ProcessKeyboard(LEFT, deltaTime);
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-        actualCamera.ProcessKeyboard(RIGHT, deltaTime);
+        actualCamera->ProcessKeyboard(RIGHT, deltaTime);
     }    
 }
 
@@ -507,7 +540,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
       lastY = ypos;
 
       // we pass the offset to the Camera class instance in order to update the rendering
-      actualCamera.ProcessMouseMovement(xoffset, yoffset);
+      actualCamera->ProcessMouseMovement(xoffset, yoffset);
 
 }
 
@@ -558,18 +591,18 @@ GLint LoadTexture(const char* path){
 
 void changeTerrainPos(TerrainManagement* manager){
     
-    if(actualCamera.Position.z - manager->getLastZ() <= 0){
+    if(actualCamera->Position.z - manager->getLastZ() <= 0){
         manager->translateTerrain(manager->BACKWARD);
         manager->increaseZ(true);
-    }else if(actualCamera.Position.z - manager->getLastZ() >= Terrain::getSize()){
+    }else if(actualCamera->Position.z - manager->getLastZ() >= Terrain::getSize()){
         manager->translateTerrain(manager->FORWARD);
         manager->increaseZ(false);
     }
 
-    if(actualCamera.Position.x - manager->getLastX() <= 0){
+    if(actualCamera->Position.x - manager->getLastX() <= 0){
         manager->translateTerrain(manager->RIGHT);
         manager->increaseX(true);
-    }else if(actualCamera.Position.x - manager->getLastX() >= Terrain::getSize()){
+    }else if(actualCamera->Position.x - manager->getLastX() >= Terrain::getSize()){
         manager->translateTerrain(manager->LEFT);
         manager->increaseX(false);
     }
@@ -678,10 +711,11 @@ void PrintCurrentShader(int subroutine)
     std::cout << "Current shader subroutine: " << shaders[subroutine]  << std::endl;
 }
 
-void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, TerrainManagement terrainManager, glm::vec4 plane){
-            // Check is an I/O event is happening
+void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, TerrainManagement terrainManager, glm::vec4 plane, bool boolCamera){
+        
+        // Check is an I/O event is happening
         glfwPollEvents();
-
+        
         apply_camera_movements(window);
 
         changeTerrainPos(&terrainManager);
@@ -712,7 +746,7 @@ void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, Terrai
         light_movements(window);
 
         // View matrix (=camera): position, view direction, camera "up" vector
-        view = actualCamera.GetViewMatrix();
+        view = actualCamera->GetViewMatrix();
         shader.setMat4("view", view);
         
         //light
@@ -758,7 +792,7 @@ void skyBoxRenderer(Shader skybox_shader, glm::vec3 fogColor,Model cubeModel){
         skybox_shader.setMat4("projection", projection);   
         // to have the background fixed during camera movements, we have to remove the translations from the view matrix
         // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
-        view =  glm::mat4(glm::mat3(actualCamera.GetViewMatrix()));    // Remove any translation component of the view matrix
+        view =  glm::mat4(glm::mat3(actualCamera->GetViewMatrix()));    // Remove any translation component of the view matrix
         skybox_shader.setMat4("view", view);
 
         // we determine the position in the Shader Program of the uniform variables

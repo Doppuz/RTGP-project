@@ -31,9 +31,13 @@ const float gradient = 3;
 
 vec4 positionRelativeToCam;
 
+out vec4 worldPosition;
+out vec3 worldNormal;
+out vec4 clipSpace;
+
 void main() {
   // light incidence direction (in view coordinate)
-  vec4 positionRelativeToCam = view * model * vec4(pos, 1.0f);
+  vec4 positionRelativeToCam = view * model * vec4(pos , 1.0f);
 
 	outTexture = texCoord;
   h = pos.y;
@@ -41,6 +45,15 @@ void main() {
   float distance = length(positionRelativeToCam.xyz);
   visibility = exp(-pow((distance*density),gradient));
   visibility = clamp(visibility,0.0f,1.0f);
+
+  // vertex position in world coordinate (= we apply only trasformations)
+  worldPosition = model * vec4( pos, 1.0 );
+
+  // we calculate the normal in world coordinates: in this case we do not use the normalMatrix (= inverse of the transpose of the modelview matrix), but we use the inverse of the transpose of the model matrix
+  // We can think to pass this matrix as an uniform like the normalMatrix, if we do not want to calculate here
+  worldNormal = mat3(transpose(inverse(model))) * normal;
+
+  clipSpace = projection * positionRelativeToCam;
 
   gl_Position = projection * positionRelativeToCam;
 }
