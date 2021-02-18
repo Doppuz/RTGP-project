@@ -74,6 +74,11 @@ public:
         return glm::lookAt(this->Position, this->Position + this->Front, this->Up);
     }
 
+    glm::mat4 GetViewMatrixInverted()
+    {
+        return glm::lookAt(this->Position, this->Position + this->Front, -this->Up);
+    }
+
     //////////////////////////////////////////
     // it updates camera position when a WASD key is pressed
     void ProcessKeyboard(Camera_Movement direction, GLfloat deltaTime)
