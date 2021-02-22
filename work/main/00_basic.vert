@@ -47,8 +47,9 @@ void main() {
   vNormal = normalize( normalMatrix * normal );;
   // light incidence direction (in view coordinate)
   vec4 positionRelativeToCam = view * model * vec4(pos, 1.0f);
-  vec4 lightPos = view  * vec4(pointLightPosition, 1.0);
-  
+  //vec4 lightPos = view  * vec4(pointLightPosition, 1.0);
+  vec4 lightPos = view  * vec4(vec3(300,500,100000), 1.0);
+
   lightDir = lightPos.xyz - positionRelativeToCam.xyz;
   h = pos.y;
   

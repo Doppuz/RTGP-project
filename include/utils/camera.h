@@ -76,7 +76,10 @@ public:
 
     glm::mat4 GetViewMatrixInverted()
     {
-        return glm::lookAt(this->Position, this->Position + this->Front, -this->Up);
+        //return glm::lookAt(this->Position, this->Position + this->Front, -this->Up);
+        glm::mat4 viewMatrix = GetViewMatrix();
+        viewMatrix = glm::scale(viewMatrix, glm::vec3(1.0f,-1.0f,1.0f));
+        return viewMatrix;
     }
 
     //////////////////////////////////////////
@@ -124,7 +127,7 @@ public:
         this->Pitch = -this->Pitch;
 
         // Update Front, Right and Up Vectors using the updated Euler angles.
-        updateCameraVectors();
+        this->updateCameraVectors();
     }
 
 private:

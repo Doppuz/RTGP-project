@@ -17,7 +17,7 @@ uniform mat3 normalMatrix;
 
 out vec3 vNormal;
 
-uniform vec3 pointLightPosition;
+uniform vec3 cameraPosition;
 
 // light incidence direction (calculated in vertex shader, interpolated by rasterization)
 
@@ -30,30 +30,39 @@ const float density = 0.00032; //0.000009
 const float gradient = 3;
 
 vec4 positionRelativeToCam;
+vec3 lightPosition;
 
 out vec4 worldPosition;
 out vec3 worldNormal;
 out vec4 clipSpace;
 out vec3 interp_UVW;
+out vec3 toCameraVector;
+out vec3 fromLightVector;
 
 void main() {
+
+  // vertex position in world coordinate (= we apply only trasformations)
+  worldPosition = model * vec4( pos, 1.0 );
+
+  lightPosition = vec3(300,500,100000);//cameraPosition;
+
+  fromLightVector = worldPosition.xyz - lightPosition;
+
+  toCameraVector = cameraPosition - worldPosition.xyz; 
+  
   // light incidence direction (in view coordinate)
-  vec4 positionRelativeToCam = view * model * vec4(pos , 1.0f);
+  vec4 positionRelativeToCam = view * worldPosition;
 
   interp_UVW = pos;
 
-	outTexture = texCoord;
+	outTexture = texCoord * 1;
+  
   h = pos.y;
   
   float distance = length(positionRelativeToCam.xyz);
   visibility = exp(-pow((distance*density),gradient));
   visibility = clamp(visibility,0.0f,1.0f);
 
-  // vertex position in world coordinate (= we apply only trasformations)
-  worldPosition = model * vec4( pos, 1.0 );
-
-  // we calculate the normal in world coordinates: in this case we do not use the normalMatrix (= inverse of the transpose of the modelview matrix), but we use the inverse of the transpose of the model matrix
-  // We can think to pass this matrix as an uniform like the normalMatrix, if we do not want to calculate here
   worldNormal = mat3(transpose(inverse(model))) * (normal);
 
   clipSpace = projection * positionRelativeToCam;

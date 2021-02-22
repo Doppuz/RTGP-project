@@ -129,10 +129,6 @@ GLfloat orientationY = 0.0f;
 // rotation speed on Y axis
 GLfloat spin_speed = 30.0f;
 
-int vertexCount = 64;
-
-int cam = 0;
-
 // texture unit for the cube map
 GLuint textureCube;
 
@@ -144,6 +140,11 @@ vector<std::string> shaders;
 GLint groundTexture;
 GLint snowTexture;
 GLint grassTexture;
+
+//Water
+float waterMovement = 0.0f;
+const float waterSpeed = 0.03f;
+const glm::vec3 lightColour = glm::vec3(1.0f,1.0f,1.0f);
 
 GLfloat Eta = 1.0f/1.52f;
 // exponent for Fresnel equation
@@ -230,13 +231,17 @@ int main(){
 
     std::cout << "After 2 texture" << std::endl;
     
-    grassTexture = LoadTexture("../../textures/plane/ground2.jpg");
+    grassTexture = LoadTexture("../../textures/plane/ground4.jpg");
 
     std::cout << "After 3 texture" << std::endl;
 
     GLint redTexture = LoadTexture("../../textures/plane/redTexture.jpg");
 
-    textureCube = LoadTextureCube("../../textures/cube/Maskonaive2/");;
+    textureCube = LoadTextureCube("../../textures/cube/MySkyBox2/");
+  
+    GLint waterDuDvTexture = LoadTexture("../../textures/plane/waterDUDV.png");
+    
+    GLint waterNormalTexture = LoadTexture("../../textures/plane/normalMap.png");
 
     GLfloat orientationY = -90.0f;
 
@@ -286,31 +291,23 @@ int main(){
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
+        calculateFPS();
+
         glEnable(GL_CLIP_DISTANCE0);
 
         lightPos = glm::vec3(actualCamera->Position.x,lightPos.y,actualCamera->Position.z);
 
+        glfwPollEvents();
+        
+        apply_camera_movements(window);
+
+        changeTerrainPos(&terrainManager);
+
         fbos.bindReflectionFrameBuffer();
 
-        //float distance = 2 * (actualCamera->Position.y - 10);
-        //actualCamera->Position.y -= distance;
-        //actualCamera.Pitch += +90;
-        
-        //camera.Position.x = actualCamera.Position.x;
-        //camera.Position.y = actualCamera.Position.y;
-        //camera.Position.z = actualCamera.Position.z;
-
-        //actualCamera = &farCamera;
-        //actualCamera->Pitch += 80;
-
-        //actualCamera->InvertPitch();
+        float distance = 2 * (actualCamera->Position.y - 10);
 
         terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,1,0,-10),true);
-
-        //actualCamera->InvertPitch();
-        //shader.setMat4("model", planeModelMatrix2);
-        //planeModel2.Draw();
-        //actualCamera->Position.y += distance;
         
         glDepthFunc(GL_LEQUAL);
         skybox_shader.Use();
@@ -333,21 +330,9 @@ int main(){
         cubeModel.Draw();
         glDepthFunc(GL_LESS);
 
-        //actualCamera->Position.y += distance;
-
-        //actualCamera->Position.y += distance;
-        //farCamera.Position.x = actualCamera.Position.x;
-        //farCamera.Position.y = actualCamera.Position.y;
-        //farCamera.Position.z = actualCamera.Position.z;
-
-        //actualCamera = &camera;
-
         fbos.bindRefractionFrameBuffer();
 
-        //actualCamera->InvertPitch();
         terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,-1,0,10),false);
-        //shader.setMat4("model", planeModelMatrix);
-        //planeModel.Draw();
 
         glDepthFunc(GL_LEQUAL);
         skybox_shader.Use();
@@ -375,7 +360,7 @@ int main(){
         //actualCamera->Pitch += -80;
 
         terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,1,0,100000),false);
-        
+
         //planeModelMatrix = glm::translate(planeModelMatrix,glm::vec3(-300.0f, 0.0f,-400));
         shader.setMat4("model", planeModelMatrix2);
         //planeModel2.Draw();
@@ -391,7 +376,7 @@ int main(){
 
 //PLANE render
 
-        planeShader.Use();
+       /* planeShader.Use();
         planeShader.setMat4("view", view);
         planeShader.setMat4("projection", projection);   
         planeShader.setInt("waterTexture",0);
@@ -400,7 +385,7 @@ int main(){
         glBindTexture(GL_TEXTURE_2D, fbos.getReflectionTexture());
         planeShader.setMat4("model", planeModelMatrix);
         planeModel.Draw();
-        planeShader.setVec3("fogColor",fogColor);
+        planeShader.setVec3("fogColor",fogColor);*/
 
 //WATER render
 
@@ -413,12 +398,7 @@ int main(){
         waterShader.setVec3("cameraPosition",actualCamera->Position); 
         waterShader.setFloat("Eta",Eta); 
         waterShader.setFloat("mFresnelPower",mFresnelPower); 
-        waterShader.setVec3("pointLightPosition",lightPos);
-        
-        /*glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, fbos.getReflectionTexture());
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, fbos.getRefractionTexture());*/
+        waterShader.setVec3("cameraPosition",actualCamera->Position);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
@@ -429,12 +409,25 @@ int main(){
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, fbos.getRefractionTexture());
 
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, waterDuDvTexture);
+
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, waterNormalTexture);
+
         waterShader.setInt("waterTexture",0);
         waterShader.setInt("reflTexture",1);
         waterShader.setInt("refrTexture",2);
+        waterShader.setInt("waterDuDvTexture",3);
+        waterShader.setInt("waterNormalTexture",4);
+
+        waterMovement += waterSpeed *deltaTime;
+        waterMovement = fmod(waterMovement,1);
+
+        waterShader.setFloat("waterMovement",waterMovement);
+        waterShader.setVec3("lightColour",lightColour);
 
         for(int i = 0; i < terrainManager.terrains.size(); i++){   
-            //glm::mat4 m = glm::scale(terrainManager.terrains[0].water.getModelMatrix(), glm::vec3(2,0,2));
             waterShader.setMat4("model", terrainManager.terrains[i].water.getModelMatrix());
             waterShader.setMat3("normalMatrix",terrainManager.terrains[i].water.getNormalMatrix(view));
             terrainManager.terrains[i].water.draw(); 
@@ -603,7 +596,6 @@ GLint LoadTexture(const char* path){
  }
 
 void changeTerrainPos(TerrainManagement* manager){
-    
     if(actualCamera->Position.z - manager->getLastZ() <= 0){
         manager->translateTerrain(manager->BACKWARD);
         manager->increaseZ(true);
@@ -653,12 +645,12 @@ GLint LoadTextureCube(string path)
     // we load and set the 6 images corresponding to the 6 views of the cubemap
     // we use as convention that the names of the 6 images are "posx, negx, posy, negy, posz, negz", placed at the path passed as parameter
     // we load the images individually and we assign them to the correct side of the cube map
-    LoadTextureCubeSide(path, std::string("posx.jpg"), GL_TEXTURE_CUBE_MAP_POSITIVE_X);
-    LoadTextureCubeSide(path, std::string("negx.jpg"), GL_TEXTURE_CUBE_MAP_NEGATIVE_X);
-    LoadTextureCubeSide(path, std::string("posy.jpg"), GL_TEXTURE_CUBE_MAP_POSITIVE_Y);
-    LoadTextureCubeSide(path, std::string("negy.jpg"), GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
-    LoadTextureCubeSide(path, std::string("posz.jpg"), GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
-    LoadTextureCubeSide(path, std::string("negz.jpg"), GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
+    LoadTextureCubeSide(path, std::string("posx.png"), GL_TEXTURE_CUBE_MAP_POSITIVE_X);
+    LoadTextureCubeSide(path, std::string("negx.png"), GL_TEXTURE_CUBE_MAP_NEGATIVE_X);
+    LoadTextureCubeSide(path, std::string("posy.png"), GL_TEXTURE_CUBE_MAP_POSITIVE_Y);
+    LoadTextureCubeSide(path, std::string("negy.png"), GL_TEXTURE_CUBE_MAP_NEGATIVE_Y);
+    LoadTextureCubeSide(path, std::string("posz.png"), GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
+    LoadTextureCubeSide(path, std::string("negz.png"), GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
 
     // we set the filtering for minification and magnification
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -725,13 +717,6 @@ void PrintCurrentShader(int subroutine)
 }
 
 void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, TerrainManagement terrainManager, glm::vec4 plane, bool boolCamera){
-        
-        // Check is an I/O event is happening
-        glfwPollEvents();
-        
-        apply_camera_movements(window);
-
-        changeTerrainPos(&terrainManager);
 
     shader.Use();  
 
@@ -754,12 +739,12 @@ void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, Terrai
         // we activate the subroutine using the index (this is where shaders swapping happens)
         glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &index);
 
-        calculateFPS();
-
         // View matrix (=camera): position, view direction, camera "up" vector
-        if(boolCamera)
+        if(boolCamera){
+            //view = actualCamera->GetViewMatrix();
+            //actualCamera->InvertPitch();
             view = actualCamera->GetViewMatrixInverted();
-        else
+        }else
             view = actualCamera->GetViewMatrix();
 
         shader.setMat4("view", view);
