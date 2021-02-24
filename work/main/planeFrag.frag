@@ -10,14 +10,12 @@ in float h;
 in float visibility;
 in vec3 interp_UVW;
 
-uniform vec3 skyColor;
-
-uniform sampler2D waterTexture;
+uniform sampler2D trunkTexture;
 
 uniform vec3 fogColor;
 
 void main(){
     //FragColor = vec4(0.0f,0.0f,1.0f,1.0f);
-    FragColor = texture(waterTexture, outTexture);
+    FragColor = texture(trunkTexture, outTexture);
     //FragColor = mix(vec4(fogColor,1),FragColor,visibility);
 }

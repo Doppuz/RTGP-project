@@ -17,6 +17,7 @@ uniform sampler2D reflTexture;
 uniform sampler2D refrTexture;
 uniform sampler2D waterDuDvTexture;
 uniform sampler2D waterNormalTexture;
+uniform sampler2D depthTexture;
 
 uniform samplerCube waterTexture;
 
@@ -73,5 +74,6 @@ void main(){
 	vec3 specularHighlights = lightColour * specular * reflectivity;
     
     FragColor = mix(refractionTexture,reflectionTexture,refractiveFactor);
-    FragColor = mix(FragColor, vec4(0.0,0.3,0.5,1),0.2) + vec4(specularHighlights,0.0);
+    FragColor = mix(FragColor, vec4(0.0,0.3,0.5,1),0.2) + vec4(specularHighlights,0.0); 
+    FragColor = mix(vec4(fogColor,1),FragColor,visibility);
 }

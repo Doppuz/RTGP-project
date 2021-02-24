@@ -45,6 +45,12 @@ public:
         this->loadModel(path);
     }
 
+    Model(){}
+
+    void Load(const string& path){
+        this->loadModel(path);
+    }
+
     //////////////////////////////////////////
 
     // model rendering: calls rendering methods of each instance of Mesh class in the vector
