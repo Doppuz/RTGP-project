@@ -15,16 +15,18 @@ class Tree{
         
         Model model;
 
-        Tree(Model model, glm::vec3 translate, string path)
+        Tree(glm::vec3 translate, string path)
             :modelMatrix{glm::mat4(1.0f)}{
             modelMatrix = glm::translate(modelMatrix,translate);
+            modelMatrix = glm::scale(modelMatrix, glm::vec3(20,20,20));
             loadTree(path);
         }
 
         Tree(){}
 
         void draw(){
-           model.Draw();
+           //model.Draw();
+           model.meshes[0].Draw();
         }
 
         glm::mat4 getModelMatrix(){

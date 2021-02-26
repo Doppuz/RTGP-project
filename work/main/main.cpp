@@ -39,6 +39,8 @@
 
 #include <utils/waterFrameBuffer.h>
 
+#include <utils/tree.h>
+
 // dimensions of application's window
 GLuint screenWidth = 1600, screenHeight = 800;
 
@@ -247,8 +249,9 @@ int main(){
 
     GLfloat orientationY = -90.0f;
 
-    Model planeModel("../../models/Tree/Tree.obj");
-    //tree t()
+    //Model planeModel("../../models/Tree/Tree.obj");
+    //planeModel.meshes[0].SetupMesh();
+    Tree t(glm::vec3(0.0f, 300.0f,-800),"../../models/Tree/Tree.obj");
 
     Model cubeModel("../../models/cube.obj"); // used for the environment map
     cubeModel.meshes[0].SetupMesh();
@@ -261,12 +264,12 @@ int main(){
 
     bool first = false;
     
-    glm::mat4 planeModelMatrix = glm::mat4(1.0f);
+    /*glm::mat4 planeModelMatrix = glm::mat4(1.0f);
     planeModelMatrix = glm::translate(planeModelMatrix,glm::vec3(0.0f, 300.0f,-800));
     planeModelMatrix = glm::rotate(planeModelMatrix, glm::radians(orientationY), glm::vec3(1.0f, 0.0f, 0.0f));
 
     planeModelMatrix = glm::rotate(planeModelMatrix, glm::radians(-orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
-    planeModelMatrix = glm::scale(planeModelMatrix, glm::vec3(20,20,20));
+    planeModelMatrix = glm::scale(planeModelMatrix, glm::vec3(20,20,20));*/
 
     glm::mat4 planeModelMatrix2 = glm::mat4(1.0f);
     planeModelMatrix2 = glm::translate(planeModelMatrix2,glm::vec3(300.0f, 300.0f,0.0f));
@@ -336,6 +339,27 @@ int main(){
 
         terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,-1,0,10),false);
 
+        glDepthFunc(GL_LEQUAL);
+        skybox_shader.Use();
+        // we activate the cube map
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
+         // we pass projection and view matrices to the Shader Program of the skybox
+        skybox_shader.setMat4("projection", projection);   
+        // to have the background fixed during camera movements, we have to remove the translations from the view matrix
+        // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
+        view =  glm::mat4(glm::mat3(actualCamera->GetViewMatrix()));    // Remove any translation component of the view matrix
+        skybox_shader.setMat4("view", view);
+
+        // we determine the position in the Shader Program of the uniform variables
+        skybox_shader.setInt("textureCube",0);
+        
+        skybox_shader.setVec3("fogColor",fogColor);
+
+        // we render the cube with the environment map
+        cubeModel.Draw();
+        glDepthFunc(GL_LESS);
+
         fbos.unbindCurrentFrameBuffer();
 
         //actualCamera->Pitch += -80;
@@ -364,8 +388,8 @@ int main(){
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, trunkTexture);
-        planeShader.setMat4("model", planeModelMatrix);
-        planeModel.Draw();
+        planeShader.setMat4("model", t.getModelMatrix());
+        t.draw();
         planeShader.setVec3("fogColor",fogColor);
 
 //WATER render
@@ -381,6 +405,9 @@ int main(){
         waterShader.setFloat("mFresnelPower",mFresnelPower); 
         waterShader.setVec3("cameraPosition",actualCamera->Position);
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
 
@@ -395,6 +422,9 @@ int main(){
 
         glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_2D, waterNormalTexture);
+
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, fbos.getRefractionDepthTexture());
 
         waterShader.setInt("waterTexture",0);
         waterShader.setInt("reflTexture",1);
@@ -418,6 +448,7 @@ int main(){
         //waterShader.setMat4("model", planeModelMatrix);
         waterShader.setVec3("fogColor",fogColor);
 
+        glDisable(GL_BLEND);
 //SKYBOX Render
 
         glDepthFunc(GL_LEQUAL);
