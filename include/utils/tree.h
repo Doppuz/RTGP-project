@@ -13,20 +13,19 @@
 class Tree{
     public:
         
-        Model model;
+        Model* model;
 
-        Tree(glm::vec3 translate, string path)
-            :modelMatrix{glm::mat4(1.0f)}{
+        Tree(glm::vec3 translate, Model* loadedModel)
+            :modelMatrix{glm::mat4(1.0f)},model{loadedModel}{
             modelMatrix = glm::translate(modelMatrix,translate);
             modelMatrix = glm::scale(modelMatrix, glm::vec3(20,20,20));
-            loadTree(path);
+            //loadTree(path);
         }
 
         Tree(){}
 
         void draw(){
-           //model.Draw();
-           model.meshes[0].Draw();
+           model->Draw();
         }
 
         glm::mat4 getModelMatrix(){
@@ -45,12 +44,10 @@ class Tree{
     private:
         glm::mat4 modelMatrix;
 
-        void loadTree(string path){
-            Model planeModel(path);
-            model = planeModel;
-            model.Load(path);
-            for(int i = 0; i < planeModel.meshes.size(); i++){
+        /*void loadTree(string path){
+            model = Model(path);
+            for(int i = 0; i < model.meshes.size(); i++){
                 model.meshes[i].SetupMesh();
             }
-        }
+        }*/
 };

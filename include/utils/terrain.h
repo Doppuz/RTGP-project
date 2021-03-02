@@ -7,16 +7,18 @@
 #include <ctime>
 
 #include <utils/water.h>
+#include <utils/tree.h>
+#include <math.h>
 
 class Terrain{
     public:
         
         Mesh mesh;
         Water water;
+        Tree tree;
 
-        Terrain(GLfloat x, glm::vec3 translate)
+        Terrain(GLfloat x, glm::vec3 translate,Model* treeModel)
             :modelMatrix{glm::mat4(1.0f)}{
-            
             modelMatrix = glm::translate(modelMatrix,translate);
             noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
             srand((unsigned) time(0));
@@ -29,6 +31,11 @@ class Terrain{
             noise.SetFractalGain(0.5f);
             generateBaseTerrain();
             water = Water(x,translate,10);
+            tree = Tree(translate,treeModel);
+        }
+
+        void createTree(){
+            //t = Tree(glm::vec3(0.0f, 300.0f,-800),"../../models/Tree/Tree.obj");
         }
 
         Terrain(){}
@@ -52,19 +59,52 @@ class Terrain{
         void translateModelMatrix(glm::vec3 translate){
             modelMatrix = glm::translate(modelMatrix,translate);
             water.translateModelMatrix(translate);
+            tree.translateModelMatrix(translate);
+            if(translate.x != 0.0f)
+                xPos += translate.x;
+            else
+                zPos += translate.z;
+            //std::cout << xPos << " " << zPos << std::endl;
         }
 
         glm::mat3 getNormalMatrix(glm::mat4 viewMatrix){
             return  glm::inverseTranspose(glm::mat3(viewMatrix*modelMatrix));
         }
 
+        float getTerrainHeight(){
+            float terrainX = 230;
+            float terrainZ = 230;
+            float gridSquareSize = size / ((float)vertex_count - 1);
+            int gridX = (int) floor(terrainX / gridSquareSize);
+            int gridZ = (int) floor(terrainZ / gridSquareSize);
+
+            if(gridX > (vertex_count - 1) || gridZ > (vertex_count - 1) || gridX < 0 || gridZ < 0)
+                return 0;
+
+            float xCoord = fmod(terrainX,gridSquareSize)/gridSquareSize;
+            float zCoord = fmod(terrainZ,gridSquareSize)/gridSquareSize;
+            float answer;
+
+            if(xCoord <= (1 - zCoord)){
+                answer = (heights[gridX][gridZ] + heights[gridX + 1][gridZ] + heights[gridX][gridZ + 1])/3; 
+            }else{
+                answer = (heights[gridX + 1][gridZ] + heights[gridX + 1][gridZ + 1] + heights[gridX][gridZ + 1])/3;
+            }
+
+            //std::cout << gridX << " " << gridZ << std::endl;
+            //std::cout << xCoord << " " << zCoord << std::endl;
+            return answer;
+        }
 
     private:
         const static GLint size = 500; //10000
-        const static GLint vertex_count = 16; //32
+        const static GLint vertex_count = 12; //32
         FastNoiseLite noise;
         glm::mat4 modelMatrix;
-        float height = 2000; 
+        float height = 3000; 
+        float heights[vertex_count][vertex_count];
+        int xPos = 0;
+        int zPos = 0;
 
         void generateBaseTerrain(){
             vector<Vertex> vertices;
@@ -80,7 +120,7 @@ class Terrain{
                     vector = glm::vec3((float)j/((float)vertex_count - 1) * size, height *  noise.GetNoise((float)j, (float)i)
                         ,(float)i/((float)vertex_count - 1) * size);
                     vertex.Position = vector;
-
+                    heights[i][j] = vector.y;
                     vector = glm::vec3(0,1,0);
                     vertex.Normal = vector;
 
@@ -109,4 +149,5 @@ class Terrain{
             
 		 this->mesh = Mesh(vertices, indices);
     }
+
 };

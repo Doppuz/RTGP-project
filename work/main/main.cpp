@@ -251,7 +251,7 @@ int main(){
 
     //Model planeModel("../../models/Tree/Tree.obj");
     //planeModel.meshes[0].SetupMesh();
-    Tree t(glm::vec3(0.0f, 300.0f,-800),"../../models/Tree/Tree.obj");
+    //Tree t(glm::vec3(0.0f, 300.0f,-800),"../../models/Tree/Tree.obj");
 
     Model cubeModel("../../models/cube.obj"); // used for the environment map
     cubeModel.meshes[0].SetupMesh();
@@ -259,8 +259,13 @@ int main(){
     Model cubeModel2("../../models/cube.obj"); // used for the environment map
     cubeModel2.meshes[0].SetupMesh();
 
+    Model tree("../../models/Tree/tree.obj"); // used for the environment map
+    tree.meshes[0].SetupMesh();
+    
+    //Tree t(glm::vec3(0.0f, 300.0f,-800),&tree);
+    //Tree t2(glm::vec3(0.0f, 300.0f,-400),&tree);
     //terrain
-    TerrainManagement terrainManager;
+    TerrainManagement terrainManager(&tree);
 
     bool first = false;
     
@@ -285,6 +290,8 @@ int main(){
     glm::vec3 fogColor = {0.0f,0.0f,0.0f};
 
     WaterFrameBuffers fbos = WaterFrameBuffers();
+    
+    //terrainManager.terrains[0].createTree();
 
     while(!glfwWindowShouldClose(window)){
         int waterShow = 0;
@@ -388,9 +395,12 @@ int main(){
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, trunkTexture);
-        planeShader.setMat4("model", t.getModelMatrix());
-        t.draw();
+        for(int i = 0; i < terrainManager.terrains.size(); i++){
+            planeShader.setMat4("model", terrainManager.terrains[i].tree.getModelMatrix());
+            terrainManager.terrains[0].tree.draw();
+        }
         planeShader.setVec3("fogColor",fogColor);
+        terrainManager.terrains[0].getTerrainHeight();
 
 //WATER render
 
@@ -472,7 +482,7 @@ int main(){
         cubeModel.Draw();
         glDepthFunc(GL_LESS);
         glfwSwapBuffers(window);
-
+        
     }
 
 

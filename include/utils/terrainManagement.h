@@ -9,6 +9,7 @@
 #include <string>
 
 #include <utils/terrain.h>
+#include <utils/tree.h>
 
 class TerrainManagement{
 public:
@@ -22,18 +23,17 @@ public:
 
     vector<Terrain> terrains;
 
-    TerrainManagement()
+    TerrainManagement(Model* tree)
         :size{Terrain::getSize()},lastXPosition{4500}, lastZPosition{4500}{
         
         rowLength = 21;
         indexLastRow  = rowLength * (rowLength - 1);
         indexLastColumn = (rowLength - 1);
-
         int index = 0;
 
         for(int j = 0; j < rowLength; j++){
             for(int i = 0; i < rowLength; i++){
-                Terrain terrain(index, glm::vec3(-size + i *size, 0.0f, -size + j *size));
+                Terrain terrain(index, glm::vec3(-size + i *size, 0.0f, -size + j *size), tree);
                 terrains.push_back(terrain);
                 index ++;
             }
@@ -45,9 +45,6 @@ public:
         for(int i = 0; i < terrains.size();i++){
             terrains[i].mesh.SetupMesh(); 
         }
-
-        
-        std::cout << terrains.size() << std::endl;
 
     }
 
