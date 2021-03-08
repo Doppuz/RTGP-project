@@ -20,14 +20,19 @@ out vec3 vNormal;
 uniform vec3 pointLightPosition;
 
 // light incidence direction (calculated in vertex shader, interpolated by rasterization)
+out vec3 lightDir;
 
 out vec2 outTexture;
 out float h;
 
 out float visibility;
 
+out vec3 vViewPosition;
+
 const float density = 0.00032; //0.000009
 const float gradient = 3;
+
+uniform vec4 plane;
 
 vec4 positionRelativeToCam;
 
@@ -35,8 +40,14 @@ void main() {
   // light incidence direction (in view coordinate)
   vec4 positionRelativeToCam = view * model * vec4(pos, 1.0f);
 
+  vNormal = normalize( normalMatrix * normal );
+  
+  //vec4 lightPos = view  * vec4(pointLightPosition, 1.0);
+  vec4 lightPos = view  * vec4(vec3(300,500,100000), 1.0);
+
+  lightDir = lightPos.xyz - positionRelativeToCam.xyz;
+
 	outTexture = texCoord;
-  h = pos.y;
   
   float distance = length(positionRelativeToCam.xyz);
   visibility = exp(-pow((distance*density),gradient));

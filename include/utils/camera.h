@@ -19,6 +19,10 @@ Universita' degli Studi di Milano
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <glad/glad.h>
+
+#include <glfw/glfw3.h>
+
 // possible camera movements
 enum Camera_Movement {
     FORWARD,

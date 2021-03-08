@@ -126,8 +126,11 @@ private:
             }       
         }
 
-        for(int i = 0; i < terrains.size(); i++)
+        for(int i = 0; i < terrains.size(); i++){
             calculateNormal(&terrains[i].mesh,i);
+            calculateHeights(&terrains[i]);
+            terrains[i].createTree();
+        }    
 
         /*for(int i = 0; i < vertexCount; i++){
             std::cout << std::endl;
@@ -201,9 +204,7 @@ private:
     {
         for (int i = 0; i < b->vertices.size() / vertexCount; i++)
         {
-            //std::cout << " prima: " <<i << " , " << (b->vertices.size() - 1) - (vertexCount * ((int)(i / vertexCount) + 1) - 1) + i % vertexCount << std::endl;
             float value = lerp(a->vertices[i].Position.y, b->vertices[(b->vertices.size() - 1) - (vertexCount * ((int)(i / vertexCount) + 1) - 1) + i % vertexCount].Position.y, 0.5f);
-            //std::cout << " Dopo: " << (b->vertices.size() - 2) - ((4 * ((int)i / 4) + 1)) + (i % 4 - 1) << std::endl;
             a->vertices[i].Position.y = value;
             b->vertices[(b->vertices.size() - 1) - (vertexCount * ((int)(i / vertexCount) + 1) - 1) + i % vertexCount].Position.y = value;
         }
@@ -298,6 +299,16 @@ private:
             normal = glm::normalize(normal);
             mesh->vertices[i].Normal = normal;
         }
+    }
+
+    void calculateHeights(Terrain* t){
+        int index = 0;
+        for(int i=0;i<t->vertex_count;i++){
+			for(int j=0;j < t->vertex_count;j++){
+                t->heights[i][j] = t->mesh.vertices[index].Position.y;
+                index += 1;
+            }
+        }    
     }
 
     //float lerp(float a, float b, float t) { return a + t * (b - a); }

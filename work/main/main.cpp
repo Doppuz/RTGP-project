@@ -70,6 +70,7 @@ void skyBoxRenderer(Shader skybox_shader, glm::vec3 fogColor,Model cubeModel);
 //subroutine
 void SetupShader(int program);
 void PrintCurrentShader(int subroutine);
+void lightShaderSetUp(Shader shaderParam);
 
 //First movement bool
 bool firstMouse = true;
@@ -293,6 +294,8 @@ int main(){
     
     //terrainManager.terrains[0].createTree();
 
+    GLuint index;
+
     while(!glfwWindowShouldClose(window)){
         int waterShow = 0;
         //std::cout << actualCamera.Position.x << " " <<  actualCamera.Position.y << " " <<  actualCamera.Position.z << std::endl;
@@ -318,6 +321,28 @@ int main(){
         //actualCamera->Position.y -= 30;
 
         terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,1,0,-10),true);
+
+        planeShader.Use();
+        planeShader.setMat4("view", view);
+        planeShader.setMat4("projection", projection);   
+        planeShader.setInt("trunkTexture",0);
+
+        lightShaderSetUp(planeShader);
+
+        index = glGetSubroutineIndex(shader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());
+        // we activate the subroutine using the index (this is where shaders swapping happens)
+        glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &index);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, trunkTexture);
+        
+        for(int i = 0; i < terrainManager.terrains.size(); i++){
+            planeShader.setMat4("model", terrainManager.terrains[i].tree.getModelMatrix());    
+            planeShader.setMat3("normalMatrix",terrainManager.terrains[i].tree.getNormalMatrix(view));
+            if(terrainManager.terrains[i].hasTree)
+                terrainManager.terrains[i].tree.draw();
+        }
+        planeShader.setVec3("fogColor",fogColor);
 
         //actualCamera->Position.y += 30;
         
@@ -345,6 +370,27 @@ int main(){
         fbos.bindRefractionFrameBuffer();
 
         terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,-1,0,10),false);
+
+        planeShader.Use();
+        planeShader.setMat4("view", view);
+        planeShader.setMat4("projection", projection);   
+        planeShader.setInt("trunkTexture",0);
+
+        lightShaderSetUp(planeShader);
+
+        index = glGetSubroutineIndex(shader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());
+        // we activate the subroutine using the index (this is where shaders swapping happens)
+        glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &index);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, trunkTexture);
+        for(int i = 0; i < terrainManager.terrains.size(); i++){
+            planeShader.setMat4("model", terrainManager.terrains[i].tree.getModelMatrix());
+            planeShader.setMat3("normalMatrix",terrainManager.terrains[i].tree.getNormalMatrix(view));
+            if(terrainManager.terrains[i].hasTree)
+                terrainManager.terrains[i].tree.draw();
+        }
+        planeShader.setVec3("fogColor",fogColor);
 
         glDepthFunc(GL_LEQUAL);
         skybox_shader.Use();
@@ -393,14 +439,22 @@ int main(){
         planeShader.setMat4("projection", projection);   
         planeShader.setInt("trunkTexture",0);
 
+        lightShaderSetUp(planeShader);
+
+        index = glGetSubroutineIndex(shader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());
+        // we activate the subroutine using the index (this is where shaders swapping happens)
+        glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &index);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, trunkTexture);
         for(int i = 0; i < terrainManager.terrains.size(); i++){
             planeShader.setMat4("model", terrainManager.terrains[i].tree.getModelMatrix());
-            terrainManager.terrains[0].tree.draw();
+            planeShader.setMat3("normalMatrix",terrainManager.terrains[i].tree.getNormalMatrix(view));
+            if(terrainManager.terrains[i].hasTree)
+                terrainManager.terrains[i].tree.draw();
         }
         planeShader.setVec3("fogColor",fogColor);
-        terrainManager.terrains[0].getTerrainHeight();
+        //terrainManager.terrains[0].getTerrainHeight();
 
 //WATER render
 
@@ -746,14 +800,7 @@ void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, Terrai
 
         //glm::vec3 fogColor = glm::vec3(0.1f,0.3f,0.1f);
         shader.setVec3("fogColor",fogColor);
-
-        shader.setFloat("kd",Kd);
-        shader.setFloat("ks",Ks);
-        shader.setFloat("ka",Ka);
-        shader.setVec3("ambientColor",ambientColor);
-        shader.setVec3("diffuseColor",diffuseColor);
-        shader.setVec3("specularColor",specularColor);
-        shader.setFloat("shininess",shininess);
+        lightShaderSetUp(shader);
         shader.setVec4("plane", plane);
 
         projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 10.0f,10000.0f); //150000
@@ -772,11 +819,6 @@ void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, Terrai
             view = actualCamera->GetViewMatrix();
 
         shader.setMat4("view", view);
-        
-        //light
-        shader.setVec3("pointLightPosition",lightPos);
-        shader.setVec3("diffuseColor",diffuseColor);
-        shader.setFloat("Kd",Kd); 
 
         // we "clear" the frame and z  buffer
         glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
@@ -796,8 +838,6 @@ void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, Terrai
 
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, grassTexture);
-
-        
 
         for(int i = 0; i < terrainManager.terrains.size(); i++){     
             shader.setMat4("model", terrainManager.terrains[i].getModelMatrix());
@@ -827,4 +867,19 @@ void skyBoxRenderer(Shader skybox_shader, glm::vec3 fogColor,Model cubeModel){
         // we render the cube with the environment map
         cubeModel.Draw();
 
+}
+
+void lightShaderSetUp(Shader shaderParam){
+    
+        shaderParam.setFloat("kd",Kd);
+        shaderParam.setFloat("ks",Ks);
+        shaderParam.setFloat("ka",Ka);
+        shaderParam.setVec3("ambientColor",ambientColor);
+        shaderParam.setVec3("diffuseColor",diffuseColor);
+        shaderParam.setVec3("specularColor",specularColor);
+        shaderParam.setFloat("shininess",shininess);
+
+        shaderParam.setVec3("pointLightPosition",lightPos);
+        shaderParam.setVec3("diffuseColor",diffuseColor);
+        shaderParam.setFloat("Kd",Kd); 
 }

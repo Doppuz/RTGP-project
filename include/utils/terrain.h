@@ -16,9 +16,14 @@ class Terrain{
         Mesh mesh;
         Water water;
         Tree tree;
+        const static GLint vertex_count = 8; //32
+        float heights[vertex_count][vertex_count];
+        glm::vec3 initialTranslate;
+        Model* model;
+        bool hasTree = true;
 
         Terrain(GLfloat x, glm::vec3 translate,Model* treeModel)
-            :modelMatrix{glm::mat4(1.0f)}{
+            :modelMatrix{glm::mat4(1.0f)}, initialTranslate{translate}, model{treeModel}{
             modelMatrix = glm::translate(modelMatrix,translate);
             noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
             srand((unsigned) time(0));
@@ -31,11 +36,17 @@ class Terrain{
             noise.SetFractalGain(0.5f);
             generateBaseTerrain();
             water = Water(x,translate,10);
-            tree = Tree(translate,treeModel);
         }
 
         void createTree(){
-            //t = Tree(glm::vec3(0.0f, 300.0f,-800),"../../models/Tree/Tree.obj");
+            float height = getTerrainHeight();
+            if(height > 10)
+                tree = Tree(glm::vec3(initialTranslate.x+250,height - 25,initialTranslate.z+250),model);
+            else{
+                Tree* tempTree = &tree;
+                tempTree = NULL;
+                hasTree = false;
+            }
         }
 
         Terrain(){}
@@ -72,8 +83,8 @@ class Terrain{
         }
 
         float getTerrainHeight(){
-            float terrainX = 230;
-            float terrainZ = 230;
+            float terrainX = 250;
+            float terrainZ = 250;
             float gridSquareSize = size / ((float)vertex_count - 1);
             int gridX = (int) floor(terrainX / gridSquareSize);
             int gridZ = (int) floor(terrainZ / gridSquareSize);
@@ -86,23 +97,26 @@ class Terrain{
             float answer;
 
             if(xCoord <= (1 - zCoord)){
-                answer = (heights[gridX][gridZ] + heights[gridX + 1][gridZ] + heights[gridX][gridZ + 1])/3; 
+                answer = barryCentric(glm::vec3(0, heights[gridX][gridZ], 0), glm::vec3(1,
+							heights[gridX + 1][gridZ], 0), glm::vec3(0,
+							heights[gridX][gridZ + 1], 1), glm::vec2(xCoord, zCoord)); 
             }else{
-                answer = (heights[gridX + 1][gridZ] + heights[gridX + 1][gridZ + 1] + heights[gridX][gridZ + 1])/3;
+                answer = barryCentric(glm::vec3(1, heights[gridX + 1][gridZ], 0), glm::vec3(1,
+							heights[gridX + 1][gridZ + 1], 1), glm::vec3(0,
+							heights[gridX][gridZ + 1], 1), glm::vec2(xCoord, zCoord));
             }
 
             //std::cout << gridX << " " << gridZ << std::endl;
             //std::cout << xCoord << " " << zCoord << std::endl;
+            //std::cout << " a " << answer << std::endl;
             return answer;
         }
 
     private:
         const static GLint size = 500; //10000
-        const static GLint vertex_count = 12; //32
         FastNoiseLite noise;
         glm::mat4 modelMatrix;
-        float height = 3000; 
-        float heights[vertex_count][vertex_count];
+        float height = 6000; 
         int xPos = 0;
         int zPos = 0;
 
@@ -120,7 +134,7 @@ class Terrain{
                     vector = glm::vec3((float)j/((float)vertex_count - 1) * size, height *  noise.GetNoise((float)j, (float)i)
                         ,(float)i/((float)vertex_count - 1) * size);
                     vertex.Position = vector;
-                    heights[i][j] = vector.y;
+                    heights[i][j] = vertex.Position.y;
                     vector = glm::vec3(0,1,0);
                     vertex.Normal = vector;
 
@@ -150,4 +164,11 @@ class Terrain{
 		 this->mesh = Mesh(vertices, indices);
     }
 
+    float barryCentric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos) {
+	   	float det = (p2.z - p3.z) * (p1.x - p3.x) + (p3.x - p2.x) * (p1.z - p3.z);
+	    float l1 = ((p2.z - p3.z) * (pos.x - p3.x) + (p3.x - p2.x) * (pos.y - p3.z)) / det;
+	    float l2 = ((p3.z - p1.z) * (pos.x - p3.x) + (p1.x - p3.x) * (pos.y - p3.z)) / det;
+	    float l3 = 1.0f - l1 - l2;
+	    return l1 * p1.y + l2 * p2.y + l3 * p3.y;
+    }
 };

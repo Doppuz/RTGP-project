@@ -17,8 +17,8 @@ class Tree{
 
         Tree(glm::vec3 translate, Model* loadedModel)
             :modelMatrix{glm::mat4(1.0f)},model{loadedModel}{
-            modelMatrix = glm::translate(modelMatrix,translate);
             modelMatrix = glm::scale(modelMatrix, glm::vec3(20,20,20));
+            modelMatrix = glm::translate(modelMatrix,glm::vec3(translate.x/20,translate.y/20,translate.z/20));
             //loadTree(path);
         }
 
@@ -33,7 +33,9 @@ class Tree{
         }
 
         void translateModelMatrix(glm::vec3 translate){
-            modelMatrix = glm::translate(modelMatrix,translate);
+            //modelMatrix = glm::scale(modelMatrix, glm::vec3(1/20,1/20,1/20));
+            modelMatrix = glm::translate(modelMatrix,glm::vec3(translate.x/20,translate.y/20,translate.z/20));
+            //modelMatrix = glm::scale(modelMatrix, glm::vec3(20,20,20));
         }
 
         glm::mat3 getNormalMatrix(glm::mat4 viewMatrix){
@@ -50,4 +52,5 @@ class Tree{
                 model.meshes[i].SetupMesh();
             }
         }*/
+	
 };
