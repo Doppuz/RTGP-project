@@ -59,7 +59,7 @@ void main(){
 
     vec2 distortedTexCoords = texture(waterDuDvTexture, vec2(outTexture.x + waterMovement, outTexture.y)).rg*0.1;
 	distortedTexCoords = outTexture + vec2(distortedTexCoords.x, distortedTexCoords.y+waterMovement);
-	vec2 totalDistortion = (texture(waterDuDvTexture, distortedTexCoords).rg * 2.0 - 1.0) * waveStrength;// * clamp(waterDepth/20.0,0.0,1.0);
+	vec2 totalDistortion = (texture(waterDuDvTexture, distortedTexCoords).rg * 2.0 - 1.0) * waveStrength * clamp(waterDepth/200.0,0.0,1.0);
 
     refractionTextureCoor += totalDistortion;
     refractionTextureCoor = clamp(refractionTextureCoor,0.001,0.999);
@@ -80,12 +80,9 @@ void main(){
     vec3 reflectedLight = reflect(normalize(fromLightVector), normal);
 	float specular = max(dot(reflectedLight, viewVector), 0.0);
 	specular = pow(specular, shineDamper);
-	vec3 specularHighlights = lightColour * specular * reflectivity;// * clamp(waterDepth/50.0,0.0,1.0);
+	vec3 specularHighlights = lightColour * specular * reflectivity * clamp(waterDepth/200.0,0.0,1.0);
     
     FragColor = mix(refractionTexture,reflectionTexture,refractiveFactor);
     FragColor = mix(FragColor, vec4(0.0,0.3,0.5,1),0.2) + vec4(specularHighlights,0.0); 
     FragColor = mix(vec4(fogColor,1),FragColor,visibility);
-    //FragColor = vec4(waterDepth/50);
-    //FragColor.a = 1;
-    //FragColor.a = clamp(waterDepth/50,0.0,1.0);
 }

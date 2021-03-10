@@ -30,8 +30,8 @@ out vec3 interp_UVW;
 
 out vec3 vViewPosition;
 
-const float density = 0.00032; //0.000009
-const float gradient = 3;
+const float density = 0.00044; //0.00032
+const float gradient = 3; // 3
 
 uniform vec4 plane;
 

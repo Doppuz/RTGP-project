@@ -33,11 +33,11 @@ enum Camera_Movement {
 
 // Default camera settings
 // Initial camera orientation on Y and X (Z not considered)
-const GLfloat YAW        = -90.0f; //Y
+const GLfloat YAW        = 0.0f; //Y
 const GLfloat PITCH      =  0.0f; //X
 
 // parameters to manage mouse movement
-const GLfloat SPEED      =  700.0f;
+const GLfloat SPEED      =  700.0f; //700
 const GLfloat SENSITIVITY =  0.25f;
 
 ///////////////////  CAMERA class ///////////////////////
@@ -121,6 +121,9 @@ public:
                 this->Pitch = 89.0f;
             if (this->Pitch < -89.0f)
                 this->Pitch = -89.0f;
+
+            if (this->Yaw >= 360 || this->Yaw <= -360)
+                this->Yaw = 0;
         }
 
         // the camera reference system is updated using the new camera rotations

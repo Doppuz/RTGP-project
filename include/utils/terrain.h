@@ -113,10 +113,10 @@ class Terrain{
         }
 
     private:
-        const static GLint size = 500; //10000
+        const static GLint size = 500; //500
         FastNoiseLite noise;
         glm::mat4 modelMatrix;
-        float height = 6000; 
+        float height = 6000; //6000 
         int xPos = 0;
         int zPos = 0;
 

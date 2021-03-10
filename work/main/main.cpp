@@ -147,7 +147,7 @@ GLint grassTexture;
 //Water
 float waterMovement = 0.0f;
 const float waterSpeed = 0.03f;
-const glm::vec3 lightColour = glm::vec3(1.0f,1.0f,1.0f);
+const glm::vec3 lightColour = glm::vec3({0.70f,0.90f,1.f});//glm::vec3({0.50f,0.83f,1.f});
 
 GLfloat Eta = 1.0f/1.52f;
 // exponent for Fresnel equation
@@ -288,7 +288,10 @@ int main(){
     cubeModelMatrix = glm::translate(cubeModelMatrix,glm::vec3(0.0f, 8000.0f,120000));
     cubeModelMatrix = glm::scale(cubeModelMatrix, glm::vec3(500000,50000,250000));
 
-    glm::vec3 fogColor = {0.0f,0.0f,0.0f};
+    //glm::vec3 fogColor = {0.0f,0.0f,0.0f};
+    //glm::vec3 fogColor = {0.16f,0.22f,0.29f};
+    glm::vec3 fogColor = {0.05f,0.08f,0.13f};
+    //glm::vec3 fogColor = {0.33f,0.33f,0.33f};
 
     WaterFrameBuffers fbos = WaterFrameBuffers();
     
@@ -297,6 +300,9 @@ int main(){
     GLuint index;
 
     while(!glfwWindowShouldClose(window)){
+
+        //std::cout << actualCamera->Yaw << " " << actualCamera->Pitch << std::endl;
+
         int waterShow = 0;
         //std::cout << actualCamera.Position.x << " " <<  actualCamera.Position.y << " " <<  actualCamera.Position.z << std::endl;
 
@@ -384,12 +390,6 @@ int main(){
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, trunkTexture);
-        for(int i = 0; i < terrainManager.terrains.size(); i++){
-            planeShader.setMat4("model", terrainManager.terrains[i].tree.getModelMatrix());
-            planeShader.setMat3("normalMatrix",terrainManager.terrains[i].tree.getNormalMatrix(view));
-            if(terrainManager.terrains[i].hasTree)
-                terrainManager.terrains[i].tree.draw();
-        }
         planeShader.setVec3("fogColor",fogColor);
 
         glDepthFunc(GL_LEQUAL);
@@ -803,7 +803,7 @@ void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, Terrai
         lightShaderSetUp(shader);
         shader.setVec4("plane", plane);
 
-        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 10.0f,10000.0f); //150000
+        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,8000.0f); //10000
         shader.setMat4("projection", projection);   
 
         GLuint index = glGetSubroutineIndex(shader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());

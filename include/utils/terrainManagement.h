@@ -24,7 +24,7 @@ public:
     vector<Terrain> terrains;
 
     TerrainManagement(Model* tree)
-        :size{Terrain::getSize()},lastXPosition{4500}, lastZPosition{4500}{
+        :size{Terrain::getSize()},lastXPosition{5000}, lastZPosition{5000}{ //4500 4500
         
         rowLength = 21;
         indexLastRow  = rowLength * (rowLength - 1);

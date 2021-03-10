@@ -20,6 +20,8 @@ uniform vec3 diffuseColor;
 
 uniform vec3 fogColor;
 
+const float lowerLimit = 0.0f;
+const float upperLimit = 0.3f;
 
 // light incidence direction (calculated in vertex shader, interpolated by rasterization)
 in vec3 lightDir;
@@ -29,5 +31,9 @@ in vec3 vNormal;
 void main(){
 	 // we sample the cube map
     FragColor = texture(textureCube, interp_UVW);
-    FragColor = mix(vec4(fogColor,1),FragColor,0.5f);
+
+    float factor = (interp_UVW.y - lowerLimit) / (upperLimit - lowerLimit);
+    factor = clamp(factor ,0.0, 1.0);
+    FragColor = mix(vec4(fogColor,1.0),FragColor, factor);
+    //FragColor = mix(vec4(fogColor,1),FragColor,0.8f);
 }
