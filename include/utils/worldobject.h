@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdlib.h>
 #include <utils/mesh_v1.h>
 #include <utils/model_v1.h>
 #include <ctime>
@@ -10,21 +11,24 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-class Tree{
+class WorldObject{
     public:
         
         Model* model;
 
-        Tree(glm::vec3 translate, Model* loadedModel)
-            :modelMatrix{glm::mat4(1.0f)},model{loadedModel}{
+        WorldObject(glm::vec3 translate, Model* loadedModel)
+            :modelMatrix{glm::mat4(1.0f)}, model{loadedModel}{
             modelMatrix = glm::scale(modelMatrix, glm::vec3(20,20,20));
             modelMatrix = glm::translate(modelMatrix,glm::vec3(translate.x/20,translate.y/20,translate.z/20));
+            std::cout << "B " << model <<std::endl; 
+            //modelMatrix = glm::rotate(modelMatrix, glm::radians(-90.f), glm::vec3(1.0f, 0.0f, 0.0f));
             //loadTree(path);
         }
 
-        Tree(){}
+        WorldObject(){}
 
         void draw(){
+            std::cout << "A " << model <<std::endl; 
            model->Draw();
         }
 

@@ -7,7 +7,7 @@
 #include <ctime>
 
 #include <utils/water.h>
-#include <utils/tree.h>
+#include <utils/worldobject.h>
 #include <math.h>
 
 class Terrain{
@@ -15,7 +15,7 @@ class Terrain{
         
         Mesh mesh;
         Water water;
-        Tree tree;
+        WorldObject* tree = nullptr;
         const static GLint vertex_count = 8; //32
         float heights[vertex_count][vertex_count];
         glm::vec3 initialTranslate;
@@ -23,7 +23,9 @@ class Terrain{
         bool hasTree = true;
 
         Terrain(GLfloat x, glm::vec3 translate,Model* treeModel)
-            :modelMatrix{glm::mat4(1.0f)}, initialTranslate{translate}, model{treeModel}{
+            :modelMatrix{glm::mat4(1.0f)},
+             initialTranslate{translate},
+             model{treeModel}{
             modelMatrix = glm::translate(modelMatrix,translate);
             noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
             srand((unsigned) time(0));
@@ -40,13 +42,13 @@ class Terrain{
 
         void createTree(){
             float height = getTerrainHeight();
-            if(height > 10)
-                tree = Tree(glm::vec3(initialTranslate.x+250,height - 25,initialTranslate.z+250),model);
-            else{
-                Tree* tempTree = &tree;
-                tempTree = NULL;
-                hasTree = false;
-            }
+            //if(height > 10){
+                tree = &WorldObject(glm::vec3(initialTranslate.x+250,height - 25,initialTranslate.z+250),model);
+            //}else{
+                //WorldObject* tempTree = &tree;
+                //tempTree = NULL;
+            //    hasTree = false;
+            //}
         }
 
         Terrain(){}
@@ -70,7 +72,8 @@ class Terrain{
         void translateModelMatrix(glm::vec3 translate){
             modelMatrix = glm::translate(modelMatrix,translate);
             water.translateModelMatrix(translate);
-            tree.translateModelMatrix(translate);
+            if(tree != nullptr)
+                tree->translateModelMatrix(translate);
             if(translate.x != 0.0f)
                 xPos += translate.x;
             else

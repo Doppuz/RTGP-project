@@ -9,7 +9,7 @@
 #include <string>
 
 #include <utils/terrain.h>
-#include <utils/tree.h>
+#include <utils/worldobject.h>
 
 class TerrainManagement{
 public:

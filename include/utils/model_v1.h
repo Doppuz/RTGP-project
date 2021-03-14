@@ -56,8 +56,9 @@ public:
     // model rendering: calls rendering methods of each instance of Mesh class in the vector
     void Draw()
     {
-        for(GLuint i = 0; i < this->meshes.size(); i++)
+        for(GLuint i = 0; i < this->meshes.size(); i++){
             this->meshes[i].Draw();
+        }    
     }
 
     //////////////////////////////////////////

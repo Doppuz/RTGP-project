@@ -39,7 +39,7 @@
 
 #include <utils/waterFrameBuffer.h>
 
-#include <utils/tree.h>
+#include <utils/worldobject.h>
 
 // dimensions of application's window
 GLuint screenWidth = 1600, screenHeight = 800;
@@ -230,15 +230,15 @@ int main(){
     
     std::cout << "After 1 texture" << std::endl;
 
-    snowTexture = LoadTexture("../../textures/plane/snow.jpg");
+    snowTexture = LoadTexture("../../textures/plane/desert.jpg");
 
     std::cout << "After 2 texture" << std::endl;
     
-    grassTexture = LoadTexture("../../textures/plane/ground4.jpg");
+    grassTexture = LoadTexture("../../textures/plane/desert2.jpg");
 
     std::cout << "After 3 texture" << std::endl;
 
-    GLint redTexture = LoadTexture("../../textures/plane/redTexture.jpg");
+    GLint redTexture = LoadTexture("../../textures/plane/DesertPlants.png");
 
     textureCube = LoadTextureCube("../../textures/cube/MySkyBox2/");
   
@@ -247,7 +247,7 @@ int main(){
     GLint waterNormalTexture = LoadTexture("../../textures/plane/normalMap.png");
 
     GLint trunkTexture = LoadTexture("../../textures/plane/trunk.jpg");
-
+    //GLint trunkTexture = LoadTexture("../../textures/plane/cactus.png");
     GLfloat orientationY = -90.0f;
 
     //Model planeModel("../../models/Tree/Tree.obj");
@@ -261,6 +261,9 @@ int main(){
     cubeModel2.meshes[0].SetupMesh();
 
     Model tree("../../models/Tree/tree.obj"); // used for the environment map
+    //tree.meshes[0].SetupMesh();
+
+    //Model tree("../../models/cactus.3ds"); // used for the environment map
     tree.meshes[0].SetupMesh();
     
     //Tree t(glm::vec3(0.0f, 300.0f,-800),&tree);
@@ -324,9 +327,11 @@ int main(){
 
         fbos.bindReflectionFrameBuffer();
 
-        //actualCamera->Position.y -= 30;
+        actualCamera->Position.y -= 30;
 
         terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,1,0,-10),true);
+
+        actualCamera->Position.y += 30;
 
         planeShader.Use();
         planeShader.setMat4("view", view);
@@ -341,13 +346,15 @@ int main(){
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, trunkTexture);
-        
+    
         for(int i = 0; i < terrainManager.terrains.size(); i++){
-            planeShader.setMat4("model", terrainManager.terrains[i].tree.getModelMatrix());    
-            planeShader.setMat3("normalMatrix",terrainManager.terrains[i].tree.getNormalMatrix(view));
-            if(terrainManager.terrains[i].hasTree)
-                terrainManager.terrains[i].tree.draw();
+            //if(terrainManager.terrains[i].tree != nullptr){
+                planeShader.setMat4("model", terrainManager.terrains[i].tree->getModelMatrix());    
+                planeShader.setMat3("normalMatrix",terrainManager.terrains[i].tree->getNormalMatrix(view));
+                terrainManager.terrains[i].tree->draw();
+            //}    
         }
+        
         planeShader.setVec3("fogColor",fogColor);
 
         //actualCamera->Position.y += 30;
@@ -433,7 +440,6 @@ int main(){
             orientationY+=(deltaTime*spin_speed);
 
 //PLANE render
-
         planeShader.Use();
         planeShader.setMat4("view", view);
         planeShader.setMat4("projection", projection);   
@@ -448,10 +454,11 @@ int main(){
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, trunkTexture);
         for(int i = 0; i < terrainManager.terrains.size(); i++){
-            planeShader.setMat4("model", terrainManager.terrains[i].tree.getModelMatrix());
-            planeShader.setMat3("normalMatrix",terrainManager.terrains[i].tree.getNormalMatrix(view));
-            if(terrainManager.terrains[i].hasTree)
-                terrainManager.terrains[i].tree.draw();
+            //if(terrainManager.terrains[i].tree != nullptr){
+                planeShader.setMat4("model", terrainManager.terrains[i].tree->getModelMatrix());    
+                planeShader.setMat3("normalMatrix",terrainManager.terrains[i].tree->getNormalMatrix(view));
+                terrainManager.terrains[i].tree->draw();
+            //} 
         }
         planeShader.setVec3("fogColor",fogColor);
         //terrainManager.terrains[0].getTerrainHeight();
