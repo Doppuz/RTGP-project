@@ -15,20 +15,20 @@ class Terrain{
         
         Mesh mesh;
         Water water;
-        WorldObject* tree = nullptr;
-        const static GLint vertex_count = 8; //32
+        WorldObject object;
+        const static GLint vertex_count = 8;
         float heights[vertex_count][vertex_count];
         glm::vec3 initialTranslate;
         Model* model;
-        bool hasTree = true;
+        bool hasObject = true;
+        int objectType;
 
-        Terrain(GLfloat x, glm::vec3 translate,Model* treeModel)
-            :modelMatrix{glm::mat4(1.0f)},
+        Terrain(GLfloat x, glm::vec3 translate,Model* treeModel,int object)
+            :modelMatrix{glm::mat4(1.0f)}, objectType{object},
              initialTranslate{translate},
              model{treeModel}{
             modelMatrix = glm::translate(modelMatrix,translate);
             noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-            srand((unsigned) time(0));
             int random = (rand() % 1000000) * x;
             noise.SetSeed(random);
             noise.SetFrequency(0.008f);
@@ -42,13 +42,14 @@ class Terrain{
 
         void createTree(){
             float height = getTerrainHeight();
-            //if(height > 10){
-                tree = &WorldObject(glm::vec3(initialTranslate.x+250,height - 25,initialTranslate.z+250),model);
-            //}else{
-                //WorldObject* tempTree = &tree;
-                //tempTree = NULL;
-            //    hasTree = false;
-            //}
+            if(height > 10){
+                if(objectType == 0)
+                    object = WorldObject(glm::vec3(initialTranslate.x+250,height - 25,initialTranslate.z+250), 20 , 0.f,model);
+                else
+                    object = WorldObject(glm::vec3(initialTranslate.x+250,height - 25,initialTranslate.z+250), 2 , -90.f,model);
+            }else{
+                hasObject = false;
+            }
         }
 
         Terrain(){}
@@ -72,8 +73,8 @@ class Terrain{
         void translateModelMatrix(glm::vec3 translate){
             modelMatrix = glm::translate(modelMatrix,translate);
             water.translateModelMatrix(translate);
-            if(tree != nullptr)
-                tree->translateModelMatrix(translate);
+            if(hasObject)
+                object.translateModelMatrix(translate);
             if(translate.x != 0.0f)
                 xPos += translate.x;
             else
@@ -108,18 +109,14 @@ class Terrain{
 							heights[gridX + 1][gridZ + 1], 1), glm::vec3(0,
 							heights[gridX][gridZ + 1], 1), glm::vec2(xCoord, zCoord));
             }
-
-            //std::cout << gridX << " " << gridZ << std::endl;
-            //std::cout << xCoord << " " << zCoord << std::endl;
-            //std::cout << " a " << answer << std::endl;
             return answer;
         }
 
     private:
-        const static GLint size = 500; //500
+        const static GLint size = 500;
         FastNoiseLite noise;
         glm::mat4 modelMatrix;
-        float height = 6000; //6000 
+        float height = 6000;
         int xPos = 0;
         int zPos = 0;
 

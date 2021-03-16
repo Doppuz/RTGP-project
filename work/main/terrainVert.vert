@@ -14,26 +14,21 @@ uniform mat4 view;
 uniform mat4 projection;
 
 uniform mat3 normalMatrix;
-
-out vec3 vNormal;
-
 uniform vec3 pointLightPosition;
+uniform vec4 clippingPlane;
 
 // light incidence direction (calculated in vertex shader, interpolated by rasterization)
 out vec3 lightDir;
+out vec3 vNormal;
 
 out vec2 outTexture;
-out float h;
+out float yPos;
 
 out float visibility;
 out vec3 interp_UVW;
 
-out vec3 vViewPosition;
-
-const float density = 0.00044; //0.00032
-const float gradient = 3; // 3
-
-uniform vec4 plane;
+const float density = 0.00044; 
+const float gradient = 3; 
 
 vec4 positionRelativeToCam;
 
@@ -42,18 +37,15 @@ void main() {
   interp_UVW = pos;
 	outTexture = texCoord;
 
-  gl_ClipDistance[0] = dot(model * vec4(pos, 1.0f),plane);
+  gl_ClipDistance[0] = dot(model * vec4(pos, 1.0f),clippingPlane);
 
-  vNormal = normalize( normalMatrix * normal );;
-  // light incidence direction (in view coordinate)
+  vNormal = normalize( normalMatrix * normal );
   vec4 positionRelativeToCam = view * model * vec4(pos, 1.0f);
-  //vec4 lightPos = view  * vec4(pointLightPosition, 1.0);
-  vec4 lightPos = view  * vec4(vec3(300,500,100000), 1.0);
+  vec4 lightPos = view  * vec4(pointLightPosition, 1.0);
 
   lightDir = lightPos.xyz - positionRelativeToCam.xyz;
-  h = pos.y;
+  yPos = pos.y;
   
-  vViewPosition = -positionRelativeToCam.xyz;
   float distance = length(positionRelativeToCam.xyz);
   visibility = exp(-pow((distance*density),gradient));
   visibility = clamp(visibility,0.0f,1.0f);

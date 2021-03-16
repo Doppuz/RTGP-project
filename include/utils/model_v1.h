@@ -181,10 +181,8 @@ private:
         for(GLuint i = 0; i < mesh->mNumFaces; i++)
         {
             aiFace face = mesh->mFaces[i];
-        //    vector<GLuint> triangle;
             for(GLuint j = 0; j < face.mNumIndices; j++){
-                indices.push_back(face.mIndices[j]);            
-        //        triangle.push_back(face.mIndices[j]);
+                indices.push_back(face.mIndices[j]);      
             }    
 
 

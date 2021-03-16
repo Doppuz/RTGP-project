@@ -18,6 +18,7 @@ uniform mat3 normalMatrix;
 out vec3 vNormal;
 
 uniform vec3 cameraPosition;
+uniform vec3 lightPosition;
 
 // light incidence direction (calculated in vertex shader, interpolated by rasterization)
 
@@ -30,7 +31,6 @@ const float density = 0.00032; //0.000009
 const float gradient = 3;
 
 vec4 positionRelativeToCam;
-vec3 lightPosition;
 
 out vec4 worldPosition;
 out vec3 worldNormal;
@@ -41,16 +41,12 @@ out vec3 fromLightVector;
 
 void main() {
 
-  // vertex position in world coordinate (= we apply only trasformations)
   worldPosition = model * vec4( pos, 1.0 );
-
-  lightPosition = vec3(300,500,100000);//cameraPosition;
 
   fromLightVector = worldPosition.xyz - lightPosition;
 
   toCameraVector = cameraPosition - worldPosition.xyz; 
   
-  // light incidence direction (in view coordinate)
   vec4 positionRelativeToCam = view * worldPosition;
 
   interp_UVW = pos;

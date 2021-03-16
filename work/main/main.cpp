@@ -50,15 +50,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 // load image from disk and create an OpenGL texture
 GLint LoadTexture(const char* path);
-void createNoise(Mesh *m);
-// Create Terrain
-//vector<Terrain> generateTerrains(int x, int y);
-//just a try
-void setupMesh(Mesh m);
 //FPS
 void calculateFPS();
-//ComputeNormal
-void calculateNormal(vector<vector<Vertex>> m, Mesh *mesh);
 //TerrainPos
 void changeTerrainPos(TerrainManagement* manager);
 //SkyBox
@@ -66,23 +59,20 @@ void LoadTextureCubeSide(string path, string side_image, GLuint side_name);
 GLint LoadTextureCube(string path);
 //Render
 void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, TerrainManagement terrainManager, glm::vec4 plane,bool boolCamera);
-void skyBoxRenderer(Shader skybox_shader, glm::vec3 fogColor,Model cubeModel);
+void skyBoxRenderer(Shader skybox_shader, glm::vec3 fogColor,Model* cubeModel);
 //subroutine
 void SetupShader(int program);
 void PrintCurrentShader(int subroutine);
 void lightShaderSetUp(Shader shaderParam);
 
+//Movement with wasd
+void apply_camera_movements(GLFWwindow* window);
+
 //First movement bool
 bool firstMouse = true;
 
-    GLuint VBO, EBO; 
-    GLuint VAO;  
-
 // we need to store the previous mouse position to calculate the offset with the current frame
 GLfloat lastX, lastY;
-
-//Movement with wasd
-void apply_camera_movements(GLFWwindow* window);
 
 //Projection matrix
 glm::mat4 projection;
@@ -92,11 +82,6 @@ glm::mat4 view = glm::mat4(1.0f);
 
 //Camera
 Camera camera(glm::vec3(0.0f, 300.0f, 0.0f), GL_FALSE); //25000,20000,25000
-Camera farCamera(glm::vec3(0.0f,300.0f,0),GL_FALSE);
-Camera* actualCamera = &camera;
-
-// vector for the textures IDs
-vector<GLint> textureID;
 
 // parameters for time calculation (for animations)
 GLfloat deltaTime = 0.0f;
@@ -108,29 +93,11 @@ int nbFrames = 0;
 int initialTime = time(NULL), finalTime, frameCount;
 
 //light
-glm::vec3 lightPos = glm::vec3(0, 0.0f, 0);
-GLfloat lightMovement = 100.0f;
-
-// diffusive, specular and ambient components
-glm::vec3 diffuseColor = {1.0f,0.0f,0.0f};
-glm::vec3 specularColor = {0.2f,1.0f,0.7f};
-glm::vec3 ambientColor = {0.5f,0.1f,0.7f};
-// weights for the diffusive, specular and ambient components
+glm::vec3 lightPos = glm::vec3(300,500,100000);
 GLfloat Kd = 0.5f;
-GLfloat Ks = 0.4f;
-GLfloat Ka = 0.9f;
-// shininess coefficient for Phong and Blinn-Phong shaders
-GLfloat shininess = 25.0f;
 
 // boolean to activate/deactivate wireframe rendering
 GLboolean wireframe = GL_FALSE;
-
-// boolean to start/stop animated rotation on Y angle
-GLboolean spinning = GL_FALSE;
-// rotation angle on Y axis
-GLfloat orientationY = 0.0f;
-// rotation speed on Y axis
-GLfloat spin_speed = 30.0f;
 
 // texture unit for the cube map
 GLuint textureCube;
@@ -141,20 +108,12 @@ vector<std::string> shaders;
 
 //texture
 GLint groundTexture;
-GLint snowTexture;
-GLint grassTexture;
+GLint sandTexture;
 
 //Water
 float waterMovement = 0.0f;
 const float waterSpeed = 0.03f;
 const glm::vec3 lightColour = glm::vec3({0.70f,0.90f,1.f});//glm::vec3({0.50f,0.83f,1.f});
-
-GLfloat Eta = 1.0f/1.52f;
-// exponent for Fresnel equation
-// = 5 -> "physically correct" value
-// < 5 -> technically not physically correct,
-// but it gives more "artistic" results
-GLfloat mFresnelPower = 5.0f;
 
 /////////////////// MAIN function ///////////////////////
 int main(){
@@ -180,11 +139,7 @@ int main(){
     // we put in relation the window and the callbacks
     glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
-
-    // we disable the mouse cursor
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-    
+ 
     // GLAD tries to load the context set by GLFW
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
     {
@@ -192,16 +147,7 @@ int main(){
         return -1;
     }
 
-    
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-      // configure global opengl state
-    // -----------------------------
-    glEnable(GL_DEPTH_TEST);
-
-    
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // we define the viewport dimensions
     int width, height;
@@ -211,34 +157,19 @@ int main(){
     // we enable Z test
     glEnable(GL_DEPTH_TEST);
 
-    // the "clear" color for the frame buffer
-    glClearColor(0.07f, 0.07f, 0.07f, 1.0f);
-
     // we create and compile shaders (code of Shader class is in include/utils/shader_v1.h)
-    Shader shader("00_basic.vert", "00_basic.frag");
+    Shader terrainShader("terrainVert.vert", "terrainFrag.frag");
     Shader waterShader("waterVert.vert", "waterFrag.frag");
-    Shader planeShader("planeVert.vert", "planeFrag.frag");
+    Shader objectShader("objectVert.vert", "objectFrag.frag");
     Shader skybox_shader("skyboxVert.vert", "skyboxFrag.frag");
 
-    SetupShader(shader.Program);
+    SetupShader(terrainShader.Program);
     // we print on console the name of the first subroutine used
     PrintCurrentShader(current_subroutine);
 
-    std::cout << "Before texture" << std::endl;
-
-    groundTexture = LoadTexture("../../textures/plane/ground.jpg");
+    sandTexture = LoadTexture("../../textures/plane/desert.jpg");
     
-    std::cout << "After 1 texture" << std::endl;
-
-    snowTexture = LoadTexture("../../textures/plane/desert.jpg");
-
-    std::cout << "After 2 texture" << std::endl;
-    
-    grassTexture = LoadTexture("../../textures/plane/desert2.jpg");
-
-    std::cout << "After 3 texture" << std::endl;
-
-    GLint redTexture = LoadTexture("../../textures/plane/DesertPlants.png");
+    groundTexture = LoadTexture("../../textures/plane/desert2.jpg");
 
     textureCube = LoadTextureCube("../../textures/cube/MySkyBox2/");
   
@@ -247,67 +178,36 @@ int main(){
     GLint waterNormalTexture = LoadTexture("../../textures/plane/normalMap.png");
 
     GLint trunkTexture = LoadTexture("../../textures/plane/trunk.jpg");
-    //GLint trunkTexture = LoadTexture("../../textures/plane/cactus.png");
-    GLfloat orientationY = -90.0f;
-
-    //Model planeModel("../../models/Tree/Tree.obj");
-    //planeModel.meshes[0].SetupMesh();
-    //Tree t(glm::vec3(0.0f, 300.0f,-800),"../../models/Tree/Tree.obj");
+    
+    GLint cactusTexture = LoadTexture("../../textures/plane/cactus.png");
 
     Model cubeModel("../../models/cube.obj"); // used for the environment map
-    cubeModel.meshes[0].SetupMesh();
-
-    Model cubeModel2("../../models/cube.obj"); // used for the environment map
-    cubeModel2.meshes[0].SetupMesh();
+    for(int i = 0; i < cubeModel.meshes.size(); i++)
+        cubeModel.meshes[i].SetupMesh();
 
     Model tree("../../models/Tree/tree.obj"); // used for the environment map
-    //tree.meshes[0].SetupMesh();
+    for(int i = 0; i < tree.meshes.size(); i++)
+        tree.meshes[i].SetupMesh();
 
-    //Model tree("../../models/cactus.3ds"); // used for the environment map
-    tree.meshes[0].SetupMesh();
-    
-    //Tree t(glm::vec3(0.0f, 300.0f,-800),&tree);
-    //Tree t2(glm::vec3(0.0f, 300.0f,-400),&tree);
-    //terrain
-    TerrainManagement terrainManager(&tree);
+    Model cactus("../../models/cactus.3ds"); // used for the environment map
+    for(int i = 0; i < cactus.meshes.size(); i++)
+        cactus.meshes[i].SetupMesh();
+  
+    TerrainManagement terrainManager(&tree,&cactus);
 
     bool first = false;
     
-    /*glm::mat4 planeModelMatrix = glm::mat4(1.0f);
-    planeModelMatrix = glm::translate(planeModelMatrix,glm::vec3(0.0f, 300.0f,-800));
-    planeModelMatrix = glm::rotate(planeModelMatrix, glm::radians(orientationY), glm::vec3(1.0f, 0.0f, 0.0f));
-
-    planeModelMatrix = glm::rotate(planeModelMatrix, glm::radians(-orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
-    planeModelMatrix = glm::scale(planeModelMatrix, glm::vec3(20,20,20));*/
-
-    glm::mat4 planeModelMatrix2 = glm::mat4(1.0f);
-    planeModelMatrix2 = glm::translate(planeModelMatrix2,glm::vec3(300.0f, 300.0f,0.0f));
-    planeModelMatrix2 = glm::rotate(planeModelMatrix2, glm::radians(orientationY), glm::vec3(1.0f, 0.0f, 0.0f));
-
-    planeModelMatrix2 = glm::rotate(planeModelMatrix2, glm::radians(-orientationY), glm::vec3(0.0f, 1.0f, 0.0f));
-    planeModelMatrix2 = glm::scale(planeModelMatrix2, glm::vec3(50,50,50));
-
     glm::mat4 cubeModelMatrix = glm::mat4(1.0f);
     cubeModelMatrix = glm::translate(cubeModelMatrix,glm::vec3(0.0f, 8000.0f,120000));
     cubeModelMatrix = glm::scale(cubeModelMatrix, glm::vec3(500000,50000,250000));
 
-    //glm::vec3 fogColor = {0.0f,0.0f,0.0f};
-    //glm::vec3 fogColor = {0.16f,0.22f,0.29f};
     glm::vec3 fogColor = {0.05f,0.08f,0.13f};
-    //glm::vec3 fogColor = {0.33f,0.33f,0.33f};
 
     WaterFrameBuffers fbos = WaterFrameBuffers();
-    
-    //terrainManager.terrains[0].createTree();
 
     GLuint index;
 
     while(!glfwWindowShouldClose(window)){
-
-        //std::cout << actualCamera->Yaw << " " << actualCamera->Pitch << std::endl;
-
-        int waterShow = 0;
-        //std::cout << actualCamera.Position.x << " " <<  actualCamera.Position.y << " " <<  actualCamera.Position.z << std::endl;
 
         GLfloat currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -317,164 +217,105 @@ int main(){
 
         glEnable(GL_CLIP_DISTANCE0);
 
-        lightPos = glm::vec3(actualCamera->Position.x,lightPos.y,actualCamera->Position.z);
-
         glfwPollEvents();
         
         apply_camera_movements(window);
 
         changeTerrainPos(&terrainManager);
 
-        fbos.bindReflectionFrameBuffer();
-
-        actualCamera->Position.y -= 30;
-
-        terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,1,0,-10),true);
-
-        actualCamera->Position.y += 30;
-
-        planeShader.Use();
-        planeShader.setMat4("view", view);
-        planeShader.setMat4("projection", projection);   
-        planeShader.setInt("trunkTexture",0);
-
-        lightShaderSetUp(planeShader);
-
-        index = glGetSubroutineIndex(shader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());
-        // we activate the subroutine using the index (this is where shaders swapping happens)
-        glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &index);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, trunkTexture);
-    
-        for(int i = 0; i < terrainManager.terrains.size(); i++){
-            //if(terrainManager.terrains[i].tree != nullptr){
-                planeShader.setMat4("model", terrainManager.terrains[i].tree->getModelMatrix());    
-                planeShader.setMat3("normalMatrix",terrainManager.terrains[i].tree->getNormalMatrix(view));
-                terrainManager.terrains[i].tree->draw();
-            //}    
-        }
-        
-        planeShader.setVec3("fogColor",fogColor);
-
-        //actualCamera->Position.y += 30;
-        
-        glDepthFunc(GL_LEQUAL);
-        skybox_shader.Use();
-        // we activate the cube map
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
-         // we pass projection and view matrices to the Shader Program of the skybox
-        skybox_shader.setMat4("projection", projection);   
-        // to have the background fixed during camera movements, we have to remove the translations from the view matrix
-        // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
-        view =  glm::mat4(glm::mat3(actualCamera->GetViewMatrix()));    // Remove any translation component of the view matrix
-        skybox_shader.setMat4("view", view);
-
-        // we determine the position in the Shader Program of the uniform variables
-        skybox_shader.setInt("textureCube",0);
-        
-        skybox_shader.setVec3("fogColor",fogColor);
-
-        // we render the cube with the environment map
-        cubeModel.Draw();
-        glDepthFunc(GL_LESS);
-
-        fbos.bindRefractionFrameBuffer();
-
-        terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,-1,0,10),false);
-
-        planeShader.Use();
-        planeShader.setMat4("view", view);
-        planeShader.setMat4("projection", projection);   
-        planeShader.setInt("trunkTexture",0);
-
-        lightShaderSetUp(planeShader);
-
-        index = glGetSubroutineIndex(shader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());
-        // we activate the subroutine using the index (this is where shaders swapping happens)
-        glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &index);
-
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, trunkTexture);
-        planeShader.setVec3("fogColor",fogColor);
-
-        glDepthFunc(GL_LEQUAL);
-        skybox_shader.Use();
-        // we activate the cube map
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
-         // we pass projection and view matrices to the Shader Program of the skybox
-        skybox_shader.setMat4("projection", projection);   
-        // to have the background fixed during camera movements, we have to remove the translations from the view matrix
-        // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
-        view =  glm::mat4(glm::mat3(actualCamera->GetViewMatrix()));    // Remove any translation component of the view matrix
-        skybox_shader.setMat4("view", view);
-
-        // we determine the position in the Shader Program of the uniform variables
-        skybox_shader.setInt("textureCube",0);
-        
-        skybox_shader.setVec3("fogColor",fogColor);
-
-        // we render the cube with the environment map
-        cubeModel.Draw();
-        glDepthFunc(GL_LESS);
-
-        fbos.unbindCurrentFrameBuffer();
-
-        //actualCamera->Pitch += -80;
-
-        terrainRender(shader,fogColor,window,terrainManager, glm::vec4(0,1,0,100000),false);
-
-        //planeModelMatrix = glm::translate(planeModelMatrix,glm::vec3(-300.0f, 0.0f,-400));
-        shader.setMat4("model", planeModelMatrix2);
-        //planeModel2.Draw();
-        
         if (wireframe)
-            // Draw in wireframe
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         else
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-        if (spinning)
-            orientationY+=(deltaTime*spin_speed);
+//Reflaction
 
-//PLANE render
-        planeShader.Use();
-        planeShader.setMat4("view", view);
-        planeShader.setMat4("projection", projection);   
-        planeShader.setInt("trunkTexture",0);
+        fbos.bindReflectionFrameBuffer();
 
-        lightShaderSetUp(planeShader);
+        camera.Position.y -= 30;
 
-        index = glGetSubroutineIndex(shader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());
-        // we activate the subroutine using the index (this is where shaders swapping happens)
+        terrainRender(terrainShader,fogColor,window,terrainManager, glm::vec4(0,1,0,-10),true);
+
+        camera.Position.y += 30;
+
+        objectShader.Use();
+        objectShader.setMat4("view", view);
+        objectShader.setMat4("projection", projection);   
+
+        lightShaderSetUp(objectShader);
+
+        index = glGetSubroutineIndex(terrainShader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());
         glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &index);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, trunkTexture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, cactusTexture);
+    
+        objectShader.setInt("trunkTexture",0);
+        objectShader.setInt("cactusTexture",1);
+        
         for(int i = 0; i < terrainManager.terrains.size(); i++){
-            //if(terrainManager.terrains[i].tree != nullptr){
-                planeShader.setMat4("model", terrainManager.terrains[i].tree->getModelMatrix());    
-                planeShader.setMat3("normalMatrix",terrainManager.terrains[i].tree->getNormalMatrix(view));
-                terrainManager.terrains[i].tree->draw();
-            //} 
+            if(terrainManager.terrains[i].hasObject){
+                objectShader.setInt("objectType", terrainManager.terrains[i].objectType);
+                objectShader.setMat4("model", terrainManager.terrains[i].object.getModelMatrix());    
+                objectShader.setMat3("normalMatrix",terrainManager.terrains[i].object.getNormalMatrix(view));
+                terrainManager.terrains[i].object.draw();
+            }    
         }
-        planeShader.setVec3("fogColor",fogColor);
-        //terrainManager.terrains[0].getTerrainHeight();
+        
+        objectShader.setVec3("fogColor",fogColor);
+
+        skyBoxRenderer(skybox_shader,fogColor,&cubeModel);
+
+//Refraction
+
+        fbos.bindRefractionFrameBuffer();
+
+        terrainRender(terrainShader,fogColor,window,terrainManager, glm::vec4(0,-1,0,10),false);
+
+        skyBoxRenderer(skybox_shader,fogColor,&cubeModel);
+
+        fbos.unbindCurrentFrameBuffer();
+
+        terrainRender(terrainShader,fogColor,window,terrainManager, glm::vec4(0,1,0,100000),false);
+
+//Object render
+
+        objectShader.Use();
+        objectShader.setMat4("view", view);
+        objectShader.setMat4("projection", projection);   
+
+        lightShaderSetUp(objectShader);
+
+        index = glGetSubroutineIndex(terrainShader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());
+        glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &index);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, trunkTexture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, cactusTexture);
+
+        objectShader.setInt("trunkTexture",0);
+        objectShader.setInt("cactusTexture",1);
+
+        for(int i = 0; i < terrainManager.terrains.size(); i++){
+            if(terrainManager.terrains[i].hasObject){
+                objectShader.setInt("objectType", terrainManager.terrains[i].objectType);
+                objectShader.setMat4("model", terrainManager.terrains[i].object.getModelMatrix());    
+                objectShader.setMat3("normalMatrix",terrainManager.terrains[i].object.getNormalMatrix(view));
+                terrainManager.terrains[i].object.draw();
+            } 
+        }
+        objectShader.setVec3("fogColor",fogColor);
 
 //WATER render
 
         waterShader.Use();
         waterShader.setMat4("view", view);
         waterShader.setMat4("projection", projection);
-        
-        //std::cout << actualCamera->Position.x << " " << actualCamera->Position.y << " " << actualCamera->Position.z << " " << std::endl;
 
-        waterShader.setVec3("cameraPosition",actualCamera->Position); 
-        waterShader.setFloat("Eta",Eta); 
-        waterShader.setFloat("mFresnelPower",mFresnelPower); 
-        waterShader.setVec3("cameraPosition",actualCamera->Position);
+        waterShader.setVec3("cameraPosition",camera.Position); 
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -509,6 +350,7 @@ int main(){
 
         waterShader.setFloat("waterMovement",waterMovement);
         waterShader.setVec3("lightColour",lightColour);
+        waterShader.setVec3("lightPosition",lightPos);
 
         for(int i = 0; i < terrainManager.terrains.size(); i++){   
             waterShader.setMat4("model", terrainManager.terrains[i].water.getModelMatrix());
@@ -516,40 +358,22 @@ int main(){
             terrainManager.terrains[i].water.draw(); 
         }
         
-        //waterShader.setMat4("model", planeModelMatrix);
         waterShader.setVec3("fogColor",fogColor);
 
         glDisable(GL_BLEND);
+
 //SKYBOX Render
 
-        glDepthFunc(GL_LEQUAL);
-        skybox_shader.Use();
-        // we activate the cube map
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
-         // we pass projection and view matrices to the Shader Program of the skybox
-        skybox_shader.setMat4("projection", projection);   
-        // to have the background fixed during camera movements, we have to remove the translations from the view matrix
-        // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
-        view =  glm::mat4(glm::mat3(actualCamera->GetViewMatrix()));    // Remove any translation component of the view matrix
-        skybox_shader.setMat4("view", view);
-
-        // we determine the position in the Shader Program of the uniform variables
-        skybox_shader.setInt("textureCube",0);
-        
-        skybox_shader.setVec3("fogColor",fogColor);
-
-        // we render the cube with the environment map
-        cubeModel.Draw();
-        glDepthFunc(GL_LESS);
+        skyBoxRenderer(skybox_shader,fogColor,&cubeModel);
         glfwSwapBuffers(window);
         
     }
 
 
     fbos.cleanUp();
-    shader.Delete();
+    terrainShader.Delete();
     waterShader.Delete();
+    objectShader.Delete();
     skybox_shader.Delete();
 
     glfwTerminate();
@@ -567,15 +391,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     // if L is pressed, we activate/deactivate wireframe rendering of models
     if(key == GLFW_KEY_L && action == GLFW_PRESS)
         wireframe=!wireframe;
-
-         // if P is pressed, we start/stop the animated rotation of models
-    /*if(key == GLFW_KEY_P && action == GLFW_PRESS){
-        if(cam == 0)
-            actualCamera = farCamera;
-        else  
-            actualCamera = camera;
-        cam = (cam + 1) % 2;    
-    }    */
 
     GLuint new_subroutine;
     // pressing a key number, we change the shader applied to the models
@@ -602,13 +417,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 //Camera key movement.
 void apply_camera_movements(GLFWwindow* window){
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-        actualCamera->ProcessKeyboard(FORWARD, deltaTime);
+        camera.ProcessKeyboard(FORWARD, deltaTime);
     }if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS){
-        actualCamera->ProcessKeyboard(BACKWARD, deltaTime);
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
     }if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        actualCamera->ProcessKeyboard(LEFT, deltaTime);
+        camera.ProcessKeyboard(LEFT, deltaTime);
     if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS){
-        actualCamera->ProcessKeyboard(RIGHT, deltaTime);
+        camera.ProcessKeyboard(RIGHT, deltaTime);
     }    
 }
 
@@ -631,7 +446,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
       lastY = ypos;
 
       // we pass the offset to the Camera class instance in order to update the rendering
-      actualCamera->ProcessMouseMovement(xoffset, yoffset);
+      camera.ProcessMouseMovement(xoffset, yoffset);
 
 }
 
@@ -681,18 +496,18 @@ GLint LoadTexture(const char* path){
  }
 
 void changeTerrainPos(TerrainManagement* manager){
-    if(actualCamera->Position.z - manager->getLastZ() <= 0){
+    if(camera.Position.z - manager->getLastZ() <= 0){
         manager->translateTerrain(manager->BACKWARD);
         manager->increaseZ(true);
-    }else if(actualCamera->Position.z - manager->getLastZ() >= Terrain::getSize()){
+    }else if(camera.Position.z - manager->getLastZ() >= Terrain::getSize()){
         manager->translateTerrain(manager->FORWARD);
         manager->increaseZ(false);
     }
 
-    if(actualCamera->Position.x - manager->getLastX() <= 0){
+    if(camera.Position.x - manager->getLastX() <= 0){
         manager->translateTerrain(manager->RIGHT);
         manager->increaseX(true);
-    }else if(actualCamera->Position.x - manager->getLastX() >= Terrain::getSize()){
+    }else if(camera.Position.x - manager->getLastX() >= Terrain::getSize()){
         manager->translateTerrain(manager->LEFT);
         manager->increaseX(false);
     }
@@ -808,7 +623,7 @@ void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, Terrai
         //glm::vec3 fogColor = glm::vec3(0.1f,0.3f,0.1f);
         shader.setVec3("fogColor",fogColor);
         lightShaderSetUp(shader);
-        shader.setVec4("plane", plane);
+        shader.setVec4("clippingPlane", plane);
 
         projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,8000.0f); //10000
         shader.setMat4("projection", projection);   
@@ -821,9 +636,9 @@ void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, Terrai
         if(boolCamera){
             //view = actualCamera->GetViewMatrix();
             //actualCamera->InvertPitch();
-            view = actualCamera->GetViewMatrixInverted();
+            view = camera.GetViewMatrixInverted();
         }else
-            view = actualCamera->GetViewMatrix();
+            view = camera.GetViewMatrix();
 
         shader.setMat4("view", view);
 
@@ -841,10 +656,10 @@ void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, Terrai
         glBindTexture(GL_TEXTURE_2D, groundTexture);
 
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, snowTexture);
+        glBindTexture(GL_TEXTURE_2D, sandTexture);
 
         glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, grassTexture);
+        glBindTexture(GL_TEXTURE_2D, groundTexture);
 
         for(int i = 0; i < terrainManager.terrains.size(); i++){     
             shader.setMat4("model", terrainManager.terrains[i].getModelMatrix());
@@ -854,16 +669,17 @@ void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, Terrai
 
 }
 
-void skyBoxRenderer(Shader skybox_shader, glm::vec3 fogColor,Model cubeModel){
+void skyBoxRenderer(Shader skybox_shader, glm::vec3 fogColor,Model* cubeModel){
+        glDepthFunc(GL_LEQUAL);
         skybox_shader.Use();
         // we activate the cube map
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
-         // we pass projection and view matrices to the Shader Program of the skybox
+        // we pass projection and view matrices to the Shader Program of the skybox
         skybox_shader.setMat4("projection", projection);   
         // to have the background fixed during camera movements, we have to remove the translations from the view matrix
         // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
-        view =  glm::mat4(glm::mat3(actualCamera->GetViewMatrix()));    // Remove any translation component of the view matrix
+        view =  glm::mat4(glm::mat3(camera.GetViewMatrix()));    // Remove any translation component of the view matrix
         skybox_shader.setMat4("view", view);
 
         // we determine the position in the Shader Program of the uniform variables
@@ -872,21 +688,13 @@ void skyBoxRenderer(Shader skybox_shader, glm::vec3 fogColor,Model cubeModel){
         skybox_shader.setVec3("fogColor",fogColor);
 
         // we render the cube with the environment map
-        cubeModel.Draw();
+        cubeModel->Draw();
+        glDepthFunc(GL_LESS);
 
 }
 
 void lightShaderSetUp(Shader shaderParam){
-    
-        shaderParam.setFloat("kd",Kd);
-        shaderParam.setFloat("ks",Ks);
-        shaderParam.setFloat("ka",Ka);
-        shaderParam.setVec3("ambientColor",ambientColor);
-        shaderParam.setVec3("diffuseColor",diffuseColor);
-        shaderParam.setVec3("specularColor",specularColor);
-        shaderParam.setFloat("shininess",shininess);
 
         shaderParam.setVec3("pointLightPosition",lightPos);
-        shaderParam.setVec3("diffuseColor",diffuseColor);
         shaderParam.setFloat("Kd",Kd); 
 }

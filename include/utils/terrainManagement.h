@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 #include <glad/glad.h>
+#include <cstdlib>
+#include <ctime>
 
 #include <glfw/glfw3.h>
 #include <utils/mesh_v1.h>
@@ -23,18 +25,21 @@ public:
 
     vector<Terrain> terrains;
 
-    TerrainManagement(Model* tree)
+    TerrainManagement(Model* tree,Model *cactus)
         :size{Terrain::getSize()},lastXPosition{5000}, lastZPosition{5000}{ //4500 4500
         
         rowLength = 21;
         indexLastRow  = rowLength * (rowLength - 1);
         indexLastColumn = (rowLength - 1);
         int index = 0;
-
+        srand((unsigned) time(0));
         for(int j = 0; j < rowLength; j++){
             for(int i = 0; i < rowLength; i++){
-                Terrain terrain(index, glm::vec3(-size + i *size, 0.0f, -size + j *size), tree);
-                terrains.push_back(terrain);
+                int rndNum = rand() % 3;
+                if(rndNum == 0 || rndNum == 1)
+                    terrains.push_back(Terrain(index, glm::vec3(-size + i *size, 0.0f, -size + j *size), tree,0));
+                else
+                    terrains.push_back(Terrain(index, glm::vec3(-size + i *size, 0.0f, -size + j *size), cactus,1));    
                 index ++;
             }
         }
@@ -131,56 +136,6 @@ private:
             calculateHeights(&terrains[i]);
             terrains[i].createTree();
         }    
-
-        /*for(int i = 0; i < vertexCount; i++){
-            std::cout << std::endl;
-            for(int j = 0; j < vertexCount; j++){
-                std::cout << terrains[i].mesh.indices[j] << " ";
-            }
-        } */
-
-        /*int index = 0;
-            for(int i = 0; i < vertexCount; i++){
-                std::cout << std::endl;
-                for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrains[0].mesh.vertices[index].Position.y << " ";
-                index++;
-                }
-            }   
-            
-            std::cout << std::endl;
-
-         index = 0;
-            for(int i = 0; i < vertexCount; i++){
-                std::cout << std::endl;
-                for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrains[1].mesh.vertices[index].Position.y << " ";
-                index++;
-                }
-            } 
-
-            std::cout << std::endl;
-            index = 0;
-            for(int i = 0; i < vertexCount; i++){
-                std::cout << std::endl;
-                for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrains[3].mesh.vertices[index].Position.y << " ";
-                index++;
-                }
-            } 
-
-        calculateNormal(&terrains[0].mesh,0);
-
-         std::cout << std::endl;
-            index = 0;
-             for(int i = 0; i < vertexCount; i++){
-                std::cout << std::endl;
-                for(int j = 0; j < vertexCount; j++){
-                std::cout << " ( " << terrains[0].mesh.vertices[index].Normal.x << " " << terrains[0].mesh.vertices[index].Normal.y << " " 
-                    << terrains[0].mesh.vertices[index].Normal.z << " ) ";
-                index++;
-                }
-            }*/
     }
 
     void lerpVertical(Mesh *b, Mesh *a){
@@ -310,64 +265,4 @@ private:
             }
         }    
     }
-
-    //float lerp(float a, float b, float t) { return a + t * (b - a); }
 };
-
-
-
-//------------------------------------------------------------------------------------------------------------------
-
-
-/*int index = 0;
-            for(int i = 0; i < vertexCount; i++){
-                std::cout << std::endl;
-                for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrain3.terrainBaseMesh.vertices[index].Position.y << " ";
-                index++;
-                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
-                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
-                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
-            /*    }
-            }   
-            std::cout << std::endl;
-            index = 0;
-             for(int i = 0; i < vertexCount; i++){
-                std::cout << std::endl;
-                for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrain4.terrainBaseMesh.vertices[index].Position.y << " ";
-                index++;
-                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
-                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
-                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
-            /*    }
-            } */
-
-            /*lerpMeshOther(&terrain3.terrainBaseMesh,&terrain4.terrainBaseMesh);
-            lerpMeshOther2(&terrain3.terrainBaseMesh);
-            lerpMeshOther3(&terrain4.terrainBaseMesh);
-
-            /*std::cout << std::endl;
-            index = 0;
-            for(int i = 0; i < vertexCount; i++){
-                std::cout << std::endl;
-                for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrain3.terrainBaseMesh.vertices[index].Position.y << " ";
-                index++;
-                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
-                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
-                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
-            /*    }
-            }   
-            std::cout << std::endl;
-            index = 0;
-             for(int i = 0; i < vertexCount; i++){
-                std::cout << std::endl;
-                for(int j = 0; j < vertexCount; j++){
-                std::cout << " " << terrain4.terrainBaseMesh.vertices[index].Position.y << " ";
-                index++;
-                /*std::cout << " AA: " << terrain.terrainBaseMesh.vertices[i].Position.y << " , " << terrain2.terrainBaseMesh.vertices[i].Position.y <<
-                " x1: " << terrain.terrainBaseMesh.vertices[i].Position.x << " z1:" << terrain.terrainBaseMesh.vertices[i].Position.z <<
-                " x2: " << terrain2.terrainBaseMesh.vertices[i].Position.x << " z2:" << terrain2.terrainBaseMesh.vertices[i].Position.z << std::endl;*/
-            /*    }
-            } */

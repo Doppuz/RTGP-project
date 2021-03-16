@@ -1,4 +1,3 @@
-
 #version 460 core
 
 // vertex position in world coordinates
@@ -15,9 +14,7 @@ uniform mat4 projection;
 
 uniform vec3 pointLightPosition;
 
-// light incidence direction (calculated in vertex shader, interpolated by rasterization)
 out vec3 lightDir;
-// the transformed normal has been calculated per-vertex in the vertex shader
 out vec3 vNormal;
 
 out vec2 outTexture;
@@ -28,7 +25,6 @@ out vec3 interp_UVW;
 void main(){
 		interp_UVW = pos;
           
-		// we apply the transformations to the vertex
         vec4 pos = projection * view * vec4(pos, 1.0);
 		
         gl_Position = pos.xyww;

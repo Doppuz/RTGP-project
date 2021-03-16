@@ -27,23 +27,17 @@ out float h;
 
 out float visibility;
 
-out vec3 vViewPosition;
-
-const float density = 0.00032; //0.000009
+const float density = 0.00044;
 const float gradient = 3;
-
-uniform vec4 plane;
 
 vec4 positionRelativeToCam;
 
 void main() {
-  // light incidence direction (in view coordinate)
   vec4 positionRelativeToCam = view * model * vec4(pos, 1.0f);
 
   vNormal = normalize( normalMatrix * normal );
   
-  //vec4 lightPos = view  * vec4(pointLightPosition, 1.0);
-  vec4 lightPos = view  * vec4(vec3(300,500,100000), 1.0);
+  vec4 lightPos = view  * vec4(pointLightPosition, 1.0);
 
   lightDir = lightPos.xyz - positionRelativeToCam.xyz;
 

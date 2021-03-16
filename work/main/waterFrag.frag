@@ -1,7 +1,5 @@
-
 #version 460 core
 
-// output variable for the fragment shader. Usually, it is the final color of the fragment
 out vec4 FragColor;
 
 in vec2 outTexture;
@@ -27,11 +25,6 @@ uniform vec3 cameraPosition;
 
 uniform float waterMovement;
 
-// Eta (= ratio between the 2 refraction indices)
-uniform float Eta;
-// exponent of Fresnel equation (=5 in literature, but we can change its value to have more artistic control on the final effect)
-uniform float mFresnelPower;
-
 uniform vec3 lightColour;
 
 in vec4 worldPosition;
@@ -55,7 +48,6 @@ void main(){
     depth = gl_FragCoord.z;
     float waterDistance = 2.0 * near * far / (far + near - (2.0 * depth - 1.0) * (far - near));
     float waterDepth = floorDistance - waterDistance;
-
 
     vec2 distortedTexCoords = texture(waterDuDvTexture, vec2(outTexture.x + waterMovement, outTexture.y)).rg*0.1;
 	distortedTexCoords = outTexture + vec2(distortedTexCoords.x, distortedTexCoords.y+waterMovement);
