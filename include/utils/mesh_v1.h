@@ -51,13 +51,14 @@ public:
 
     //////////////////////////////////////////
     // Constructor
-    Mesh(vector<Vertex> vertices, vector<GLuint> indices)
+    Mesh(vector<Vertex> vertices, vector<GLuint> indices,bool setupMesh)
     {
         this->vertices = vertices;
         this->indices = indices;
         //this->triangles = triangles;
         // initialization of OpenGL buffers
-        //this->setupMesh();
+        if(setupMesh)
+            this->setupMesh();
     }
 
     Mesh(){

@@ -182,16 +182,10 @@ int main(){
     GLint cactusTexture = LoadTexture("../../textures/plane/cactus.png");
 
     Model cubeModel("../../models/cube.obj"); // used for the environment map
-    for(int i = 0; i < cubeModel.meshes.size(); i++)
-        cubeModel.meshes[i].SetupMesh();
 
     Model tree("../../models/Tree/tree.obj"); // used for the environment map
-    for(int i = 0; i < tree.meshes.size(); i++)
-        tree.meshes[i].SetupMesh();
 
     Model cactus("../../models/cactus.3ds"); // used for the environment map
-    for(int i = 0; i < cactus.meshes.size(); i++)
-        cactus.meshes[i].SetupMesh();
   
     TerrainManagement terrainManager(&tree,&cactus);
 
@@ -364,7 +358,7 @@ int main(){
 
 //SKYBOX Render
 
-        skyBoxRenderer(skybox_shader,fogColor,&cubeModel);
+        //skyBoxRenderer(skybox_shader,fogColor,&cubeModel);
         glfwSwapBuffers(window);
         
     }

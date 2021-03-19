@@ -189,6 +189,6 @@ private:
         }
 
         // we return an instance of the Mesh class created using the vertices and faces data structures we have created above.
-        return Mesh(vertices, indices);
+        return Mesh(vertices, indices, true);
     }
 };

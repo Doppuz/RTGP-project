@@ -79,7 +79,6 @@ class Terrain{
                 xPos += translate.x;
             else
                 zPos += translate.z;
-            //std::cout << xPos << " " << zPos << std::endl;
         }
 
         glm::mat3 getNormalMatrix(glm::mat4 viewMatrix){
@@ -161,7 +160,7 @@ class Terrain{
 			    }
 		    }
             
-		 this->mesh = Mesh(vertices, indices);
+		 this->mesh = Mesh(vertices, indices,false);
     }
 
     float barryCentric(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3, glm::vec2 pos) {

@@ -28,7 +28,7 @@ class WorldObject{
         WorldObject(){}
 
         void draw(){
-           model->Draw();
+           //model->Draw();
         }
 
         glm::mat4 getModelMatrix(){

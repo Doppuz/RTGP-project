@@ -28,7 +28,7 @@ public:
     TerrainManagement(Model* tree,Model *cactus)
         :size{Terrain::getSize()},lastXPosition{5000}, lastZPosition{5000}{ //4500 4500
         
-        rowLength = 21;
+        rowLength = 2;
         indexLastRow  = rowLength * (rowLength - 1);
         indexLastColumn = (rowLength - 1);
         int index = 0;
@@ -70,7 +70,7 @@ public:
     }
 
     void translateTerrain(int index){
-        switch(index){
+        /*switch(index){
             case BACKWARD:
                 for(int i = 0; i < rowLength; i++){
                     terrains[indexLastRow+i].translateModelMatrix( glm::vec3(0.0f, 0.0f, -(size * rowLength)));
@@ -101,7 +101,7 @@ public:
                     indexLastColumn = indexFirstColoumn;
                 }
                 break;
-        }
+        }*/
     }
 
 private:
@@ -135,19 +135,19 @@ private:
             calculateNormal(&terrains[i].mesh,i);
             calculateHeights(&terrains[i]);
             terrains[i].createTree();
-        }    
+        }  
     }
 
     void lerpVertical(Mesh *b, Mesh *a){
-        lerpMesh(a,b);
-        lerpMesh2(b);
-        lerpMesh3(a);
+        connectMeshHorizontally(a,b);
+        propagateUpdown(b);
+        propagateDownUp(a);
     }
 
     void lerpHorizontal(Mesh *b, Mesh *a){
-        lerpMeshOther(a,b);
-        lerpMeshOther2(a);
-        lerpMeshOther3(b);
+        connectMeshVertically(a,b);
+        propagateLeftRight(a);
+        propagateRightLeft(b);
     }
 
     float lerp(float a, float b, float c){
@@ -155,7 +155,7 @@ private:
     }
 
     //Lerp vertex
-    void lerpMesh(Mesh *a, Mesh *b)
+    void connectMeshHorizontally(Mesh *a, Mesh *b)
     {
         for (int i = 0; i < b->vertices.size() / vertexCount; i++)
         {
@@ -163,9 +163,10 @@ private:
             a->vertices[i].Position.y = value;
             b->vertices[(b->vertices.size() - 1) - (vertexCount * ((int)(i / vertexCount) + 1) - 1) + i % vertexCount].Position.y = value;
         }
+        
     }
 
-    void lerpMesh2(Mesh *a)
+    void propagateUpdown(Mesh *a)
     {
         int size = a->vertices.size() - vertexCount - 1;
         float value1, value2, value3, value4;
@@ -175,7 +176,7 @@ private:
         }
     }
 
-    void lerpMesh3(Mesh *a)
+    void propagateDownUp(Mesh *a)
     {
         float value1, value2, value3, value4;
         for (int i = vertexCount; i < a->vertices.size(); i++)
@@ -186,7 +187,7 @@ private:
     }
 
     //Lerp vertex
-    void lerpMeshOther(Mesh *a, Mesh *b)
+    void connectMeshVertically(Mesh *a, Mesh *b)
     {
         for (int i = 0; i < b->vertices.size(); i = i + vertexCount)
         {
@@ -196,7 +197,7 @@ private:
         }
     }
 
-    void lerpMeshOther2(Mesh *a)
+    void propagateLeftRight(Mesh *a)
     {
         for (int i = 1; i < vertexCount; i++)
         {
@@ -208,7 +209,7 @@ private:
         }
     }
 
-    void lerpMeshOther3(Mesh *a)
+    void propagateRightLeft(Mesh *a)
     {
         for (int i = 1; i < vertexCount; i++)
         {
