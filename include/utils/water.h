@@ -25,7 +25,7 @@ class Water{
         Water(){}
 
         void draw(){
-           //mesh.Draw();
+           mesh.Draw();
         }
 
         GLint static getVertexCount(){

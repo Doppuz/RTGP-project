@@ -142,4 +142,72 @@ I have now got a blend between two cells horizontally, but of course I need it v
 
 \subsection{Infinite terrain}
 \label{sub::infinteTerrain}
-I want my terrain to move with me, wo that it gives the allusion to be infinite. 
+I want my terrain to move with me, so that it gives the illusion of being infinite. As I said before, our terrain is made up of a fixed number of cells in each row / column so I need to figure out when is the right time to move a cell / column. To explain it, Let's see the image below.
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width= 1
+	\textwidth]{images/infiniteTerrainSchema.jpg}
+	\caption{Infinite terrain moving schema.}
+\end{figure} 
+
+\noindent
+Basically to move a row or a column, I check when I overlap another cell and based on the side that I overlapped, I move a column or row on the opposite side. In the above case I am moving forward, so when I reached the end of the middle cell I move the last row to the first position. This is why I need to blend the last row / column as well, so they continue to match perfectly.
+In practice what I have to do is simply memorize the indices of the first cell of the last column and row (to get the first I just add the index of a column / row and apply the module operator) so that I can change it to real time and I always know which cells to move.
+Obviously the position of the camera is in the central cell. (To keep things simple, I assumed that each row and column had an odd number of cells, so there is always a unique center cell.)
+
+\subsection{Calculate the terrain normals.}
+To calculate the normal of a particular vertex, I used a simple method called the "finite difference method" which allowed me to calculate the components of the difference (x, y, z) in a very simple way. Let's start with the x component. I calculated the height near the selected vertex shifting the position in the four direction by a small amount. I first computed the left and right heights, then I subtracted the left one with the right one and obtained the x component. For the z component I do the same but instead of left and right I used the bottom and the top. Finally I set the y component to 2.0. I leave below the simple formula.
+
+\begin{equation}
+	normal = vec3(\textcolor{red}{heightLeft} - \textcolor{cyan}{heightRight}, 2.0, \textcolor{magenta}{heightDown} - \textcolor{green}{heightUp})		
+\end{equation}
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width= 1
+	\textwidth]{images/normalSchema.jpg}
+	\caption{Color of the heights considered to calculate the normal in the central vertex.}
+\end{figure} 
+
+\noindent
+After calculated the normal vector, I normalized it to create a versor.
+
+\subsection{Terrain shader}
+
+\subsubsection{Lambertian light}
+Inside the shader there is implemented a simple light model, the Lambertian one. Since it is very simple (the aim was only to check if normals were working, not to create a complex light model) and it isn't different from the one implemented in class, I don't give any others details.
+
+\begin{figure}[hbt!]
+	\centering
+	\subfloat[\centering No light.]{{\includegraphics[width=6.3cm]{images/lightTerrainBefore.png}}}%
+	\qquad
+	\subfloat[\centering Lambertian model.]{{\includegraphics[width=6.3cm]{images/lightTerrainAfter.png} }}%
+	\caption{}
+\end{figure}
+
+\subsubsection{Multi-texturing}
+Instead of assigning a single texture, I used a texture for vertices below a certain height (e.g. up to height < 15), then I used another texture for vertices above another height (e.g. for height > 115). For the central vertices I interpolated the two textures based on the height value.
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width= 0.45
+	\textwidth]{images/textureSchema.jpg}
+	\caption{Multi-texturing schema.}
+\end{figure} 
+
+\newpage
+
+\begin{figure}[hbt!]
+	\centering
+	\subfloat[\centering Terrain one texture.]{{\includegraphics[width=6.3cm]{images/terrain1Texture.png}}}%
+	\qquad
+	\subfloat[\centering Terrain two textures.]{{\includegraphics[width=6.3cm]{images/terrain2Texture.png} }}%
+	\caption{}
+\end{figure}
+
+\subsection{References}
+
+If you want to find the things mentioned above, you can check \textbf{terrainManagement.h}, \textbf{terrainVert.vert}, \textbf{terrainFrag.frag} files.
+
+\newpage

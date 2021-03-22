@@ -55,7 +55,7 @@ class Terrain{
         Terrain(){}
 
         void draw(){
-           mesh.Draw();
+           //mesh.Draw();
         }
 
         GLint static getVertexCount(){

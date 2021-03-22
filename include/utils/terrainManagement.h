@@ -234,24 +234,24 @@ private:
             heightL = i % vertexCount != 0 ? vertex[i-1].Position.y : this->terrains[predecessorLeft]
                 .mesh.vertices[(vertexCount)*((int)(i/vertexCount)+1) - 2].Position.y;
             
-            heightL = lerp(heightL,vertex[i].Position.y,0.9f);
+            heightL = lerp(heightL,vertex[i].Position.y,0.1f);
 
             heightR = i % vertexCount != (vertexCount - 1) ? vertex[i+1].Position.y : this->terrains[predecessorRight]
                 .mesh.vertices[(vertexCount)*((int)(i/vertexCount))+1].Position.y;
 
-            heightR = lerp(heightR,vertex[i].Position.y,0.9f);
+            heightR = lerp(heightR,vertex[i].Position.y,0.1f);
 
             heightD = i >= vertexCount ? vertex[i - vertexCount].Position.y : this->terrains[predecessorDown]
                 .mesh.vertices[(vertexCount * vertexCount) - 2 * vertexCount + i].Position.y;
                 
-            heightD = lerp(heightD,vertex[i].Position.y,0.9f);
+            heightD = lerp(heightD,vertex[i].Position.y,0.1f);
              
             heightU = i < (vertex.size() - vertexCount) ? vertex[i + vertexCount].Position.y :  this->terrains[predecessorUp]
                 .mesh.vertices[vertexCount + i - (vertex.size() - vertexCount)].Position.y;
     
-            heightU = lerp(heightU, vertex[i].Position.y ,0.9f);    
+            heightU = lerp(heightU, vertex[i].Position.y ,0.1f);    
 
-            glm::vec3 normal = glm::vec3(heightL - heightR, 2.0f, -heightU + heightD);
+            glm::vec3 normal = glm::vec3(heightL - heightR, 2.0f, heightD - heightU );
             normal = glm::normalize(normal);
             mesh->vertices[i].Normal = normal;
         }

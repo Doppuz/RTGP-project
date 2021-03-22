@@ -8,3 +8,9 @@
 \contentsline {subsubsection}{\numberline {2.3.3}Extra details}{7}{subsubsection.2.3.3}%
 \contentsline {subsection}{\numberline {2.4}Final blending}{9}{subsection.2.4}%
 \contentsline {subsection}{\numberline {2.5}Infinite terrain}{9}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Calculate the terrain normals.}{10}{subsection.2.6}%
+\contentsline {subsection}{\numberline {2.7}Terrain shader}{12}{subsection.2.7}%
+\contentsline {subsubsection}{\numberline {2.7.1}Lambertian light}{12}{subsubsection.2.7.1}%
+\contentsline {subsubsection}{\numberline {2.7.2}Multi-texturing}{12}{subsubsection.2.7.2}%
+\contentsline {subsection}{\numberline {2.8}References}{13}{subsection.2.8}%
+\contentsline {section}{\numberline {3}Water}{14}{section.3}%
