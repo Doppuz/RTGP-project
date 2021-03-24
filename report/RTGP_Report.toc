@@ -14,3 +14,7 @@
 \contentsline {subsubsection}{\numberline {2.7.2}Multi-texturing}{12}{subsubsection.2.7.2}%
 \contentsline {subsection}{\numberline {2.8}References}{13}{subsection.2.8}%
 \contentsline {section}{\numberline {3}Water}{14}{section.3}%
+\contentsline {section}{\numberline {4}Reflection and refraction}{14}{section.4}%
+\contentsline {subsubsection}{\numberline {4.0.1}Frame buffer objects}{14}{subsubsection.4.0.1}%
+\contentsline {subsection}{\numberline {4.1}Clipping plane}{16}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Projective texture mapping}{17}{subsection.4.2}%
