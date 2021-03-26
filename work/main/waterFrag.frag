@@ -16,6 +16,8 @@ uniform sampler2D refrTexture;
 uniform sampler2D waterDuDvTexture;
 uniform sampler2D waterNormalTexture;
 uniform sampler2D depthTexture;
+uniform float near;
+uniform float far;
 
 uniform samplerCube waterTexture;
 
@@ -41,8 +43,6 @@ void main(){
     vec2 refractionTextureCoor = vec2(ndc.x, ndc.y);
     vec2 reflectionTextureCoor = vec2(ndc.x, ndc.y);
 
-    float near = 10.0;
-    float far = 10000;
     float depth = texture(depthTexture,refractionTextureCoor).r;
     float floorDistance = 2.0 * near * far / (far + near - (2.0 * depth - 1.0) * (far - near));
     depth = gl_FragCoord.z;
@@ -51,7 +51,7 @@ void main(){
 
     vec2 distortedTexCoords = texture(waterDuDvTexture, vec2(outTexture.x + waterMovement, outTexture.y)).rg*0.1;
 	distortedTexCoords = outTexture + vec2(distortedTexCoords.x, distortedTexCoords.y+waterMovement);
-	vec2 totalDistortion = (texture(waterDuDvTexture, distortedTexCoords).rg * 2.0 - 1.0) * waveStrength * clamp(waterDepth/200.0,0.0,1.0);
+	vec2 totalDistortion = (texture(waterDuDvTexture, distortedTexCoords).rg * 2.0 - 1.0) * waveStrength * clamp(waterDepth/1000.0,0.0,1.0);
 
     refractionTextureCoor += totalDistortion;
     refractionTextureCoor = clamp(refractionTextureCoor,0.001,0.999);
@@ -72,9 +72,10 @@ void main(){
     vec3 reflectedLight = reflect(normalize(fromLightVector), normal);
 	float specular = max(dot(reflectedLight, viewVector), 0.0);
 	specular = pow(specular, shineDamper);
-	vec3 specularHighlights = lightColour * specular * reflectivity * clamp(waterDepth/200.0,0.0,1.0);
+	vec3 specularHighlights = lightColour * specular * reflectivity * clamp(waterDepth/1000.0,0.0,1.0);
     
     FragColor = mix(refractionTexture,reflectionTexture,refractiveFactor);
     FragColor = mix(FragColor, vec4(0.0,0.3,0.5,1),0.2) + vec4(specularHighlights,0.0); 
     FragColor = mix(vec4(fogColor,1),FragColor,visibility);
+    
 }

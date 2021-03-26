@@ -115,6 +115,10 @@ float waterMovement = 0.0f;
 const float waterSpeed = 0.03f;
 const glm::vec3 lightColour = glm::vec3({0.70f,0.90f,1.f});//glm::vec3({0.50f,0.83f,1.f});
 
+//Near Far plane
+const float near = 0.1f;
+const float far = 8000.0f;
+
 /////////////////// MAIN function ///////////////////////
 int main(){
 
@@ -272,7 +276,7 @@ int main(){
 
         fbos.unbindCurrentFrameBuffer();
 
-        terrainRender(terrainShader,fogColor,window,terrainManager, glm::vec4(0,1,0,100000),false);
+        terrainRender(terrainShader,fogColor,window,terrainManager, glm::vec4(0,-1,0,100000),false);
 
 //Object render
 
@@ -343,6 +347,8 @@ int main(){
         waterMovement = fmod(waterMovement,1);
 
         waterShader.setFloat("waterMovement",waterMovement);
+        waterShader.setFloat("near",near);
+        waterShader.setFloat("far",far);
         waterShader.setVec3("lightColour",lightColour);
         waterShader.setVec3("lightPosition",lightPos);
 
@@ -358,7 +364,7 @@ int main(){
 
 //SKYBOX Render
 
-        //skyBoxRenderer(skybox_shader,fogColor,&cubeModel);
+        skyBoxRenderer(skybox_shader,fogColor,&cubeModel);
         glfwSwapBuffers(window);
         
     }
@@ -619,7 +625,7 @@ void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, Terrai
         lightShaderSetUp(shader);
         shader.setVec4("clippingPlane", plane);
 
-        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, 0.1f,8000.0f); //10000
+        projection = glm::perspective(45.0f, (float)screenWidth / (float)screenHeight, near,far); //10000
         shader.setMat4("projection", projection);   
 
         GLuint index = glGetSubroutineIndex(shader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());

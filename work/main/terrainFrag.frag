@@ -77,5 +77,5 @@ vec4 NoLight() {
 
 void main(){
     FragColor = Illumination_Model();
-    //FragColor = mix(vec4(fogColor,1),FragColor,visibility);
+    FragColor = mix(vec4(fogColor,1),FragColor,visibility);
 }

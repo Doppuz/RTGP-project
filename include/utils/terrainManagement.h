@@ -28,7 +28,7 @@ public:
     TerrainManagement(Model* tree,Model *cactus)
         :size{Terrain::getSize()},lastXPosition{5000}, lastZPosition{5000}{ //4500 4500
         
-        rowLength = 2;
+        rowLength = 21;
         indexLastRow  = rowLength * (rowLength - 1);
         indexLastColumn = (rowLength - 1);
         int index = 0;
@@ -70,7 +70,7 @@ public:
     }
 
     void translateTerrain(int index){
-        /*switch(index){
+        switch(index){
             case BACKWARD:
                 for(int i = 0; i < rowLength; i++){
                     terrains[indexLastRow+i].translateModelMatrix( glm::vec3(0.0f, 0.0f, -(size * rowLength)));
@@ -101,7 +101,7 @@ public:
                     indexLastColumn = indexFirstColoumn;
                 }
                 break;
-        }*/
+        }
     }
 
 private:
