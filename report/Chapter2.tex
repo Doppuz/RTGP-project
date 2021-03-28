@@ -1,19 +1,17 @@
 \section{Water}
-The water is basically a squared plane (built in the same way of the flat terrain). Each cell has a water plane that will be visible only if some vertex of the cell has an height < of the water.
+The water is basically a squared plane (built in the same way of the flat terrain). Each cell has a water plane that will be visible only if some vertex of the cell has an height greater than the terrain.
+After creating the plane, the first thing I implemented was the reflaction and the refraction on the plane.
 
 \begin{figure}[hbt!]
 	\centering
 	\subfloat[\centering Plane.]{{\includegraphics[width=6.3cm]{images/Water.png}}}%
 	\qquad
 	\subfloat[\centering Vertices, indices and faces.]{{\includegraphics[width=6.3cm]{images/WaterNoVert.png} }}%
-	\caption{}
+	\caption{}3
 \end{figure}
 
-\section{Reflection and refraction}
-After creating the plane, the first thing I implemented was the reflaction and the refraction on the plane.
-
-\subsubsection{Frame buffer objects}
-The frame buffer is used to render our scene with all the information from the different buffers, such as color and depth. You can create your own frame buffer object to render the scene and save it in a texture. In particular, every time we render the scene in our frame buffer, we will update our 2D texture. This is exactly what we need because we need a texture to project inside the plane.
+\subsection{Frame buffer objects}
+The frame buffer is used to render our scene with all the information from the different buffers, such as color and depth. You can create your own frame buffer object to render the scene and save it in a texture. In particular, every time we render the scene in our frame buffer, we will update our 2D texture. This is exactly what I need because we have to create a texture to project inside the plane.
 I'll quickly explain how I created the class for the frame buffer object (Full code in \textbf{waterFrameBuffer.h}).
 
 \newpage
@@ -234,4 +232,109 @@ I used a cube map to create the sky. One of the images I choose, contains moon t
 \end{figure}
 
 \subsection{Fog}
-Right now I can see the cells movement. To avoid this I need to create a Fog.
+Right now I can see the movement of the cells. To avoid this I need to create a fog. The general idea is to blend objects with the colour of the sky, depending on how far they are from the camera. Near objects will have their normal colour, distant ones will have the same colour as the sky, and the objects in the middle will have a mixed colour. To do this I introduced a variable called \textbf(visibility) used in each shader, whose value goes from 0 (object in the fog) to 1 (normal colour). I used an exponential formula to calculate it which has two parameters: \textbf{density} and \textbf{gradient}. The first represents the thickness of the fog and increasing this value will decrease the overall visibility of the scene. The second determined how quickly visibility decreases with distance, and increasing this value makes the transition from 0 visibility to full visibility much smaller. To get the distance from the camera I used the built-in GLSL length function on the \textbf(positionRelativeToCam) variable (view matrix * model matrix * position).
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width= 1
+	\textwidth]{images/fog.png}
+	\caption{Code for the fog visibility calculation.}
+\end{figure}
+
+After calculating the visibility I mixed the color value with the fog color (usually the sky color) using the visibility factor in the fragments shader.
+
+\begin{equation}
+\text{FragColour} = mix(vec4(fogColour,1), FragColour, visibility);
+\end{equation}
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width= 1
+	\textwidth]{images/fog1.png}
+	\caption{Fog with fixed colour.}
+\end{figure}
+
+\noindent
+Perhaps in the image it is not very visible but there is still a problem. Fog is a fixed colour, but the sky has several. In fact, I can still see the movement of the terrain. The solution is to blend the horizon of the cube map with the colour of the fog. I have defined a lower and an upper limit. As before, below the lower limit, the cube map will have the colour of fog, above the upper limit it will be normal, and in the middle it will be mixed.
+
+\newpage
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width= 1
+	\textwidth]{images/fog2.png}
+	\caption{Final fog result.}
+\end{figure}
+
+\section{Other elements}
+I decided to decorate the scene with other elements, in particular with a tree and a cactus. To keep things simple, I randomly assign one of the two patterns to each cell above the water. The only difficult thing is to calculate the height of the ground to position the object correctly.
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width= 0.75
+	\textwidth]{images/object.jpg}
+	\caption{Grid square of a cell.}
+\end{figure}
+
+\noindent
+Given a position within a cell, I need to calculate the height of that point. First I need to find the size of a grid square. I divided the size of a cell by the number of vertices subtracted by one. For example in the image above there are four vertices and with a size of 500, the size of the grid square is 500/3. Now I can calculate which square of the grid is the object in by dividing the X and Y coordinates of the object's position with the grid size of the grid an floor the result. Now I want to calculate what the coordinates of the object are in that grid square. To do this I apply the mod operator between the position and size of the square and then divide it by the size of the square. Basically now I have the coordinate inside a square from 0 to 1. To understand what the object of the triangles is, I checked the X coordinate and I saw if it is less than or greater than 1 - Z. Finally I have my triangle and I have the height of the vertices and I can calculate the height of my points in several possible ways, for example using the barycentric interpolation.
+After doing this, we can easily place the different objects at the right height.
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width= 1
+	\textwidth]{images/object2.jpg}
+	\caption{Grid square triangles division.}
+\end{figure}
+
+\newpage
+
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width= 1
+	\textwidth]{images/object3.png}
+	\caption{Trees and cactus positioned.}
+\end{figure}
+
+\section{Performance}
+Last thing, I want to mentioned the performance of the terrain. With a size cell of 500 with 8 vertices and 21 cells for row (441 cells in total), the scene is rendered with a range beetween 58 and 60 FPS.
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width= 1
+	\textwidth]{images/fps2.png}
+	\caption{FPS calculation.}
+\end{figure}
+
+\newpage
+
+\begin{figure}[hbt!]
+	\centering
+	\vspace*{\fill}
+	
+	\noindent\makebox[\textwidth]{\includegraphics[width=1.4\textwidth,height=0.5\textheight]{images/fps.png}}%
+	
+	\caption{Scene with FPS below.}
+\end{figure} 
+
+\newpage
+
+\section{Conclusion}
+This is how I implemented everything. If you have any more questions I can answer them during the oral interview.
+
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width= 1
+	\textwidth]{images/final1.png}
+	\caption{Final image3 (front view).}
+\end{figure}
+
+
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width= 1
+	\textwidth]{images/final2.png}
+	\caption{Final image (back view).}
+\end{figure}

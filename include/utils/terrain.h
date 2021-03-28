@@ -40,23 +40,6 @@ class Terrain{
             water = Water(x,translate,10);
         }
 
-        Terrain(GLfloat x, glm::vec3 translate,Model* treeModel,int object,int rnd)
-            :modelMatrix{glm::mat4(1.0f)}, objectType{object},
-             initialTranslate{translate},
-             model{treeModel}{
-            modelMatrix = glm::translate(modelMatrix,translate);
-            noise.SetNoiseType(FastNoiseLite::NoiseType_Perlin);
-            int random = rnd;
-            noise.SetSeed(random);
-            noise.SetFrequency(0.008f);
-            noise.SetFractalType(FastNoiseLite::FractalType_FBm);
-            noise.SetFractalOctaves(5);
-            noise.SetFractalLacunarity(2.0f);
-            noise.SetFractalGain(0.5f);
-            generateBaseTerrain();
-            water = Water(x,translate,10);
-        }
-
         void createTree(){
             float height = getTerrainHeight();
             if(height > 10){

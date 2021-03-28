@@ -27,7 +27,7 @@ out float h;
 
 out float visibility;
 
-const float density = 0.00032; //0.000009
+const float density = 0.00040; //0.000009
 const float gradient = 3;
 
 vec4 positionRelativeToCam;

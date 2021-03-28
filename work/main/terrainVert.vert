@@ -27,7 +27,7 @@ out float yPos;
 out float visibility;
 out vec3 interp_UVW;
 
-const float density = 0.00044; 
+const float density = 0.00040; 
 const float gradient = 3; 
 
 vec4 positionRelativeToCam;

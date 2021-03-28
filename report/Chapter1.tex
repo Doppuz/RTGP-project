@@ -4,7 +4,7 @@ The terrain is the main topic of this project so let's start to introduce the di
 
 \subsection{Cell}
 \noindent
-The main part of the terrain is a cell, a cell is basically a square whose sides have a fixed and equal size and number of vertices. As you can imagine, a cell at first is just a plane, as large as the multiplication \textbf {Dimension x Dimension} and with \textbf {Vertices x Vertices} number of vertices. Creating a plane is not a difficult task, so I didn't load a model but I generated it manually. First, I created the different vertices and stored them in a vector, then I generated the different indices to create the triangles of the mesh.
+The main part of the terrain is a cell, a cell is basically a square whose sides have a fixed  size and equal number of vertices. As you can imagine, a cell at first is just a plane, as large as the multiplication \textbf {Size x Size} and with \textbf {Vertices x Vertices} number of vertices. Creating a plane is not a difficult task, so I didn't load a model but I generated it manually. First, I created the different vertices and stored them in a vector, then I generated the different indices to create the triangles of the mesh.
 
 \begin{figure}[hbt!]
 	\centering
@@ -47,7 +47,7 @@ To create a large terrain, I put several cells together, specifically I create a
 
 \subsection{Blending}
 The simple solution is to use a blending function between two adjacent cells.
-we can summarize this process in three parts.
+I can summarize this process in three parts.
 
 \subsubsection{First Part}
 
@@ -88,7 +88,7 @@ As it is not very easy to explain the process, I have created the image below wh
 \newpage
 
 \noindent
-So we first apply this propagation to one of the two cell and then we do it for the other one (which why the second part and the third part are the same).
+So we first apply this propagation to one of the two cell and then we do it for the other one (which is why the second and the third part are nearly the same).
 
 \begin{figure}[hbt!]
 	\centering
@@ -126,15 +126,19 @@ The second thing is that I also have to interpolate the first cell with the last
 	\centering
 	\includegraphics[width= 0.75
 	\textwidth]{images/terrain7.png}
-	\caption{Final blending between two cells. (Compare it with figure \ref{fig::thirdTerrain}b)}
+	\caption{Horizontal blending between two cells. (Compare it with figure \ref{fig::thirdTerrain}b)}
 \end{figure} 
 
+\newpage
+
 \subsection{Final blending}
-I have now got a blend between two cells horizontally, but of course I need it vertically as well. The process is perfectly the same, the only thing to watch out for is not to mix the two interpolations and, before starting the second, you must wait the end of the first.
+I have now blended two cells horizontally, but of course I need it vertically as well. The process is perfectly the same, the only thing to watch out for is not to mix the two interpolations and, before starting the vertical one, you must wait the end of the horizontal or vice versa.
+
+\newpage
 
 \begin{figure}[hbt!]
 	\centering
-	\includegraphics[width= 1
+	\includegraphics[width= 0.9
 	\textwidth]{images/terrain8.png}
 	\caption{Example of horizontal and vertical blending between four cells. (The seed of the cells is different from the one used in the previous example).}
 \end{figure} 
@@ -152,12 +156,12 @@ I want my terrain to move with me, so that it gives the illusion of being infini
 \end{figure} 
 
 \noindent
-Basically to move a row or a column, I check when I overlap another cell and based on the side that I overlapped, I move a column or row on the opposite side. In the above case I am moving forward, so when I reached the end of the middle cell I move the last row to the first position. This is why I need to blend the last row / column as well, so they continue to match perfectly.
-In practice what I have to do is simply memorize the indices of the first cell of the last column and row (to get the first I just add the index of a column / row and apply the module operator) so that I can change it to real time and I always know which cells to move.
+Basically to move a row or a column, I checked when I overlapped another cell and based on the side that I overlapped, I moved a column or row on the opposite side. In the below case I am moving forward, so when I reached the end of the middle cell I move the last row to the first position. This is why I need to blend the last row / column as well, so they continue to match perfectly.
+In practice what I have to do is simply memorize the indices of the first cell of the last column and row (to get the first I just add the index of a column / row and apply the module operator) so that I can change it real time and I always know which cells to move.
 Obviously the position of the camera is in the central cell. (To keep things simple, I assumed that each row and column had an odd number of cells, so there is always a unique center cell.)
 
 \subsection{Calculate the terrain normals.}
-To calculate the normal of a particular vertex, I used a simple method called the "finite difference method" which allowed me to calculate the components of the difference (x, y, z) in a very simple way. Let's start with the x component. I calculated the height near the selected vertex shifting the position in the four direction by a small amount. I first computed the left and right heights, then I subtracted the left one with the right one and obtained the x component. For the z component I do the same but instead of left and right I used the bottom and the top. Finally I set the y component to 2.0. I leave below the simple formula.
+To calculate the normal of a particular vertex, I used a simple method called the "finite difference method" which allowed me to calculate the components of the difference (x, y, z) in a very simple way. Let's start with the x component. I calculated the height near the selected vertex shifting the position in the four direction by a small amount. I first computed the left and right heights, then I subtracted the left one with the right one and obtained the x component. For the z component I did the same but instead of left and right I used the bottom and the top. Finally I set the y component to 2.0. I leave below the simple formula.
 
 \begin{equation}
 	normal = vec3(\textcolor{red}{heightLeft} - \textcolor{cyan}{heightRight}, 2.0, \textcolor{magenta}{heightDown} - \textcolor{green}{heightUp})		
@@ -176,7 +180,7 @@ After calculated the normal vector, I normalized it to create a versor.
 \subsection{Terrain shader}
 
 \subsubsection{Lambertian light}
-Inside the shader there is implemented a simple light model, the Lambertian one. Since it is very simple (the aim was only to check if normals were working, not to create a complex light model) and it isn't different from the one implemented in class, I don't give any others details.
+Inside the shader there is implemented a simple light model, the Lambertian one. Since it is very simple (the aim was only to check if normals were working, not to create a complex light model) and it isn't different from the one implemented in class, so I don't give any others details.
 
 \begin{figure}[hbt!]
 	\centering
@@ -187,7 +191,7 @@ Inside the shader there is implemented a simple light model, the Lambertian one.
 \end{figure}
 
 \subsubsection{Multi-texturing}
-Instead of assigning a single texture, I used a texture for vertices below a certain height (e.g. up to height < 15), then I used another texture for vertices above another height (e.g. for height > 115). For the central vertices I interpolated the two textures based on the height value.
+Instead of assigning a single texture, I used a texture for vertices below a certain height (e.g. up to heights of 15), then I used another texture for vertices above a different height (e.g. for heights greater than 115). For the central vertices I interpolated the two textures based on the height value.
 
 \begin{figure}[hbt!]
 	\centering
