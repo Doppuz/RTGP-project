@@ -28,7 +28,7 @@ public:
     TerrainManagement(Model* tree,Model *cactus)
         :size{Terrain::getSize()},lastXPosition{5000}, lastZPosition{5000}{ //4500 4500
         
-        rowLength = 21;
+        rowLength = 7;
         indexLastRow  = rowLength * (rowLength - 1);
         indexLastColumn = (rowLength - 1);
         int index = 0;
@@ -251,7 +251,7 @@ private:
     
             heightU = lerp(heightU, vertex[i].Position.y ,0.1f);    
 
-            glm::vec3 normal = glm::vec3(heightL - heightR, 2.0f, heightD - heightU );
+            glm::vec3 normal = glm::vec3(heightL - heightR, 3.0f, heightD - heightU );
             normal = glm::normalize(normal);
             mesh->vertices[i].Normal = normal;
         }

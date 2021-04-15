@@ -16,7 +16,7 @@ class Water{
 
         Water(GLfloat x, glm::vec3 translate,float ht)
             :modelMatrix{glm::mat4(1.0f)},height{ht}{
-            
+  
             modelMatrix = glm::translate(modelMatrix,translate);
             generatePlane();
 
@@ -50,8 +50,8 @@ class Water{
 
 
     private:
-        const static GLint size = 500; //10000
-        const static GLint vertex_count = 2; //32
+        const static GLint size = 4000; //500
+        const static GLint vertex_count = 2; 
         float height;
         glm::mat4 modelMatrix;
 

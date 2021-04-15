@@ -16,7 +16,7 @@ class Terrain{
         Mesh mesh;
         Water water;
         WorldObject object;
-        const static GLint vertex_count = 8;
+        const static GLint vertex_count = 32; //8
         float heights[vertex_count][vertex_count];
         glm::vec3 initialTranslate;
         Model* model;
@@ -112,10 +112,10 @@ class Terrain{
         }
 
     private:
-        const static GLint size = 500;
+        const static GLint size = 4000; //500
         FastNoiseLite noise;
         glm::mat4 modelMatrix;
-        float height = 6000;
+        float height = 10000; //6000
         int xPos = 0;
         int zPos = 0;
 

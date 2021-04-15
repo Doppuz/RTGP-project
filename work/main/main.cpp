@@ -1,5 +1,4 @@
 
-// Std. Includes
 #include <string>
 #include <stdlib.h>
 #include <ctime>
@@ -26,7 +25,6 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-// we include the library for images loading
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image/stb_image.h>
 
@@ -60,7 +58,8 @@ GLint LoadTextureCube(string path);
 //Render
 void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, TerrainManagement terrainManager, glm::vec4 plane,bool boolCamera);
 void skyBoxRenderer(Shader skybox_shader, glm::vec3 fogColor,Model* cubeModel);
-//subroutine
+
+//subroutine shader
 void SetupShader(int program);
 void PrintCurrentShader(int subroutine);
 void lightShaderSetUp(Shader shaderParam);
@@ -83,7 +82,7 @@ glm::mat4 view = glm::mat4(1.0f);
 //Camera
 Camera camera(glm::vec3(0.0f, 300.0f, 0.0f), GL_FALSE); //25000,20000,25000
 
-// parameters for time calculation (for animations)
+// parameters for time calculation
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
@@ -117,7 +116,7 @@ const glm::vec3 lightColour = glm::vec3({0.70f,0.90f,1.f});//glm::vec3({0.50f,0.
 
 //Near Far plane
 const float near = 0.1f;
-const float far = 8000.0f;
+const float far = 30000.0f;
 
 /////////////////// MAIN function ///////////////////////
 int main(){
@@ -161,14 +160,14 @@ int main(){
     // we enable Z test
     glEnable(GL_DEPTH_TEST);
 
-    // we create and compile shaders (code of Shader class is in include/utils/shader_v1.h)
+    // we create and compile shaders
     Shader terrainShader("terrainVert.vert", "terrainFrag.frag");
     Shader waterShader("waterVert.vert", "waterFrag.frag");
     Shader objectShader("objectVert.vert", "objectFrag.frag");
     Shader skybox_shader("skyboxVert.vert", "skyboxFrag.frag");
 
     SetupShader(terrainShader.Program);
-    // we print on console the name of the first subroutine used
+    //we print on console the name of the first subroutine used
     PrintCurrentShader(current_subroutine);
 
     sandTexture = LoadTexture("../../textures/plane/desert.jpg");
@@ -185,11 +184,11 @@ int main(){
     
     GLint cactusTexture = LoadTexture("../../textures/plane/cactus.png");
 
-    Model cubeModel("../../models/cube.obj"); // used for the environment map
+    Model cubeModel("../../models/cube.obj");
 
-    Model tree("../../models/Tree/tree.obj"); // used for the environment map
+    Model tree("../../models/Tree/tree.obj");
 
-    Model cactus("../../models/cactus.3ds"); // used for the environment map
+    Model cactus("../../models/cactus.3ds");
   
     TerrainManagement terrainManager(&tree,&cactus);
 
@@ -275,6 +274,8 @@ int main(){
         skyBoxRenderer(skybox_shader,fogColor,&cubeModel);
 
         fbos.unbindCurrentFrameBuffer();
+
+//Normal render
 
         terrainRender(terrainShader,fogColor,window,terrainManager, glm::vec4(0,-1,0,100000),false);
 
@@ -393,19 +394,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         wireframe=!wireframe;
 
     GLuint new_subroutine;
-    // pressing a key number, we change the shader applied to the models
-    // if the key is between 1 and 9, we proceed and check if the pressed key corresponds to
-    // a valid subroutine
+    
     if((key >= GLFW_KEY_1 && key <= GLFW_KEY_9) && action == GLFW_PRESS)
     {
-        // "1" to "9" -> ASCII codes from 49 to 59
-        // we subtract 48 (= ASCII CODE of "0") to have integers from 1 to 9
-        // we subtract 1 to have indices from 0 to 8
         new_subroutine = (key-'0'-1);
-        // if the new index is valid ( = there is a subroutine with that index in the shaders vector),
-        // we change the value of the current_subroutine variable
-        // NB: we can just check if the new index is in the range between 0 and the size of the shaders vector, 
-        // avoiding to use the std::find function on the vector
         if (new_subroutine<shaders.size())
         {
             current_subroutine = new_subroutine;
@@ -537,14 +529,10 @@ GLint LoadTextureCube(string path)
 {
     GLuint textureImage;
     
-    // we create and activate the OpenGL cubemap texture
     glGenTextures(1, &textureImage);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureImage);
 
-    // we load and set the 6 images corresponding to the 6 views of the cubemap
-    // we use as convention that the names of the 6 images are "posx, negx, posy, negy, posz, negz", placed at the path passed as parameter
-    // we load the images individually and we assign them to the correct side of the cube map
     LoadTextureCubeSide(path, std::string("posx.png"), GL_TEXTURE_CUBE_MAP_POSITIVE_X);
     LoadTextureCubeSide(path, std::string("negx.png"), GL_TEXTURE_CUBE_MAP_NEGATIVE_X);
     LoadTextureCubeSide(path, std::string("posy.png"), GL_TEXTURE_CUBE_MAP_POSITIVE_Y);
@@ -552,16 +540,14 @@ GLint LoadTextureCube(string path)
     LoadTextureCubeSide(path, std::string("posz.png"), GL_TEXTURE_CUBE_MAP_POSITIVE_Z);
     LoadTextureCubeSide(path, std::string("negz.png"), GL_TEXTURE_CUBE_MAP_NEGATIVE_Z);
 
-    // we set the filtering for minification and magnification
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    // we set how to consider the texture coordinates outside [0,1] range
-    // in this case we have a cube map, so
+    
+    
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     
-    // we set the binding to 0 once we have finished
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
     return textureImage;
@@ -574,32 +560,24 @@ void SetupShader(int program)
     GLchar name[256]; 
     int len, numCompS;
     
-    // global parameters about the Subroutines parameters of the system
     glGetIntegerv(GL_MAX_SUBROUTINES, &maxSub);
     glGetIntegerv(GL_MAX_SUBROUTINE_UNIFORM_LOCATIONS, &maxSubU);
     std::cout << "Max Subroutines:" << maxSub << " - Max Subroutine Uniforms:" << maxSubU << std::endl;
 
-    // get the number of Subroutine uniforms (only for the Fragment shader, due to the nature of the exercise)
-    // it is possible to add similar calls also for the Vertex shader
     glGetProgramStageiv(program, GL_FRAGMENT_SHADER, GL_ACTIVE_SUBROUTINE_UNIFORMS, &countActiveSU);
     
-    // print info for every Subroutine uniform
     for (int i = 0; i < countActiveSU; i++) {
         
-        // get the name of the Subroutine uniform (in this example, we have only one)
         glGetActiveSubroutineUniformName(program, GL_FRAGMENT_SHADER, i, 256, &len, name);
-        // print index and name of the Subroutine uniform
+
         std::cout << "Subroutine Uniform: " << i << " - name: " << name << std::endl;
 
-        // get the number of subroutines
         glGetActiveSubroutineUniformiv(program, GL_FRAGMENT_SHADER, i, GL_NUM_COMPATIBLE_SUBROUTINES, &numCompS);
         
-        // get the indices of the active subroutines info and write into the array s
         int *s =  new int[numCompS];
         glGetActiveSubroutineUniformiv(program, GL_FRAGMENT_SHADER, i, GL_COMPATIBLE_SUBROUTINES, s);
         std::cout << "Compatible Subroutines:" << std::endl;
         
-        // for each index, get the name of the subroutines, print info, and save the name in the shaders vector
         for (int j=0; j < numCompS; ++j) {
             glGetActiveSubroutineName(program, GL_FRAGMENT_SHADER, s[j], 256, &len, name);
             std::cout << "\t" << s[j] << " - " << name << "\n";
@@ -620,7 +598,6 @@ void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, Terrai
 
     shader.Use();  
 
-        //glm::vec3 fogColor = glm::vec3(0.1f,0.3f,0.1f);
         shader.setVec3("fogColor",fogColor);
         lightShaderSetUp(shader);
         shader.setVec4("clippingPlane", plane);
@@ -629,20 +606,16 @@ void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, Terrai
         shader.setMat4("projection", projection);   
 
         GLuint index = glGetSubroutineIndex(shader.Program, GL_FRAGMENT_SHADER, shaders[current_subroutine].c_str());
-        // we activate the subroutine using the index (this is where shaders swapping happens)
+
         glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &index);
 
-        // View matrix (=camera): position, view direction, camera "up" vector
         if(boolCamera){
-            //view = actualCamera->GetViewMatrix();
-            //actualCamera->InvertPitch();
             view = camera.GetViewMatrixInverted();
         }else
             view = camera.GetViewMatrix();
 
         shader.setMat4("view", view);
 
-        // we "clear" the frame and z  buffer
         glClearColor(0.7f, 0.7f, 0.7f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -672,22 +645,19 @@ void terrainRender(Shader shader, glm::vec3 fogColor, GLFWwindow* window, Terrai
 void skyBoxRenderer(Shader skybox_shader, glm::vec3 fogColor,Model* cubeModel){
         glDepthFunc(GL_LEQUAL);
         skybox_shader.Use();
-        // we activate the cube map
+        
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, textureCube);
-        // we pass projection and view matrices to the Shader Program of the skybox
+        
         skybox_shader.setMat4("projection", projection);   
-        // to have the background fixed during camera movements, we have to remove the translations from the view matrix
-        // thus, we consider only the top-left submatrix, and we create a new 4x4 matrix
-        view =  glm::mat4(glm::mat3(camera.GetViewMatrix()));    // Remove any translation component of the view matrix
+
+        view =  glm::mat4(glm::mat3(camera.GetViewMatrix())); 
         skybox_shader.setMat4("view", view);
 
-        // we determine the position in the Shader Program of the uniform variables
         skybox_shader.setInt("textureCube",0);
         
         skybox_shader.setVec3("fogColor",fogColor);
 
-        // we render the cube with the environment map
         cubeModel->Draw();
         glDepthFunc(GL_LESS);
 

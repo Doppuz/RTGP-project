@@ -1,3 +1,20 @@
+\section{OpenGL version and Libraries}
+For this project I have used the 4.6 version of OpenGL.
+Library:
+
+\begin{itemize}
+	\item \textbf{glad}: OpenGL loading library.
+	\item \textbf{glfw}: It provides a simple API for creating windows, contexts and surfaces, receiving input and events.
+	\item \textbf{stb\textunderscore image}: Mainly for loading images.
+	\item \textbf{glm}: Used for 3D mathematics, in particular for 3D vectors and all operations that concern them. 
+	\item \textbf{assimp}: Library for importing 3D models.
+	\item \textbf{FastNoiseLite}: It is an open source noise generation library with a large selection of noise algorithms. You can set different types of parameters such as the seed (used to generate the noise), the frequency of the noise, the type of noise (you can choose different types such as Perlin noise, Value noise, Value Cubic noise ...) and other small parameters to influence the noise. The main function to call is \textbf{GetNoise (seed, x, y)} which takes the seed and two floats and returns a value between -1 and 1. This is the function used for generating the terrain. 
+	There is also an app to get a visual representation of the different features presented in this library and you can find it all \href{https://github.com/Auburn/FastNoiseLite}{here}.
+	
+\end{itemize}
+
+\newpage
+
 \section{Terrain}
 
 The terrain is the main topic of this project so let's start to introduce the different components.
@@ -15,7 +32,7 @@ The main part of the terrain is a cell, a cell is basically a square whose sides
 \end{figure}
 
 \noindent
-Obviously I didn't want flat ground, so I had to introduce some noises. For this task I relied on an existing library called \textbf{FastNoiseLite} which implemented different types of noise function. You can set various parameters, such as the type of noise, the seed and the frequency. In this specific case I choose a Perlin noise type, a random seed and a noise frequency of 0.008. By changing these parameters you can get different terrains.
+Obviously I didn't want flat ground, so I had to introduce some noise. For this task I relied on an existing library called \textbf{FastNoiseLite} which implemented different types of noise function. You can set various parameters, such as the type of noise, the seed and the frequency. In this specific case I choose a Perlin noise type, a random seed and a noise frequency of 0.008. By changing these parameters you can get different terrains.
 In addition, the maximum height of the terrain must also be specified. Then, at the time of creation, each vertex generates a noise that will be multiplied by the maximum height.
 
 \newpage
@@ -32,7 +49,7 @@ For any other information about a cell, you can check the \textbf{terrain.h} fil
 
 \subsection{Terrain}
 
-To create a large terrain, I put several cells together, specifically I create a square of cells. Basically I just have to choose the number of cells per row/column and put them close together. What I get now is something pretty awful, because there is no correlation between the height of the adjacent cells but it is totally random.
+To create a large terrain, I put several cells together, specifically I created a square of cells. Basically I just have to choose the number of cells per row/column and put them close together. What I get now is something pretty awful, because there is no correlation between the height of the adjacent cells but it is totally random.
 
 \smallbreak
 
@@ -51,7 +68,7 @@ I can summarize this process in three parts.
 
 \subsubsection{First Part}
 
-Since I am doing this process on adjacent cells, they obviously need to reach the same height on the common side. The simplest way to accomplish this, is to use a simple lerp function that averages the heights of two common side vertices and assign it to them.
+Since I am doing this process on adjacent cells, they obviously need to reach the same height on the common side. The simplest way to accomplish this, is to use a simple lerp function that averages the heights of two common side and assign it to the vertices.
 
 \begin{figure}[hbt!]
 	\centering
@@ -156,12 +173,12 @@ I want my terrain to move with me, so that it gives the illusion of being infini
 \end{figure} 
 
 \noindent
-Basically to move a row or a column, I checked when I overlapped another cell and based on the side that I overlapped, I moved a column or row on the opposite side. In the below case I am moving forward, so when I reached the end of the middle cell I move the last row to the first position. This is why I need to blend the last row / column as well, so they continue to match perfectly.
+Basically to move a row or a column, I checked when I overlapped another cell and based on the side that I overlapped, I moved a column or row on the opposite side. In the below case I am moving forward, so when I reached the end of the middle cell I moved the last row to the first position. This is why I need to blend the last row / column as well, so they continue to match perfectly.
 In practice what I have to do is simply memorize the indices of the first cell of the last column and row (to get the first I just add the index of a column / row and apply the module operator) so that I can change it real time and I always know which cells to move.
 Obviously the position of the camera is in the central cell. (To keep things simple, I assumed that each row and column had an odd number of cells, so there is always a unique center cell.)
 
 \subsection{Calculate the terrain normals.}
-To calculate the normal of a particular vertex, I used a simple method called the "finite difference method" which allowed me to calculate the components of the difference (x, y, z) in a very simple way. Let's start with the x component. I calculated the height near the selected vertex shifting the position in the four direction by a small amount. I first computed the left and right heights, then I subtracted the left one with the right one and obtained the x component. For the z component I did the same but instead of left and right I used the bottom and the top. Finally I set the y component to 2.0. I leave below the simple formula.
+To calculate the normal of a particular vertex, I used a simple method called the "finite difference method" which allowed me to calculate the difference components  (x, y, z) in a very simple way. I calculated the height near the selected vertex shifting the position in the four direction by a small amount. I first computed the left and right heights, then I subtracted the left one with the right one and obtained the x component. For the z component I did the same but instead of left and right I used the bottom and the top. Finally I set the y component to 2.0. I leave below the simple formula.
 
 \begin{equation}
 	normal = vec3(\textcolor{red}{heightLeft} - \textcolor{cyan}{heightRight}, 2.0, \textcolor{magenta}{heightDown} - \textcolor{green}{heightUp})		
@@ -180,7 +197,7 @@ After calculated the normal vector, I normalized it to create a versor.
 \subsection{Terrain shader}
 
 \subsubsection{Lambertian light}
-Inside the shader there is implemented a simple light model, the Lambertian one. Since it is very simple (the aim was only to check if normals were working, not to create a complex light model) and it isn't different from the one implemented in class, so I don't give any others details.
+Inside the shader there is implemented a simple light model, the Lambertian one. Since it is very simple (the aim was only to check if normals were working, not to create a complex light model) and it isn't different from the one implemented in class, I don't give any others details.
 
 \begin{figure}[hbt!]
 	\centering
@@ -189,6 +206,8 @@ Inside the shader there is implemented a simple light model, the Lambertian one.
 	\subfloat[\centering Lambertian model.]{{\includegraphics[width=6.3cm]{images/lightTerrainAfter.png} }}%
 	\caption{}
 \end{figure}
+
+\newpage
 
 \subsubsection{Multi-texturing}
 Instead of assigning a single texture, I used a texture for vertices below a certain height (e.g. up to heights of 15), then I used another texture for vertices above a different height (e.g. for heights greater than 115). For the central vertices I interpolated the two textures based on the height value.

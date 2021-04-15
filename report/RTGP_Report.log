@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7400 64-bit) (preloaded format=pdflatex 2020.5.5)  28 MAR 2021 22:30
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7400 64-bit) (preloaded format=pdflatex 2020.5.5)  30 MAR 2021 17:59
 entering extended mode
 **./RTGP_Report.tex
 (RTGP_Report.tex
@@ -388,7 +388,7 @@ LaTeX Info: Redefining \nameref on input line 16.
 \@outlinefile=\write3
 \openout3 = `RTGP_Report.out'.
 
-<images/logo.png, id=111, 1204.5pt x 1204.5pt>
+<images/logo.png, id=131, 1204.5pt x 1204.5pt>
 File: images/logo.png Graphic file (type png)
 <use images/logo.png>
 Package pdftex.def Info: images/logo.png  used on input line 48.
@@ -406,197 +406,200 @@ been already used, duplicate ignored
 <to be read again> 
                    \relax 
 l.59 	\newpage
-               [1] (Intro.tex [2]) (Chapter1.tex
-<images/terrain1Normal.png, id=159, 881.54344pt x 567.62062pt>
+               [1] [2] (Intro.tex [3]) (Chapter1.tex [4]
+<images/terrain1Normal.png, id=194, 881.54344pt x 567.62062pt>
 File: images/terrain1Normal.png Graphic file (type png)
 <use images/terrain1Normal.png>
-Package pdftex.def Info: images/terrain1Normal.png  used on input line 11.
+Package pdftex.def Info: images/terrain1Normal.png  used on input line 28.
 (pdftex.def)             Requested size: 179.25244pt x 115.4189pt.
-<images/terrain1Vertices.png, id=160, 831.105pt x 529.22719pt>
+<images/terrain1Vertices.png, id=195, 831.105pt x 529.22719pt>
 File: images/terrain1Vertices.png Graphic file (type png)
 <use images/terrain1Vertices.png>
-Package pdftex.def Info: images/terrain1Vertices.png  used on input line 13.
+Package pdftex.def Info: images/terrain1Vertices.png  used on input line 30.
 (pdftex.def)             Requested size: 179.25244pt x 114.13693pt.
- [3 <./images/terrain1Normal.png> <./images/terrain1Vertices.png>]
-<images/terrain2Front.png, id=167, 721.19438pt x 466.74374pt>
+ [5 <./images/terrain1Normal.png> <./images/terrain1Vertices.png>]
+<images/terrain2Front.png, id=202, 721.19438pt x 466.74374pt>
 File: images/terrain2Front.png Graphic file (type png)
 <use images/terrain2Front.png>
-Package pdftex.def Info: images/terrain2Front.png  used on input line 24.
+Package pdftex.def Info: images/terrain2Front.png  used on input line 41.
 (pdftex.def)             Requested size: 179.25244pt x 116.00906pt.
-<images/terrain2Side.png, id=168, 812.28468pt x 531.48563pt>
+<images/terrain2Side.png, id=203, 812.28468pt x 531.48563pt>
 File: images/terrain2Side.png Graphic file (type png)
 <use images/terrain2Side.png>
-Package pdftex.def Info: images/terrain2Side.png  used on input line 26.
+Package pdftex.def Info: images/terrain2Side.png  used on input line 43.
 (pdftex.def)             Requested size: 179.25244pt x 117.28403pt.
-<images/terrain3.png, id=169, 535.2497pt x 503.63156pt>
+<images/terrain3.png, id=204, 535.2497pt x 503.63156pt>
 File: images/terrain3.png Graphic file (type png)
 <use images/terrain3.png>
-Package pdftex.def Info: images/terrain3.png  used on input line 42.
+Package pdftex.def Info: images/terrain3.png  used on input line 59.
 (pdftex.def)             Requested size: 214.50119pt x 201.83328pt.
- [4 <./images/terrain2Front.png> <./images/terrain2Side.png> <./images/terrain3
+ [6 <./images/terrain2Front.png> <./images/terrain2Side.png> <./images/terrain3
 .png>]
-<images/terrain4Before.png, id=176, 627.09282pt x 523.20468pt>
+<images/terrain4Before.png, id=212, 627.09282pt x 523.20468pt>
 File: images/terrain4Before.png Graphic file (type png)
 <use images/terrain4Before.png>
-Package pdftex.def Info: images/terrain4Before.png  used on input line 58.
+Package pdftex.def Info: images/terrain4Before.png  used on input line 75.
 (pdftex.def)             Requested size: 179.25244pt x 149.55397pt.
-<images/terrain4After.png, id=177, 653.44125pt x 539.76656pt>
+<images/terrain4After.png, id=213, 653.44125pt x 539.76656pt>
 File: images/terrain4After.png Graphic file (type png)
 <use images/terrain4After.png>
-Package pdftex.def Info: images/terrain4After.png  used on input line 60.
+Package pdftex.def Info: images/terrain4After.png  used on input line 77.
 (pdftex.def)             Requested size: 179.25244pt x 148.06151pt.
- [5 <./images/terrain4Before.png> <./images/terrain4After.png>]
-<images/report1.jpg, id=184, 963.6pt x 475.02469pt>
+ [7 <./images/terrain4Before.png> <./images/terrain4After.png>]
+<images/report1.jpg, id=219, 963.6pt x 475.02469pt>
 File: images/report1.jpg Graphic file (type jpg)
 <use images/report1.jpg>
-Package pdftex.def Info: images/report1.jpg  used on input line 83.
+Package pdftex.def Info: images/report1.jpg  used on input line 100.
 (pdftex.def)             Requested size: 546.00827pt x 274.26054pt.
- [6 <./images/report1.jpg>]
-<images/terrain5SecondPart.png, id=191, 674.52pt x 519.44063pt>
+ [8 <./images/report1.jpg>]
+<images/terrain5SecondPart.png, id=225, 674.52pt x 519.44063pt>
 File: images/terrain5SecondPart.png Graphic file (type png)
 <use images/terrain5SecondPart.png>
-Package pdftex.def Info: images/terrain5SecondPart.png  used on input line 95.
+Package pdftex.def Info: images/terrain5SecondPart.png  used on input line 112.
+
 (pdftex.def)             Requested size: 179.25244pt x 138.03947pt.
-<images/terrain5ThirdPart.png, id=192, 658.71094pt x 515.67656pt>
+<images/terrain5ThirdPart.png, id=226, 658.71094pt x 515.67656pt>
 File: images/terrain5ThirdPart.png Graphic file (type png)
 <use images/terrain5ThirdPart.png>
-Package pdftex.def Info: images/terrain5ThirdPart.png  used on input line 97.
+Package pdftex.def Info: images/terrain5ThirdPart.png  used on input line 114.
 (pdftex.def)             Requested size: 179.25244pt x 140.32826pt.
-<images/terrain6.png, id=193, 893.58844pt x 536.75531pt>
+<images/terrain6.png, id=227, 893.58844pt x 536.75531pt>
 File: images/terrain6.png Graphic file (type png)
 <use images/terrain6.png>
-Package pdftex.def Info: images/terrain6.png  used on input line 108.
+Package pdftex.def Info: images/terrain6.png  used on input line 125.
 (pdftex.def)             Requested size: 234.00238pt x 140.55229pt.
- [7 <./images/terrain5SecondPart.png> <./images/terrain5ThirdPart.png>]
-<images/terrain6Good.png, id=199, 1076.52188pt x 479.54156pt>
+ [9 <./images/terrain5SecondPart.png> <./images/terrain5ThirdPart.png>]
+<images/terrain6Good.png, id=233, 1076.52188pt x 479.54156pt>
 File: images/terrain6Good.png Graphic file (type png)
 <use images/terrain6Good.png>
-Package pdftex.def Info: images/terrain6Good.png  used on input line 116.
+Package pdftex.def Info: images/terrain6Good.png  used on input line 133.
 (pdftex.def)             Requested size: 179.25244pt x 79.84534pt.
-<images/terrain6Bad.png, id=200, 770.12718pt x 505.89pt>
+<images/terrain6Bad.png, id=234, 770.12718pt x 505.89pt>
 File: images/terrain6Bad.png Graphic file (type png)
 <use images/terrain6Bad.png>
-Package pdftex.def Info: images/terrain6Bad.png  used on input line 118.
+Package pdftex.def Info: images/terrain6Bad.png  used on input line 135.
 (pdftex.def)             Requested size: 179.25244pt x 117.74942pt.
-<images/terrain7.png, id=202, 709.90219pt x 526.21594pt>
+<images/terrain7.png, id=236, 709.90219pt x 526.21594pt>
 File: images/terrain7.png Graphic file (type png)
 <use images/terrain7.png>
-Package pdftex.def Info: images/terrain7.png  used on input line 128.
+Package pdftex.def Info: images/terrain7.png  used on input line 145.
 (pdftex.def)             Requested size: 292.5pt x 216.81784pt.
- [8 <./images/terrain6.png> <./images/terrain6Good.png> <./images/terrain6Bad.p
-ng>] [9 <./images/terrain7.png>]
-<images/terrain8.png, id=216, 685.8122pt x 560.0925pt>
+ [10 <./images/terrain6.png> <./images/terrain6Good.png> <./images/terrain6Bad.
+png>] [11 <./images/terrain7.png>]
+<images/terrain8.png, id=250, 685.8122pt x 560.0925pt>
 File: images/terrain8.png Graphic file (type png)
 <use images/terrain8.png>
-Package pdftex.def Info: images/terrain8.png  used on input line 142.
+Package pdftex.def Info: images/terrain8.png  used on input line 159.
 (pdftex.def)             Requested size: 350.99762pt x 286.6604pt.
-<images/infiniteTerrainSchema.jpg, id=217, 834.11626pt x 432.86719pt>
+<images/infiniteTerrainSchema.jpg, id=251, 834.11626pt x 432.86719pt>
 File: images/infiniteTerrainSchema.jpg Graphic file (type jpg)
 <use images/infiniteTerrainSchema.jpg>
 Package pdftex.def Info: images/infiniteTerrainSchema.jpg  used on input line 1
-54.
+71.
 (pdftex.def)             Requested size: 390.0pt x 202.3908pt.
-
-[10 <./images/terrain8.png>]
-<images/normalSchema.jpg, id=223, 418.56375pt x 319.94531pt>
+ [12 <./images/terrain8.png>]
+<images/normalSchema.jpg, id=258, 418.56375pt x 319.94531pt>
 File: images/normalSchema.jpg Graphic file (type jpg)
 <use images/normalSchema.jpg>
-Package pdftex.def Info: images/normalSchema.jpg  used on input line 173.
+Package pdftex.def Info: images/normalSchema.jpg  used on input line 190.
 (pdftex.def)             Requested size: 390.0pt x 298.10748pt.
- [11 <./images/infiniteTerrainSchema.jpg>]
-<images/lightTerrainBefore.png, id=232, 1199.98312pt x 599.23875pt>
+ [13 <./images/infiniteTerrainSchema.jpg>]
+<images/lightTerrainBefore.png, id=267, 1199.98312pt x 599.23875pt>
 File: images/lightTerrainBefore.png Graphic file (type png)
 <use images/lightTerrainBefore.png>
-Package pdftex.def Info: images/lightTerrainBefore.png  used on input line 187.
+Package pdftex.def Info: images/lightTerrainBefore.png  used on input line 204.
 
 (pdftex.def)             Requested size: 179.25244pt x 89.50703pt.
-<images/lightTerrainAfter.png, id=233, 1201.48875pt x 602.25pt>
+<images/lightTerrainAfter.png, id=268, 1201.48875pt x 602.25pt>
 File: images/lightTerrainAfter.png Graphic file (type png)
 <use images/lightTerrainAfter.png>
-Package pdftex.def Info: images/lightTerrainAfter.png  used on input line 189.
+Package pdftex.def Info: images/lightTerrainAfter.png  used on input line 206.
 (pdftex.def)             Requested size: 179.25244pt x 89.84654pt.
- [12 <./images/normalSchema.jpg>]
-<images/textureSchema.jpg, id=240, 764.10469pt x 602.25pt>
+
+[14 <./images/normalSchema.jpg>]
+<images/textureSchema.jpg, id=274, 764.10469pt x 602.25pt>
 File: images/textureSchema.jpg Graphic file (type jpg)
 <use images/textureSchema.jpg>
-Package pdftex.def Info: images/textureSchema.jpg  used on input line 199.
+Package pdftex.def Info: images/textureSchema.jpg  used on input line 218.
 (pdftex.def)             Requested size: 175.49881pt x 138.3216pt.
- [13 <./images/lightTerrainBefore.png> <./images/lightTerrainAfter.png> <./imag
+ [15 <./images/lightTerrainBefore.png> <./images/lightTerrainAfter.png> <./imag
 es/textureSchema.jpg>]
-<images/terrain1Texture.png, id=247, 1203.7472pt x 600.74437pt>
+<images/terrain1Texture.png, id=281, 1203.7472pt x 600.74437pt>
 File: images/terrain1Texture.png Graphic file (type png)
 <use images/terrain1Texture.png>
-Package pdftex.def Info: images/terrain1Texture.png  used on input line 207.
+Package pdftex.def Info: images/terrain1Texture.png  used on input line 226.
 (pdftex.def)             Requested size: 179.25244pt x 89.45694pt.
-<images/terrain2Texture.png, id=248, 1201.48875pt x 599.99156pt>
+<images/terrain2Texture.png, id=282, 1201.48875pt x 599.99156pt>
 File: images/terrain2Texture.png Graphic file (type png)
 <use images/terrain2Texture.png>
-Package pdftex.def Info: images/terrain2Texture.png  used on input line 209.
+Package pdftex.def Info: images/terrain2Texture.png  used on input line 228.
 (pdftex.def)             Requested size: 179.25244pt x 89.50963pt.
- [14 <./images/terrain1Texture.png> <./images/terrain2Texture.png>]) (Chapter2.
+ [16 <./images/terrain1Texture.png> <./images/terrain2Texture.png>]) (Chapter2.
 tex
-<images/Water.png, id=254, 992.20688pt x 529.98pt>
+<images/Water.png, id=288, 992.20688pt x 529.98pt>
 File: images/Water.png Graphic file (type png)
 <use images/Water.png>
 Package pdftex.def Info: images/Water.png  used on input line 7.
 (pdftex.def)             Requested size: 179.25244pt x 95.74pt.
-<images/WaterNoVert.png, id=255, 947.79094pt x 480.29437pt>
+<images/WaterNoVert.png, id=289, 947.79094pt x 480.29437pt>
 File: images/WaterNoVert.png Graphic file (type png)
 <use images/WaterNoVert.png>
 Package pdftex.def Info: images/WaterNoVert.png  used on input line 9.
 (pdftex.def)             Requested size: 179.25244pt x 90.8318pt.
- [15 <./images/Water.png> <./images/WaterNoVert.png>]
-<images/FBO1.png, id=261, 455.45157pt x 178.41656pt>
+ [17 <./images/Water.png> <./images/WaterNoVert.png>]
+<images/FBO1.png, id=295, 455.45157pt x 178.41656pt>
 File: images/FBO1.png Graphic file (type png)
 <use images/FBO1.png>
 Package pdftex.def Info: images/FBO1.png  used on input line 25.
 (pdftex.def)             Requested size: 390.0pt x 152.77913pt.
-<images/FBO2.png, id=262, 651.93562pt x 331.99031pt>
+<images/FBO2.png, id=296, 651.93562pt x 331.99031pt>
 File: images/FBO2.png Graphic file (type png)
 <use images/FBO2.png>
 Package pdftex.def Info: images/FBO2.png  used on input line 35.
 (pdftex.def)             Requested size: 350.99762pt x 178.74525pt.
-<images/FBO4.png, id=263, 691.08188pt x 143.03438pt>
+<images/FBO4.png, id=297, 691.08188pt x 143.03438pt>
 File: images/FBO4.png Graphic file (type png)
 <use images/FBO4.png>
 Package pdftex.def Info: images/FBO4.png  used on input line 44.
 (pdftex.def)             Requested size: 390.0pt x 80.7207pt.
- [16 <./images/FBO1.png> <./images/FBO2.png>] [17 <./images/FBO4.png>]
-<images/Water1.png, id=278, 705.38531pt x 509.65407pt>
+ [18 <./images/FBO1.png> <./images/FBO2.png>]
+[19 <./images/FBO4.png>]
+<images/Water1.png, id=313, 705.38531pt x 509.65407pt>
 File: images/Water1.png Graphic file (type png)
 <use images/Water1.png>
 Package pdftex.def Info: images/Water1.png  used on input line 59.
 (pdftex.def)             Requested size: 179.25244pt x 129.51291pt.
-<images/Water2.png, id=279, 572.89032pt x 441.90094pt>
+<images/Water2.png, id=314, 572.89032pt x 441.90094pt>
 File: images/Water2.png Graphic file (type png)
 <use images/Water2.png>
 Package pdftex.def Info: images/Water2.png  used on input line 61.
 (pdftex.def)             Requested size: 179.25244pt x 138.26901pt.
- [18 <./images/Water1.png> <./images/Water2.png>]
-<images/Water3.png, id=287, 1199.23032pt x 602.25pt>
+ [20 <./images/Water1.png> <./images/Water2.png>]
+<images/Water3.png, id=321, 1199.23032pt x 602.25pt>
 File: images/Water3.png Graphic file (type png)
 <use images/Water3.png>
 Package pdftex.def Info: images/Water3.png  used on input line 81.
 (pdftex.def)             Requested size: 390.0pt x 195.85757pt.
-<../textures/plane/waterDUDV.png, id=288, 385.44pt x 385.44pt>
+<../textures/plane/waterDUDV.png, id=322, 385.44pt x 385.44pt>
 File: ../textures/plane/waterDUDV.png Graphic file (type png)
 <use ../textures/plane/waterDUDV.png>
 Package pdftex.def Info: ../textures/plane/waterDUDV.png  used on input line 91
 .
 (pdftex.def)             Requested size: 195.0pt x 194.99559pt.
- [19 <./images/Water3.png> <../textures/plane/waterDUDV.png>]
-<images/TextDist.png, id=295, 761.09344pt x 156.585pt>
+
+[21 <./images/Water3.png> <../textures/plane/waterDUDV.png>]
+<images/TextDist.png, id=329, 761.09344pt x 156.585pt>
 File: images/TextDist.png Graphic file (type png)
 <use images/TextDist.png>
 Package pdftex.def Info: images/TextDist.png  used on input line 101.
 (pdftex.def)             Requested size: 390.0pt x 80.23956pt.
-<images/Water4.png, id=296, 1203.7472pt x 601.4972pt>
+<images/Water4.png, id=330, 1203.7472pt x 601.4972pt>
 File: images/Water4.png Graphic file (type png)
 <use images/Water4.png>
-Package pdftex.def Info: images/Water4.png  used on input line 108.
+Package pdftex.def Info: images/Water4.png  used on input line 109.
 (pdftex.def)             Requested size: 390.0pt x 194.87851pt.
- [20 <./images/TextDist.png> <./images/Water4.png>]
-<../textures/plane/normalMap.png, id=304, 385.44pt x 385.44pt>
+ [22 <./images/TextDist.png> <./images/Water4.png>]
+<../textures/plane/normalMap.png, id=338, 385.44pt x 385.44pt>
 File: ../textures/plane/normalMap.png Graphic file (type png)
 <use ../textures/plane/normalMap.png>
 Package pdftex.def Info: ../textures/plane/normalMap.png  used on input line 12
@@ -610,144 +613,174 @@ ormalMap:r \OMS/cmsy/m/n/12  \OT1/cmr/m/n/12 2 \OMS/cmsy/m/n/12   \OT1/cmr/m/n
 n/12 2 \OMS/cmsy/m/n/12   \OT1/cmr/m/n/12 1)
  []
 
-[21 <../textures/plane/normalMap.png (PNG copy)>]
-<images/Light.png, id=313, 467.49657pt x 77.53969pt>
+[23 <../textures/plane/normalMap.png (PNG copy)>]
+<images/Light.png, id=347, 467.49657pt x 77.53969pt>
 File: images/Light.png Graphic file (type png)
 <use images/Light.png>
 Package pdftex.def Info: images/Light.png  used on input line 150.
 (pdftex.def)             Requested size: 390.0pt x 64.68918pt.
-<images/Water5.png, id=314, 1148.79187pt x 601.4972pt>
+<images/Water5.png, id=348, 1148.79187pt x 601.4972pt>
 File: images/Water5.png Graphic file (type png)
 <use images/Water5.png>
 Package pdftex.def Info: images/Water5.png  used on input line 158.
 (pdftex.def)             Requested size: 390.0pt x 204.19427pt.
- [22 <./images/Light.png> <./images/Water5.png>]
-<images/Water6.png, id=322, 895.84688pt x 595.47469pt>
+ [24 <./images/Light.png> <./images/Water5.png>]
+<images/Water6.png, id=357, 895.84688pt x 595.47469pt>
 File: images/Water6.png Graphic file (type png)
 <use images/Water6.png>
 Package pdftex.def Info: images/Water6.png  used on input line 170.
 (pdftex.def)             Requested size: 350.99762pt x 233.30635pt.
-<images/Water7.jpg, id=323, 961.34157pt x 475.7775pt>
+<images/Water7.jpg, id=358, 961.34157pt x 475.7775pt>
 File: images/Water7.jpg Graphic file (type jpg)
 <use images/Water7.jpg>
 Package pdftex.def Info: images/Water7.jpg  used on input line 180.
 (pdftex.def)             Requested size: 350.99762pt x 173.71178pt.
- [23 <./images/Water6.png> <./images/Water7.jpg>]
-<images/Water8.png, id=330, 645.16031pt x 89.58469pt>
+ [25 <./images/Water6.png> <./images/Water7.jpg>]
+<images/Water8.png, id=365, 645.16031pt x 89.58469pt>
 File: images/Water8.png Graphic file (type png)
 <use images/Water8.png>
 Package pdftex.def Info: images/Water8.png  used on input line 191.
 (pdftex.def)             Requested size: 390.0pt x 54.15309pt.
-<images/Water9.png, id=331, 1205.2528pt x 602.25pt>
+<images/Water9.png, id=366, 1205.2528pt x 602.25pt>
 File: images/Water9.png Graphic file (type png)
 <use images/Water9.png>
 Package pdftex.def Info: images/Water9.png  used on input line 198.
 (pdftex.def)             Requested size: 390.0pt x 194.8743pt.
-
-
-LaTeX Warning: Reference `fig :: distortion' on page 24 undefined on input line
- 204.
-
-
-LaTeX Warning: Reference `fig :: highlights' on page 24 undefined on input line
- 204.
-
-[24 <./images/Water8.png> <./images/Water9.png>]
-<images/Water10.png, id=340, 1203.7472pt x 601.4972pt>
+ [26 <./images/Water8.png> <./images/Water9.png>]
+<images/Water10.png, id=376, 1203.7472pt x 601.4972pt>
 File: images/Water10.png Graphic file (type png)
 <use images/Water10.png>
 Package pdftex.def Info: images/Water10.png  used on input line 211.
 (pdftex.def)             Requested size: 390.0pt x 194.87851pt.
-<images/Sky.png, id=341, 1185.67969pt x 415.5525pt>
+ [27 <./images/Water10.png>]
+<images/Sky.png, id=382, 1185.67969pt x 415.5525pt>
 File: images/Sky.png Graphic file (type png)
 <use images/Sky.png>
-Package pdftex.def Info: images/Sky.png  used on input line 221.
+Package pdftex.def Info: images/Sky.png  used on input line 223.
 (pdftex.def)             Requested size: 390.0pt x 136.68254pt.
- [25 <./images/Water10.png> <./images/Sky.png>]
-<images/Sky2.png, id=348, 1199.23032pt x 609.02531pt>
+<images/Sky2.png, id=383, 1199.23032pt x 609.02531pt>
 File: images/Sky2.png Graphic file (type png)
 <use images/Sky2.png>
 Package pdftex.def Info: images/Sky2.png  used on input line 230.
 (pdftex.def)             Requested size: 390.0pt x 198.06097pt.
-<images/fog.png, id=349, 368.1253pt x 61.73062pt>
+ [28 <./images/Sky.png> <./images/Sky2.png>]
+<images/fog.png, id=390, 368.1253pt x 61.73062pt>
 File: images/fog.png Graphic file (type png)
 <use images/fog.png>
 Package pdftex.def Info: images/fog.png  used on input line 240.
 (pdftex.def)             Requested size: 390.0pt x 65.40398pt.
-<images/fog1.png, id=350, 1202.24156pt x 605.26125pt>
+ [29 <./images/fog.png>]
+<images/fog1.png, id=398, 1202.24156pt x 605.26125pt>
 File: images/fog1.png Graphic file (type png)
 <use images/fog1.png>
-Package pdftex.def Info: images/fog1.png  used on input line 253.
-(pdftex.def)             Requested size: 390.0pt x 196.33815pt.
- [26 <./images/Sky2.png>] [27 <./images/fog.png> <./images/fog1.png>]
-<images/fog2.png, id=364, 1204.5pt x 602.25pt>
+Package pdftex.def Info: images/fog1.png  used on input line 256.
+(pdftex.def)             Requested size: 350.99762pt x 176.7034pt.
+<images/fog2.png, id=399, 1204.5pt x 602.25pt>
 File: images/fog2.png Graphic file (type png)
 <use images/fog2.png>
-Package pdftex.def Info: images/fog2.png  used on input line 265.
-(pdftex.def)             Requested size: 390.0pt x 195.00294pt.
-<images/object.jpg, id=365, 963.6pt x 519.44063pt>
+Package pdftex.def Info: images/fog2.png  used on input line 266.
+(pdftex.def)             Requested size: 350.99762pt x 175.50266pt.
+ [30 <./images/fog1.png> <./images/fog2.png>]
+<images/object.jpg, id=407, 963.6pt x 519.44063pt>
 File: images/object.jpg Graphic file (type jpg)
 <use images/object.jpg>
-Package pdftex.def Info: images/object.jpg  used on input line 275.
+Package pdftex.def Info: images/object.jpg  used on input line 278.
 (pdftex.def)             Requested size: 292.5pt x 157.67223pt.
- [28 <./images/fog2.png> <./images/object.jpg>]
-<images/object2.jpg, id=372, 963.6pt x 407.27156pt>
+ [31 <./images/object.jpg>]
+<images/object2.jpg, id=413, 963.6pt x 407.27156pt>
 File: images/object2.jpg Graphic file (type jpg)
 <use images/object2.jpg>
-Package pdftex.def Info: images/object2.jpg  used on input line 286.
+Package pdftex.def Info: images/object2.jpg  used on input line 291.
 (pdftex.def)             Requested size: 390.0pt x 164.83221pt.
- [29 <./images/object2.jpg>]
-<images/object3.png, id=378, 1203.7472pt x 601.4972pt>
+<images/object3.png, id=414, 1203.7472pt x 601.4972pt>
 File: images/object3.png Graphic file (type png)
 <use images/object3.png>
-Package pdftex.def Info: images/object3.png  used on input line 296.
+Package pdftex.def Info: images/object3.png  used on input line 298.
 (pdftex.def)             Requested size: 390.0pt x 194.87851pt.
-<images/fps2.png, id=379, 627.09282pt x 161.85469pt>
+ [32 <./images/object2.jpg> <./images/object3.png>]
+<images/fps2.png, id=421, 627.09282pt x 161.85469pt>
 File: images/fps2.png Graphic file (type png)
 <use images/fps2.png>
-Package pdftex.def Info: images/fps2.png  used on input line 306.
+Package pdftex.def Info: images/fps2.png  used on input line 321.
 (pdftex.def)             Requested size: 390.0pt x 100.6625pt.
- [30 <./images/object3.png> <./images/fps2.png>]
-<images/fps.png, id=388, 1445.4pt x 813.0375pt>
+ [33 <./images/fps2.png>]
+<images/fps3.png, id=428, 1445.4pt x 813.0375pt>
+File: images/fps3.png Graphic file (type png)
+<use images/fps3.png>
+Package pdftex.def Info: images/fps3.png  used on input line 336.
+(pdftex.def)             Requested size: 545.99358pt x 274.24565pt.
+ [34 <./images/fps3.png>]
+<images/fps.png, id=434, 1445.4pt x 813.0375pt>
 File: images/fps.png Graphic file (type png)
 <use images/fps.png>
-Package pdftex.def Info: images/fps.png  used on input line 316.
+Package pdftex.def Info: images/fps.png  used on input line 349.
 (pdftex.def)             Requested size: 545.99358pt x 274.24565pt.
- [31 <./images/fps.png>]
-<images/final1.png, id=394, 1199.98312pt x 599.99156pt>
+ [35 <./images/fps.png>]
+<images/fps4.png, id=440, 1445.4pt x 813.0375pt>
+File: images/fps4.png Graphic file (type png)
+<use images/fps4.png>
+Package pdftex.def Info: images/fps4.png  used on input line 362.
+(pdftex.def)             Requested size: 545.99358pt x 274.24565pt.
+ [36 <./images/fps4.png>]
+<images/fps5.png, id=447, 1445.4pt x 813.0375pt>
+File: images/fps5.png Graphic file (type png)
+<use images/fps5.png>
+Package pdftex.def Info: images/fps5.png  used on input line 375.
+(pdftex.def)             Requested size: 545.99358pt x 274.24565pt.
+ [37 <./images/fps5.png>]
+<images/fps6.png, id=453, 1445.4pt x 813.0375pt>
+File: images/fps6.png Graphic file (type png)
+<use images/fps6.png>
+Package pdftex.def Info: images/fps6.png  used on input line 388.
+(pdftex.def)             Requested size: 545.99358pt x 274.24565pt.
+ [38 <./images/fps6.png>]
+<images/fps7.png, id=459, 1445.4pt x 813.0375pt>
+File: images/fps7.png Graphic file (type png)
+<use images/fps7.png>
+Package pdftex.def Info: images/fps7.png  used on input line 401.
+(pdftex.def)             Requested size: 545.99358pt x 274.24565pt.
+ [39 <./images/fps7.png>]
+<images/fps8.png, id=465, 1445.4pt x 813.0375pt>
+File: images/fps8.png Graphic file (type png)
+<use images/fps8.png>
+Package pdftex.def Info: images/fps8.png  used on input line 413.
+(pdftex.def)             Requested size: 545.99358pt x 274.24565pt.
+ [40 <./images/fps8.png>]
+<images/fps9.png, id=471, 1445.4pt x 813.0375pt>
+File: images/fps9.png Graphic file (type png)
+<use images/fps9.png>
+Package pdftex.def Info: images/fps9.png  used on input line 423.
+(pdftex.def)             Requested size: 545.99358pt x 274.24565pt.
+ [41 <./images/fps9.png>]
+<images/final1.png, id=477, 1199.98312pt x 599.99156pt>
 File: images/final1.png Graphic file (type png)
 <use images/final1.png>
-Package pdftex.def Info: images/final1.png  used on input line 330.
+Package pdftex.def Info: images/final1.png  used on input line 440.
 (pdftex.def)             Requested size: 390.0pt x 194.99495pt.
-<images/final2.png, id=395, 1200.73593pt x 601.4972pt>
+<images/final2.png, id=478, 1200.73593pt x 601.4972pt>
 File: images/final2.png Graphic file (type png)
 <use images/final2.png>
-Package pdftex.def Info: images/final2.png  used on input line 338.
+Package pdftex.def Info: images/final2.png  used on input line 448.
 (pdftex.def)             Requested size: 390.0pt x 195.36496pt.
 )
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 83.
-
-[32 <./images/final1.png> <./images/final2.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 83.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 67.
+ [42 <./images/final1.png> <./images/final2.png>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 67.
  (RTGP_Report.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 83.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 83.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 67.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 67.
 Package rerunfilecheck Info: File `RTGP_Report.out' has not changed.
-(rerunfilecheck)             Checksum: 4EF93497F6608A9C5D32F0734C01B06B;1657.
-
-
-LaTeX Warning: There were undefined references.
-
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 83.
+(rerunfilecheck)             Checksum: BEBE97D8E29DA620C209DC60D4DF6242;2027.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 67.
  ) 
 Here is how much of TeX's memory you used:
- 7695 strings out of 480930
- 125640 string characters out of 2899762
- 386468 words of memory out of 3000000
- 23277 multiletter control sequences out of 15000+200000
+ 7762 strings out of 480930
+ 126645 string characters out of 2899762
+ 387487 words of memory out of 3000000
+ 23315 multiletter control sequences out of 15000+200000
  539759 words of font info for 49 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 41i,8n,51p,1119b,470s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 41i,8n,51p,1130b,470s stack positions out of 5000i,500n,10000p,200000b,50000s
  <C:\Users\doppu\AppData\Local\MiKTeX\2.9\fonts/pk/ljfour/jknappen/ec/dpi600\
 tcrm1200.pk><C:/Users/doppu/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/publi
 c/amsfonts/cm/cmbx12.pfb><C:/Users/doppu/AppData/Local/Programs/MiKTeX 2.9/font
@@ -759,9 +792,9 @@ al/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/doppu
 mr17.pfb><C:/Users/doppu/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/a
 msfonts/cm/cmsy10.pfb><C:/Users/doppu/AppData/Local/Programs/MiKTeX 2.9/fonts/t
 ype1/public/amsfonts/cm/cmti12.pfb>
-Output written on RTGP_Report.pdf (33 pages, 32424413 bytes).
+Output written on RTGP_Report.pdf (43 pages, 43089788 bytes).
 PDF statistics:
- 458 PDF objects out of 1000 (max. 8388607)
- 111 named destinations out of 1000 (max. 500000)
- 487 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 548 PDF objects out of 1000 (max. 8388607)
+ 133 named destinations out of 1000 (max. 500000)
+ 562 words of extra memory for PDF output out of 10000 (max. 10000000)
 

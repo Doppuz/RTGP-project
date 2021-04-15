@@ -1,9 +1,6 @@
 
 #version 460 core
 
-// vertex position in world coordinates
-// the number used for the location in the layout qualifier is the position of the vertex attribute
-// as defined in the Mesh class
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 texCoord;
@@ -27,7 +24,7 @@ out float h;
 
 out float visibility;
 
-const float density = 0.00040; //0.000009
+const float density = 0.0001; //0.00040
 const float gradient = 3;
 
 vec4 positionRelativeToCam;
