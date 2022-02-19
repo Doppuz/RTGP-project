@@ -1,4 +1,4 @@
-## About The Project
+# About The Project
 This project is about creating an infinite procedural terrain developed with C ++ using OpenGL. It was developed for the Real-time Graphics and Programming course and I did it all by myself.
 
 # Description
